@@ -3,7 +3,7 @@ WARNINGS := -Wall -Werror -Wnon-virtual-dtor -Wctor-dtor-privacy
 CFLAGS   := -c -pipe -ggdb3 -std=c++11 $(shell sdl2-config --cflags) \
             $(WARNINGS) -Iinclude -Ilib/include -I/usr/local/include
 LFLAGS   := $(shell sdl2-config --libs) -lSDL2_image -lGL -lGLU -lGLEW \
-            -lBox2D -ltmxparser
+            -ltmxparser
 PROJDIRS := include src
 SOURCES  := $(shell find $(PROJDIRS) -type f -name "*.cpp")
 HEADERS  := $(shell find $(PROJDIRS) -type f -name "*.hpp")

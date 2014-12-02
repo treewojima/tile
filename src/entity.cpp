@@ -25,8 +25,6 @@
 #include <SDL2/SDL.h>
 #include <sstream>
 
-#include "physics.hpp"
-
 Entity::Entity(const std::string &name, Type type) :
     _name(name),
     _type(type),

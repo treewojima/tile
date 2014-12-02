@@ -19,11 +19,10 @@
 #include "camera.hpp"
 
 #include <sstream>
-#include "physics.hpp" // For b2Vec2 stream operators
 
-Camera::Camera(const b2Vec2 &worldMin, const b2Vec2 &worldMax,
-               const b2Vec2 &screenMin, const b2Vec2 &screenMax,
-               const b2Vec2 &screenMinInWorld, const b2Vec2 &screenMaxInWorld)
+Camera::Camera(const Vector2f &worldMin, const Vector2f &worldMax,
+               const Vector2f &screenMin, const Vector2f &screenMax,
+               const Vector2f &screenMinInWorld, const Vector2f &screenMaxInWorld)
 {
     setCamera(worldMin, worldMax,
               screenMin, screenMax,
@@ -32,29 +31,29 @@ Camera::Camera(const b2Vec2 &worldMin, const b2Vec2 &worldMax,
     //_rotation = 0;
 }
 
-Camera::Camera(const b2Vec2 &worldMax,
-               const b2Vec2 &screenMax,
-               const b2Vec2 &screenMinInWorld,
-               const b2Vec2 &screenMaxInWorld)
+Camera::Camera(const Vector2f &worldMax,
+               const Vector2f &screenMax,
+               const Vector2f &screenMinInWorld,
+               const Vector2f &screenMaxInWorld)
 {
-    setCamera(b2Vec2(0, 0), worldMax,
-              b2Vec2(0, 0), screenMax,
+    setCamera(Vector2f::ZERO, worldMax,
+              Vector2f::ZERO, screenMax,
               screenMinInWorld, screenMaxInWorld);
     //_rotationOrigin = b2Vec2();
     //_rotation = 0;
 }
 
-Camera::Camera(const b2Vec2 &worldMax,
-               const b2Vec2 &screenMax)
+Camera::Camera(const Vector2f &worldMax,
+               const Vector2f &screenMax)
 {
-    setCamera(b2Vec2(0, 0), worldMax,
-              b2Vec2(0, 0), screenMax,
-              b2Vec2(0, 0), worldMax);
+    setCamera(Vector2f::ZERO, worldMax,
+              Vector2f::ZERO, screenMax,
+              Vector2f::ZERO, worldMax);
 }
 
-void Camera::setCamera(const b2Vec2 &worldMin, const b2Vec2 &worldMax,
-                       const b2Vec2 &screenMin, const b2Vec2 &screenMax,
-                       const b2Vec2 &screenMinInWorld, const b2Vec2 &screenMaxInWorld)
+void Camera::setCamera(const Vector2f &worldMin, const Vector2f &worldMax,
+                       const Vector2f &screenMin, const Vector2f &screenMax,
+                       const Vector2f &screenMinInWorld, const Vector2f &screenMaxInWorld)
 {
     _scaleWorldToScreen.x = (screenMax.x - screenMin.x) /
                             (screenMaxInWorld.x - screenMinInWorld.x);
@@ -72,9 +71,9 @@ void Camera::setCamera(const b2Vec2 &worldMin, const b2Vec2 &worldMax,
     _screenMaxInWorld = screenMaxInWorld;
 }
 
-b2Vec2 Camera::worldToScreen(const b2Vec2 &vec, bool invertYAxis) const
+Vector2f Camera::worldToScreen(const Vector2f &vec, bool invertYAxis) const
 {
-    b2Vec2 screen;
+    Vector2f screen;
     screen.x = _screenMin.x + _scaleWorldToScreen.x *
             (vec.x - _worldMin.x - _screenMinInWorld.x);
     screen.y = _screenMin.y + _scaleWorldToScreen.y *
@@ -88,9 +87,9 @@ b2Vec2 Camera::worldToScreen(const b2Vec2 &vec, bool invertYAxis) const
     return screen;
 }
 
-b2Vec2 Camera::screenToWorld(const b2Vec2 &vec, bool invertYAxis) const
+Vector2f Camera::screenToWorld(const Vector2f &vec, bool invertYAxis) const
 {
-    b2Vec2 world;
+    Vector2f world;
     world.x = (vec.x - _screenMin.x) * _scaleScreenToWorld.x +
             _worldMin.x + _screenMinInWorld.x;
 
@@ -129,42 +128,42 @@ float Camera::getScreenHeight() const
     return _screenMax.y - _screenMin.y;
 }
 
-void Camera::setScreenMin(const b2Vec2 &vec)
+void Camera::setScreenMin(const Vector2f &vec)
 {
     setCamera(_worldMin, _worldMax,
               vec, _screenMax,
               _screenMinInWorld, _screenMaxInWorld);
 }
 
-void Camera::setScreenMax(const b2Vec2 &vec)
+void Camera::setScreenMax(const Vector2f &vec)
 {
     setCamera(_worldMin, _worldMax,
               _screenMin, vec,
               _screenMinInWorld, _screenMaxInWorld);
 }
 
-void Camera::setWorldMin(const b2Vec2 &vec)
+void Camera::setWorldMin(const Vector2f &vec)
 {
     setCamera(vec, _worldMax,
               _screenMin, _screenMax,
               _screenMinInWorld, _screenMaxInWorld);
 }
 
-void Camera::setWorldMax(const b2Vec2 &vec)
+void Camera::setWorldMax(const Vector2f &vec)
 {
     setCamera(_worldMin, vec,
               _screenMin, _screenMax,
               _screenMinInWorld, _screenMaxInWorld);
 }
 
-void Camera::setScreenMinInWorld(const b2Vec2 &vec)
+void Camera::setScreenMinInWorld(const Vector2f &vec)
 {
     setCamera(_worldMin, _worldMax,
               _screenMin, _screenMax,
               vec, _screenMaxInWorld);
 }
 
-void Camera::setScreenMaxInWorld(const b2Vec2 &vec)
+void Camera::setScreenMaxInWorld(const Vector2f &vec)
 {
     setCamera(_worldMin, _worldMax,
               _screenMin, _screenMax,
@@ -174,18 +173,18 @@ void Camera::setScreenMaxInWorld(const b2Vec2 &vec)
 void Camera::reshape(float x1, float y1, float x2, float y2)
 {
     setCamera(_worldMin, _worldMax,
-              b2Vec2(x1, y1), b2Vec2(x2, y2),
+              Vector2f(x1, y1), Vector2f(x2, y2),
               _screenMinInWorld, _screenMaxInWorld);
 }
 
-void Camera::pan(const b2Vec2 &vec)
+void Camera::pan(const Vector2f &vec)
 {
     setCamera(_worldMin, _worldMax,
               _screenMin, _screenMax,
               _screenMinInWorld + vec, _screenMaxInWorld + vec);
 }
 
-void Camera::zoom(const b2Vec2 &vec)
+void Camera::zoom(const Vector2f &vec)
 {
     setCamera(_worldMin, _worldMax,
               _screenMin, _screenMax,

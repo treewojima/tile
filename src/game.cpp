@@ -19,7 +19,6 @@
 #include "game.hpp"
 
 #include <algorithm>
-#include <Box2D/Box2D.h>
 #include <easylogging++.h>
 #include <GL/glew.h>
 #include <list>
@@ -31,15 +30,9 @@
 #include <sstream>
 #include <tclap/CmdLine.h>
 
-#include "entities/ball.hpp"
-#include "entities/block.hpp"
-#include "entities/cursor.hpp"
-#include "entities/paddle.hpp"
-#include "entities/walls.hpp"
 #include "exception.hpp"
 #include "helper_events.hpp"
 #include "level.hpp"
-#include "physics.hpp"
 #include "timer.hpp"
 #include "window.hpp"
 
@@ -59,7 +52,6 @@ namespace
     void initSDL();
     void initGL();
     void shutdownSDL();
-    void initEntities();
     void destroyEntities();
     void registerEvents();
     void handleEvents();
@@ -78,12 +70,12 @@ void Game::run(Game::Options options)
         auto screenRatio = static_cast<float>(options.windowWidth) /
                            static_cast<float>(options.windowHeight);
         _camera = std::unique_ptr<Camera>(
-            new Camera(b2Vec2(0, 0),                                      // worldMin
-                       b2Vec2(10 * screenRatio, 10),                      // worldMax
-                       b2Vec2(0, 0),                                      // screenMin
-                       b2Vec2(options.windowWidth, options.windowHeight), // screenMax
-                       b2Vec2(0, 0),                                      // screenMinInWorld
-                       b2Vec2(10 * screenRatio, 10)));                    // screenMaxInWorld
+            new Camera(Vector2f::ZERO,                                      // worldMin
+                       Vector2f(10 * screenRatio, 10),                      // worldMax
+                       Vector2f(0, 0),                                        // screenMin
+                       Vector2f(options.windowWidth, options.windowHeight), // screenMax
+                       Vector2f::ZERO,                                        // screenMinInWorld
+                       Vector2f(10 * screenRatio, 10)));                      // screenMaxInWorld
         //LOG(DEBUG) << *_camera;
 
         initGL();
@@ -93,9 +85,7 @@ void Game::run(Game::Options options)
         LOG(ERROR) << "EXCEPTION: " << e.what();
     }
 
-    Physics::initialize();
     registerEvents();
-    initEntities();
 
     Timer stepTimer;
     float dt = 0;
@@ -124,7 +114,6 @@ void Game::run(Game::Options options)
             handleEvents();
 
             dt = stepTimer.getTicks() / 1000.f;
-            Physics::step(dt);
             updateEntities(dt);
             stepTimer.start();
 
@@ -261,42 +250,9 @@ void shutdownSDL()
     SDL_Quit();
 }
 
-void initEntities()
-{
-    auto walls = std::make_shared<Walls>();
-    LOG(DEBUG) << *walls;
-
-    auto initialPosition =
-            b2Vec2(_camera->getWorldWidth() / 2,
-                   _camera->getWorldHeight() / 8);
-    auto paddle = std::make_shared<Paddle>(initialPosition, walls);
-    LOG(DEBUG) << *paddle;
-
-    initialPosition =
-            b2Vec2(_camera->getWorldWidth() / 2,
-                   _camera->getWorldHeight() / 4);
-    auto ball = std::make_shared<Ball>(initialPosition);
-    LOG(DEBUG) << *ball;
-
-    _entities.push_back(walls);
-    _entities.push_back(paddle);
-    _entities.push_back(ball);
-
-    _level = std::make_shared<Level>("res/levels/level.dat");
-
-
-
-    // Draw the cursor last to preserve draw order
-    //auto cursor = std::make_shared<Cursor>();
-    //LOG(DEBUG) << *cursor;
-    //_entities.push_back(cursor);
-}
-
 void destroyEntities()
 {
     _entities.clear();
-    _level.reset();
-    //_deadEntities.clear();
 }
 
 void registerEvents()
@@ -353,7 +309,7 @@ void updateEntities(float dt)
         entity->update(dt);
     }
 
-    _level->update(dt);
+    //_level->update(dt);
 }
 
 void cullDeadEntities()
@@ -363,7 +319,7 @@ void cullDeadEntities()
         return e->isMarkedForDeath();
     });
 
-    _level->cullDeadEntities();
+    //_level->cullDeadEntities();
 }
 
 void drawScene()
@@ -375,7 +331,7 @@ void drawScene()
         entity->draw();
     }
 
-    _level->draw();
+    //_level->draw();
 
     Window::flip();
 }

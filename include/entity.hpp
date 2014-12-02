@@ -25,8 +25,6 @@
 
 #include "colors.hpp"
 
-class b2Fixture;
-
 // Base virtual entity class
 class Entity
 {
@@ -48,10 +46,6 @@ public:
     // Update and draw functions, called in every tick of the loop
     virtual void update(float dt) {}
     virtual void draw() = 0;
-
-    // Collision handlers
-    virtual void startContact(const Entity *other, const b2Fixture *otherFixture) {}
-    virtual void endContact(const Entity *other, const b2Fixture *otherFixture) {}
 
     // Various getters
     inline std::string getName() const { return _name; }

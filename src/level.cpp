@@ -19,15 +19,14 @@
 #include "level.hpp"
 
 #include <boost/tokenizer.hpp>
-#include <Box2D/Box2D.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
 
-#include "entities/block.hpp"
 #include "exception.hpp"
 #include "game.hpp"
+#include "vector.hpp"
 
 Level::Level(const std::string &filename)
 {
@@ -81,20 +80,20 @@ void Level::loadFile(const std::string &filename)
     }
     file.close();
 
-    for (const auto &line : lines)
-    {
-        boost::tokenizer<boost::escaped_list_separator<char>> tokens(line);
-        auto iter = tokens.begin();
+    //for (const auto &line : lines)
+    //{
+        //boost::tokenizer<boost::escaped_list_separator<char>> tokens(line);
+        //auto iter = tokens.begin();
 
-        auto name = *iter++;
-        auto health = std::stoi(*iter++);
-        auto row = std::stof(*iter++);
-        auto col = std::stof(*iter++);
+        //auto name = *iter++;
+        //auto health = std::stoi(*iter++);
+        //auto row = std::stof(*iter++);
+        //auto col = std::stof(*iter++);
 
-        const auto camera = Game::getCamera();
-        b2Vec2 position(camera.getWorldWidth() / 8 * col,
-                        camera.getWorldHeight() - (camera.getWorldHeight() / 16 * row));
+        //const auto camera = Game::getCamera();
+        //Vector2f position(camera.getWorldWidth() / 8 * col,
+        //                  camera.getWorldHeight() - (camera.getWorldHeight() / 16 * row));
 
-        _entities.push_back(std::make_shared<Block>(name, position, health));
-    }
+        //_entities.push_back(std::make_shared<Block>(name, position, health));
+    //}
 }

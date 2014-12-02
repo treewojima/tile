@@ -15,28 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WALLS_HPP__
-#define __WALLS_HPP__
-
 #include "defines.hpp"
-#include "entity.hpp"
+#include "vector.hpp"
 
-class b2Body;
+//template <class T>
+//const Vector2<T> Vector2<T>::ZERO = Vector2<T>();
 
-class Walls : public Entity
-{
-    friend class Paddle;
-    friend class Ball;
-
-public:
-    Walls();
-    ~Walls();
-
-    void draw() {}
-
-private:
-    b2Body *_body;
-    b2Fixture *_bottomFixture;
-};
-
-#endif
+template <> const Vector2i Vector2i::ZERO = Vector2i();
+template <> const Vector2f Vector2f::ZERO = Vector2f();
