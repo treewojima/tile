@@ -34,3 +34,6 @@ src/entities/superblock.cpp
 src/entities/walls.cpp
 include/vector.hpp
 src/vector.cpp
+include/map.hpp
+src/map.cpp
+include/resourcemanager.hpp

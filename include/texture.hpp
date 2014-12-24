@@ -19,42 +19,41 @@
 #define __TEXTURE_HPP__
 
 #include "defines.hpp"
+#include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <string>
-#include "exception.hpp"
-
-#ifdef _ENABLE_TEXTURES
+#include "resourcemanager.hpp"
 
 class Texture
 {
 public:
     Texture(const std::string &filename);
+    Texture(SDL_Surface *surface, bool freeSurface = true, bool optimize = true);
     ~Texture();
 
+private:
+    // Make this private for now, since there's no functionality to release
+    // an existing texture without a resource leak
     void load(const std::string &filename);
 
-    inline SDL_Texture *getRawTexture() const { return _texture; }
+public:
+    inline int getWidth() const { return _width; }
+    inline int getHeight() const { return _height; }
 
-    inline int getWidth() const
-    {
-        int w = 0;
-        if (SDL_QueryTexture(getRawTexture(), nullptr, nullptr, &w, nullptr))
-            throw SDLException();
-        return w;
-    }
+    inline GLuint getRawTexture() const { return _texture; }
 
-    inline int getHeight() const
-    {
-        int h = 0;
-        if (SDL_QueryTexture(getRawTexture(), nullptr, nullptr, nullptr, &h))
-            throw SDLException();
-        return h;
-    }
+    std::string toString() const;
 
 private:
-    SDL_Texture *_texture;
+    GLuint _texture;
+    int _width, _height;
+
+    static GLuint copySurfaceToGL(SDL_Surface *surface,
+                                  bool optimize = true,
+                                  int *outWidth = nullptr,
+                                  int *outHeight = nullptr);
 };
 
-#endif
+typedef ResourceManager<Texture> TextureManager;
 
 #endif

@@ -33,6 +33,8 @@
 #include "exception.hpp"
 #include "helper_events.hpp"
 #include "level.hpp"
+#include "map.hpp"
+#include "texture.hpp"
 #include "timer.hpp"
 #include "window.hpp"
 
@@ -47,7 +49,10 @@ namespace
     std::unique_ptr<Camera> _camera;
 
     std::list<std::shared_ptr<Entity>> _entities;
+    std::unique_ptr<TextureManager> _texMgr;
     std::shared_ptr<Level> _level;
+
+    std::shared_ptr<Map> _map;
 
     void initSDL();
     void initGL();
@@ -62,6 +67,11 @@ namespace
 
 void Game::run(Game::Options options)
 {
+    Timer stepTimer;
+    float dt = 0;
+    int countedFrames = 0;
+    Uint32 oldTicks = 0, currentTicks = 0;
+
     try
     {
         initSDL();
@@ -83,15 +93,31 @@ void Game::run(Game::Options options)
     catch (std::exception &e)
     {
         LOG(ERROR) << "EXCEPTION: " << e.what();
+        goto cleanup;
+    }
+
+    try
+    {
+        _map = std::make_shared<Map>("res/example.tmx");
+    }
+    catch (MapException &e)
+    {
+        LOG(ERROR) << "EXCEPTION: " << e.what();
+        goto cleanup;
+    }
+
+    try
+    {
+        _texMgr = std::unique_ptr<TextureManager>(new TextureManager());
+        _texMgr->add("tux", std::make_shared<Texture>("res/tux.png"));
+    }
+    catch (Exception &e)
+    {
+        LOG(ERROR) << "EXCEPTION: " << e.what();
+        goto cleanup;
     }
 
     registerEvents();
-
-    Timer stepTimer;
-    float dt = 0;
-
-    int countedFrames = 0;
-    Uint32 oldTicks = 0, currentTicks = 0;
 
     setRunning(true);
     _fpsTimer.start();
@@ -131,6 +157,8 @@ void Game::run(Game::Options options)
     }
     _fpsTimer.stop();
 
+cleanup:
+    _texMgr.reset();
     Window::destroy();
     destroyEntities();
     shutdownSDL();

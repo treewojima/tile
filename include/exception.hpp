@@ -76,7 +76,7 @@ private:
     }
 };
 
-class PhysicsException : public Exception
+class MapException : public Exception
 {
 public:
     using Exception::Exception;

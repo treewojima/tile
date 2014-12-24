@@ -29,6 +29,18 @@ const SDL_Color Colors::BLUE  = MAKE_COLOR(  0,   0, 255, 255);
 const SDL_Color Colors::BROWN = MAKE_COLOR( 64,  13,  18, 255);
 const SDL_Color Colors::GRAY  = MAKE_COLOR( 70,  70,  70, 255);
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+const uint32_t Colors::RMASK = 0xff000000;
+const uint32_t Colors::GMASK = 0x00ff0000;
+const uint32_t Colors::BMASK = 0x0000ff00;
+const uint32_t Colors::AMASK = 0x000000ff;
+#else
+const uint32_t Colors::RMASK = 0x000000ff;
+const uint32_t Colors::GMASK = 0x0000ff00;
+const uint32_t Colors::BMASK = 0x00ff0000;
+const uint32_t Colors::AMASK = 0xff000000;
+#endif
+
 SDL_Color Colors::makeColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
     return MAKE_COLOR(r, g, b, a);

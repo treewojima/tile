@@ -15,28 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COLORS_HPP__
-#define __COLORS_HPP__
+#include "map.hpp"
 
-#include "defines.hpp"
-#include <SDL2/SDL.h>
+#include "exception.hpp"
+#include <cassert>
+#include <sstream>
+#include <tmxparser/Tmx.h>
 
-namespace Colors
+Map::Map(const std::string &filename)
 {
-    extern const SDL_Color BLACK;
-    extern const SDL_Color WHITE;
-    extern const SDL_Color RED;
-    extern const SDL_Color GREEN;
-    extern const SDL_Color BLUE;
-    extern const SDL_Color BROWN;
-    extern const SDL_Color GRAY;
+    _map = new Tmx::Map();
+    _map->ParseFile(filename);
 
-    extern const uint32_t RMASK;
-    extern const uint32_t GMASK;
-    extern const uint32_t BMASK;
-    extern const uint32_t AMASK;
-
-    SDL_Color makeColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255);
+    if (_map->HasError())
+    {
+        std::ostringstream ss;
+        ss << "Error " << static_cast<unsigned>(_map->GetErrorCode())
+           << ": " << _map->GetErrorText();
+        delete _map;
+        throw MapException(ss.str());
+    }
 }
 
-#endif
+Map::~Map()
+{
+    assert(_map != nullptr);
+    delete _map;
+}

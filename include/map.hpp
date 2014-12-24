@@ -15,28 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COLORS_HPP__
-#define __COLORS_HPP__
+#ifndef __MAP_HPP__
+#define __MAP_HPP__
 
 #include "defines.hpp"
-#include <SDL2/SDL.h>
+#include <string>
+#include <tmxparser/TmxMap.h>
 
-namespace Colors
+class Map
 {
-    extern const SDL_Color BLACK;
-    extern const SDL_Color WHITE;
-    extern const SDL_Color RED;
-    extern const SDL_Color GREEN;
-    extern const SDL_Color BLUE;
-    extern const SDL_Color BROWN;
-    extern const SDL_Color GRAY;
+public:
+    Map(const std::string &filename);
+    ~Map();
 
-    extern const uint32_t RMASK;
-    extern const uint32_t GMASK;
-    extern const uint32_t BMASK;
-    extern const uint32_t AMASK;
-
-    SDL_Color makeColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255);
-}
+private:
+    Tmx::Map *_map;
+};
 
 #endif

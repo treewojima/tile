@@ -18,8 +18,5 @@
 #include "defines.hpp"
 #include "vector.hpp"
 
-//template <class T>
-//const Vector2<T> Vector2<T>::ZERO = Vector2<T>();
-
 template <> const Vector2i Vector2i::ZERO = Vector2i();
 template <> const Vector2f Vector2f::ZERO = Vector2f();
