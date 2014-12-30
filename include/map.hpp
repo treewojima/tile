@@ -19,8 +19,11 @@
 #define __MAP_HPP__
 
 #include "defines.hpp"
+
 #include <string>
 #include <tmxparser/TmxMap.h>
+
+#include "texture.hpp"
 
 class Map
 {
@@ -30,6 +33,7 @@ public:
 
 private:
     Tmx::Map *_map;
+    TextureManager::ResourcePtr _texture;
 };
 
 #endif

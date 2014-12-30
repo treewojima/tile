@@ -2,11 +2,11 @@ CC       := clang++
 WARNINGS := -Wall -Werror -Wnon-virtual-dtor -Wctor-dtor-privacy
 CFLAGS   := -c -pipe -ggdb3 -std=c++11 $(shell sdl2-config --cflags) \
             $(WARNINGS) -Iinclude -Ilib/include -I/usr/local/include
-LFLAGS   := $(shell sdl2-config --libs) -lSDL2_image -lGL -lGLU -lGLEW \
-            -ltmxparser
+LFLAGS   := $(shell sdl2-config --libs) -lSDL2_image -lSDL2_mixer -lGL -lGLU \
+            -lGLEW -ltmxparser
 PROJDIRS := include src
 SOURCES  := $(shell find $(PROJDIRS) -type f -name "*.cpp")
-HEADERS  := $(shell find $(PROJDIRS) -type f -name "*.hpp")
+#HEADERS  := $(shell find $(PROJDIRS) -type f -name "*.hpp")
 OBJECTS  := $(patsubst %.cpp, %.o, $(SOURCES))
 DEPFILES := $(patsubst %.cpp, %.dep, $(SOURCES))
 TARGET   := tile
@@ -25,6 +25,5 @@ clean:
 -include $(DEPFILES)
 
 %.o: %.cpp
-	$(CC) -o $@ $(CFLAGS) $<
-	@#$(CC) -o $@ $(CFLAGS) -MMD -MP -MF $(patsubst %.c, %.dep, $<) $<
+	$(CC) -o $@ $(CFLAGS) -MMD -MP -MF $(patsubst %.cpp, %.dep, $<) $<
 

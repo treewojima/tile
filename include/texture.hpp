@@ -27,31 +27,28 @@
 class Texture
 {
 public:
-    Texture(const std::string &filename);
-    Texture(SDL_Surface *surface, bool freeSurface = true, bool optimize = true);
+    Texture(const std::string &name,
+            const std::string &filename);
+    Texture(const std::string &name,
+            SDL_Surface *surface,
+            bool freeSurface = true,
+            bool optimize = true);
     ~Texture();
 
-private:
-    // Make this private for now, since there's no functionality to release
-    // an existing texture without a resource leak
-    void load(const std::string &filename);
-
-public:
+    inline std::string getName() const { return _name; }
     inline int getWidth() const { return _width; }
     inline int getHeight() const { return _height; }
-
     inline GLuint getRawTexture() const { return _texture; }
 
     std::string toString() const;
 
 private:
+    std::string _name;
     GLuint _texture;
     int _width, _height;
 
-    static GLuint copySurfaceToGL(SDL_Surface *surface,
-                                  bool optimize = true,
-                                  int *outWidth = nullptr,
-                                  int *outHeight = nullptr);
+    void copySurfaceToGL(SDL_Surface *surface,
+                         bool optimize = true);
 };
 
 typedef ResourceManager<Texture> TextureManager;

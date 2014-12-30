@@ -24,6 +24,7 @@
 
 Map::Map(const std::string &filename)
 {
+    // First, try to load the .tmx file
     _map = new Tmx::Map();
     _map->ParseFile(filename);
 
@@ -35,6 +36,8 @@ Map::Map(const std::string &filename)
         delete _map;
         throw MapException(ss.str());
     }
+
+    // Try to load the associated tileset textures
 }
 
 Map::~Map()

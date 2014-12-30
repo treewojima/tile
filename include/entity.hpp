@@ -19,6 +19,7 @@
 #define __ENTITY_HPP__
 
 #include "defines.hpp"
+
 #include <cstdint>
 #include <easylogging++.h>
 #include <string>
@@ -29,18 +30,9 @@
 class Entity
 {
 public:
-    // Entity types, for collision handling purposes
-    enum Type
-    {
-        BARRIER = 0x1,
-        PADDLE  = 0x2,
-        BALL    = 0x4,
-        BLOCK   = 0x8,
-        CURSOR  = 0x10
-    };
 
     // Constructor/destructor
-    Entity(const std::string &name, Type type = Type::BARRIER);
+    Entity(const std::string &name);
     virtual ~Entity();
 
     // Update and draw functions, called in every tick of the loop
@@ -49,7 +41,6 @@ public:
 
     // Various getters
     inline std::string getName() const { return _name; }
-    inline Type getType() const { return _type; }
     inline bool isMarkedForDeath() const { return _markedForDeath; }
     virtual std::string toString() const;
 
@@ -59,7 +50,6 @@ protected:
 
 private:
     std::string _name;
-    Type _type;
     bool _markedForDeath;
 };
 

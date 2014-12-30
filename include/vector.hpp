@@ -19,7 +19,9 @@
 #define __VECTOR_HPP__
 
 #include <easylogging++.h>
-#include <ostream>
+#include <sstream>
+#include <string>
+#include <typeinfo>
 
 template <class T>
 class Vector2
@@ -31,6 +33,13 @@ public:
     Vector2() : x(0), y(0) {}
     Vector2(const T &x_, const T &y_) : x(x_), y(y_) {}
     Vector2(const Vector2<T> &v) : x(v.x), y(v.y) {}
+
+    std::string toString() const
+    {
+        std::ostringstream ss;
+        ss << "Vector2<" << typeid(T).name() << ">(" << x << ", " << y << ")";
+        return ss.str();
+    }
 
     // TODO: Add more operators as necessary
 
@@ -98,14 +107,14 @@ inline Vector2<T> operator-(Vector2<T> lhs, const Vector2<T> &rhs)
 template <class T, class U>
 inline std::ostream &operator<<(std::ostream &stream, const Vector2<U> &v)
 {
-    stream << "Vector2(" << v.x << ", " << v.y << ")";
+    stream << v.toString();
     return stream;
 }
 
 template <class T>
 inline MAKE_LOGGABLE(Vector2<T>, v, stream)
 {
-    stream << "Vector2(" << v.x << ", " << v.y << ")";
+    stream << v.toString();
     return stream;
 }
 

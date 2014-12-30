@@ -19,7 +19,11 @@
 #define __WINDOW_HPP__
 
 #include "defines.hpp"
+
 #include <memory>
+
+#include "texture.hpp"
+#include "vector.hpp"
 
 namespace Window
 {
@@ -27,15 +31,17 @@ namespace Window
     void destroy();
 
     void clear(float r = 0, float g = 0, float b = 0, float a = 0);
-    //void blitTexture(const Texture &texture, int x, int y);
     void flip();
 
-    void setTitle(const std::string &title);
+    void blitTexture(TextureManager::ConstResourcePtr texture,
+                     float x,
+                     float y);
+    void blitTexture(TextureManager::ConstResourcePtr texture,
+                     const Vector2f &pos);
+    void blitTexture(TextureManager::ConstResourcePtr texture,
+                     const Vector2i &pos);
 
-    //float getWidth();
-    //float getHeight();
-    //int getWidthPixels();
-    //int getHeightPixels();
+    void setTitle(const std::string &title);
 }
 
 #endif

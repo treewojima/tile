@@ -31,10 +31,13 @@ class ResourceManager
 {
 public:
     typedef std::shared_ptr<T> ResourcePtr;
+    typedef std::shared_ptr<const T> ConstResourcePtr;
 
     ~ResourceManager();
 
     void add(const std::string &name, ResourcePtr ptr);
+    ResourcePtr get(const std::string &name) const;
+    void clear();
 
 private:
     typedef std::unordered_map<std::string, ResourcePtr> ResourceMap;
@@ -46,7 +49,7 @@ template <class T>
 ResourceManager<T>::~ResourceManager()
 {
     // NOTE: Should this just rely on clearing the map, or should it be ensured
-    //       that every Resource is dropped?
+    //       that every ResourcePtr is dropped properly?
 
     _map.clear();
 }
@@ -66,6 +69,29 @@ void ResourceManager<T>::add(const std::string &name, ResourcePtr ptr)
            << "\" into ResourceManager: duplicate key";
         throw Exception(ss.str());
     }
+}
+
+template <class T> typename
+ResourceManager<T>::ResourcePtr ResourceManager<T>::get(const std::string &name) const
+{
+    try
+    {
+        return _map.at(name);
+    }
+    catch (std::out_of_range &e)
+    {
+        // For now, just rethrow the exception
+        throw e;
+    }
+}
+
+template <class T>
+void ResourceManager<T>::clear()
+{
+    // NOTE: Should every ResourcePtr be properly dropped, or is clearing the
+    //       internal map enough?
+
+    _map.clear();
 }
 
 #endif

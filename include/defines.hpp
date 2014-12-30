@@ -21,7 +21,7 @@
 #define _DEBUG
 #define _ELPP_DISABLE_DEFAULT_CRASH_HANDLING
 #define _USE_MATH_DEFINES
-
+//#define _TEST_TEXTURE_DIMENSIONS
 //#define _DEBUG_EVENTS
 
 #endif

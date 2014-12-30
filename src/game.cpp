@@ -27,9 +27,11 @@
 #include <random>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #include <sstream>
 #include <tclap/CmdLine.h>
 
+#include "entities/tux.hpp"
 #include "exception.hpp"
 #include "helper_events.hpp"
 #include "level.hpp"
@@ -43,82 +45,81 @@ Uint32 Game::Event::CUSTOM_KEYPRESS_EVENT;
 // Locals
 namespace
 {
+    // Main loop status flag
     bool _running = false;
+
+    // Map of event handles to event instances
     std::map<Game::Event::Handle, std::shared_ptr<Game::Event>> _events;
+
+    // List of game entities
+    std::list<std::shared_ptr<Entity>> _entities;
+
+    // Timer for tracking and calculating FPS
     Timer _fpsTimer;
+
+    // Camera view
     std::unique_ptr<Camera> _camera;
 
-    std::list<std::shared_ptr<Entity>> _entities;
-    std::unique_ptr<TextureManager> _texMgr;
-    std::shared_ptr<Level> _level;
+    // Resource managers
+    TextureManager _texMgr;
 
-    std::shared_ptr<Map> _map;
-
+    // Subsystem initialization and shutdown functions
     void initSDL();
     void initGL();
+    void initAudio();
     void shutdownSDL();
-    void destroyEntities();
-    void registerEvents();
-    void handleEvents();
+
+    // Resource and entity allocation/destruction/management functions
+    void loadTextures();
+    void createEntities();
     void updateEntities(float dt);
     void cullDeadEntities();
+    void destroyEntities();
+
+    // Event handling functions
+    void registerEvents();
+    void handleEvents();
+
+    // Scene update functions
     void drawScene();
 }
 
 void Game::run(Game::Options options)
 {
+    // Initialize SDL and create the window
+    initSDL();
+    Window::create(options.windowWidth, options.windowHeight);
+
+    // Set up the camera view
+    //auto screenRatio = static_cast<float>(options.windowWidth) /
+    //                   static_cast<float>(options.windowHeight);
+    _camera = std::unique_ptr<Camera>(
+        new Camera(Vector2f::ZERO,                                        // worldMin
+                   Vector2f(options.windowWidth, options.windowHeight),   // worldMax
+                   Vector2f::ZERO,                                        // screenMin
+                   Vector2f(options.windowWidth, options.windowHeight),   // screenMax
+                   Vector2f::ZERO,                                        // screenMinInWorld
+                   Vector2f(options.windowWidth, options.windowHeight))); // screenMaxInWorld
+    //LOG(DEBUG) << *_camera;
+
+    // Further initialization for OpenGL and audio
+    initGL();
+    initAudio();
+
+    // Set up event handling details
+    registerEvents();
+
+    // Load resources and create entities
+    loadTextures();
+    createEntities();
+
+    // Main loop variables
     Timer stepTimer;
     float dt = 0;
     int countedFrames = 0;
     Uint32 oldTicks = 0, currentTicks = 0;
 
-    try
-    {
-        initSDL();
-        Window::create(options.windowWidth, options.windowHeight);
-
-        auto screenRatio = static_cast<float>(options.windowWidth) /
-                           static_cast<float>(options.windowHeight);
-        _camera = std::unique_ptr<Camera>(
-            new Camera(Vector2f::ZERO,                                      // worldMin
-                       Vector2f(10 * screenRatio, 10),                      // worldMax
-                       Vector2f(0, 0),                                        // screenMin
-                       Vector2f(options.windowWidth, options.windowHeight), // screenMax
-                       Vector2f::ZERO,                                        // screenMinInWorld
-                       Vector2f(10 * screenRatio, 10)));                      // screenMaxInWorld
-        //LOG(DEBUG) << *_camera;
-
-        initGL();
-    }
-    catch (std::exception &e)
-    {
-        LOG(ERROR) << "EXCEPTION: " << e.what();
-        goto cleanup;
-    }
-
-    try
-    {
-        _map = std::make_shared<Map>("res/example.tmx");
-    }
-    catch (MapException &e)
-    {
-        LOG(ERROR) << "EXCEPTION: " << e.what();
-        goto cleanup;
-    }
-
-    try
-    {
-        _texMgr = std::unique_ptr<TextureManager>(new TextureManager());
-        _texMgr->add("tux", std::make_shared<Texture>("res/tux.png"));
-    }
-    catch (Exception &e)
-    {
-        LOG(ERROR) << "EXCEPTION: " << e.what();
-        goto cleanup;
-    }
-
-    registerEvents();
-
+    // Enter the main loop
     setRunning(true);
     _fpsTimer.start();
     stepTimer.start();
@@ -135,16 +136,22 @@ void Game::run(Game::Options options)
             oldTicks = currentTicks;
         }
 
+        // Update scene
         try
         {
+            // Process the event queue
             handleEvents();
 
+            // Update entities, making sure to let them know how long it's been
+            // since the last step
             dt = stepTimer.getTicks() / 1000.f;
             updateEntities(dt);
             stepTimer.start();
 
+            // Update the screen
             drawScene();
 
+            // Collect dead entities
             cullDeadEntities();
         }
         catch (std::exception &e)
@@ -153,12 +160,13 @@ void Game::run(Game::Options options)
             setRunning(false);
         }
 
+        // Update frame count for the next iteration
         countedFrames++;
     }
     _fpsTimer.stop();
 
-cleanup:
-    _texMgr.reset();
+    // Clean up
+    _texMgr.clear();
     Window::destroy();
     destroyEntities();
     shutdownSDL();
@@ -177,6 +185,11 @@ void Game::setRunning(bool b)
 Camera &Game::getCamera()
 {
     return *_camera;
+}
+
+TextureManager &Game::getTexMgr()
+{
+    return _texMgr;
 }
 
 Game::Event::Handle Game::registerEvent(SDL_Scancode key,
@@ -217,7 +230,7 @@ namespace {
 
 void initSDL()
 {
-    if (SDL_Init(SDL_INIT_VIDEO))
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
         throw SDLException();
 
     SDL_version version;
@@ -272,10 +285,56 @@ void initGL()
     }
 }
 
+void initAudio()
+{
+    static const int DEFAULT_AUDIO_FREQ = 44100;
+
+    auto ret = Mix_OpenAudio(DEFAULT_AUDIO_FREQ, // audio frequency
+                             MIX_DEFAULT_FORMAT, // sample format
+                             2,                  // number of channels
+                             2048);              // sample size in bytes
+    if (ret)
+    {
+        std::ostringstream ss;
+        ss << "Could not initialize SDL_Mixer: " << Mix_GetError();
+        throw SDLMixerException(ss.str());
+    }
+}
+
 void shutdownSDL()
 {
+    Mix_Quit();
     IMG_Quit();
     SDL_Quit();
+}
+
+void loadTextures()
+{
+    TextureManager::ResourcePtr texture;
+
+    texture = std::make_shared<Texture>("tux", "res/tux.png");
+    _texMgr.add(texture->getName(), texture);
+}
+
+void createEntities()
+{
+    _entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));
+}
+
+void updateEntities(float dt)
+{
+    for (auto entity : _entities)
+    {
+        entity->update(dt);
+    }
+}
+
+void cullDeadEntities()
+{
+    _entities.remove_if([](std::shared_ptr<Entity> e)
+    {
+        return e->isMarkedForDeath();
+    });
 }
 
 void destroyEntities()
@@ -313,14 +372,14 @@ void handleEvents()
 {
     // Inject an event to check our keyboard state
     //SDL_PumpEvents();
-    SDL_Event event;
-    memset(&event, 0, sizeof(SDL_Event));
+    SDL_Event event = {0};
     event.type = Game::Event::CUSTOM_KEYPRESS_EVENT;
     event.user.data1 = const_cast<Uint8 *>(SDL_GetKeyboardState(nullptr));
     SDL_PushEvent(&event);
 
     // Run the normal event loop
-    memset(&event, 0, sizeof(SDL_Event));
+    //memset(&event, 0, sizeof(SDL_Event));
+    event = {0};
     while (SDL_PollEvent(&event))
     {
         for (auto &pair : _events)
@@ -328,26 +387,6 @@ void handleEvents()
             if (pair.second->test(event)) pair.second->fire(event);
         }
     }
-}
-
-void updateEntities(float dt)
-{
-    for (auto entity : _entities)
-    {
-        entity->update(dt);
-    }
-
-    //_level->update(dt);
-}
-
-void cullDeadEntities()
-{
-    _entities.remove_if([](std::shared_ptr<Entity> e)
-    {
-        return e->isMarkedForDeath();
-    });
-
-    //_level->cullDeadEntities();
 }
 
 void drawScene()
@@ -358,8 +397,6 @@ void drawScene()
     {
         entity->draw();
     }
-
-    //_level->draw();
 
     Window::flip();
 }

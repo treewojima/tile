@@ -15,30 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __TUX_HPP__
+#define __TUX_HPP__
+
 #include "defines.hpp"
+
+#include <vector>
+
 #include "entity.hpp"
+#include "game.hpp"
+#include "texture.hpp"
+#include "vector.hpp"
 
-#include <cassert>
-#include <cmath>
-#include <easylogging++.h>
-#include <GL/glew.h>
-#include <SDL2/SDL.h>
-#include <sstream>
-
-Entity::Entity(const std::string &name) :
-    _name(name),
-    _markedForDeath(false)
+class Tux : public Entity
 {
-}
+public:
+    Tux(const Vector2f &pos);
+    ~Tux();
 
-Entity::~Entity()
-{
-    LOG(DEBUG) << "destroyed entity " << getName();
-}
+    void draw();
 
-std::string Entity::toString() const
-{
-    std::ostringstream ss;
-    ss << "Entity[name = \"" << getName() << "\"]";
-    return ss.str();
-}
+    std::string toString() const;
+
+private:
+    Vector2f _position;
+    TextureManager::ResourcePtr _texture;
+    std::vector<Game::Event::Handle> _eventHandles;
+};
+
+#endif

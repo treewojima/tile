@@ -22,6 +22,7 @@
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -44,6 +45,13 @@ class SDLImageException : public SDLException
 public:
     SDLImageException(const std::string &msg) : SDLException(msg) {}
     SDLImageException() : SDLException(IMG_GetError()) {}
+};
+
+class SDLMixerException : public SDLException
+{
+public:
+    SDLMixerException(const std::string &msg) : SDLException(msg) {}
+    SDLMixerException() : SDLException(Mix_GetError()) {}
 };
 
 class GLException : public Exception

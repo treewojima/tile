@@ -72,19 +72,44 @@ void Window::clear(float r, float g, float b, float a)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-/*void Window::blitTexture(const Texture &texture, int x, int y)
+void Window::blitTexture(TextureManager::ConstResourcePtr texture,
+                         float x,
+                         float y)
 {
-    SDL_Rect r;
-    r.x = x;
-    r.y = y;
-    r.w = texture.getWidth();
-    r.h = texture.getHeight();
+    const auto width = texture->getWidth();
+    const auto height = texture->getHeight();
+    const float centeredWidth = width / 2.f;
+    const float centeredHeight = height / 2.f;
 
-    SDL_RenderCopy(_renderer,
-                   texture.getRawTexture(),
-                   nullptr,
-                   &r);
-}*/
+    // NOTE: Should there be a glLoadIdentity() here as well?
+
+    glBindTexture(GL_TEXTURE_2D, texture->getRawTexture());
+    glTranslatef(x - centeredWidth, y - centeredHeight, 0);
+    glBegin(GL_QUADS);
+        glTexCoord2i(1, 1);
+        glVertex2f(width, 0);
+        glTexCoord2i(0, 1);
+        glVertex2f(0, 0);
+        glTexCoord2i(0, 0);
+        glVertex2f(0, height);
+        glTexCoord2i(1, 0);
+        glVertex2f(width, height);
+    glEnd();
+
+    glLoadIdentity();
+}
+
+void Window::blitTexture(TextureManager::ConstResourcePtr texture,
+                         const Vector2f &pos)
+{
+    blitTexture(texture, pos.x, pos.y);
+}
+
+void Window::blitTexture(TextureManager::ConstResourcePtr texture,
+                         const Vector2i &pos)
+{
+    blitTexture(texture, pos.x, pos.y);
+}
 
 void Window::flip()
 {
@@ -95,30 +120,3 @@ void Window::setTitle(const std::string &title)
 {
     SDL_SetWindowTitle(_window, title.c_str());
 }
-
-#if 0
-float Window::getWidth()
-{
-    Game::getCamera().
-    return getWidthPixels() * Physics::PIXELS_TO_METERS;
-}
-
-float Window::getHeight()
-{
-    return getHeightPixels() * Physics::PIXELS_TO_METERS;
-}
-
-int Window::getWidthPixels()
-{
-    int w;
-    SDL_GetWindowSize(_window, &w, nullptr);
-    return w;
-}
-
-int Window::getHeightPixels()
-{
-    int h;
-    SDL_GetWindowSize(_window, nullptr, &h);
-    return h;
-}
-#endif

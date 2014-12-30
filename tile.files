@@ -37,3 +37,5 @@ src/vector.cpp
 include/map.hpp
 src/map.cpp
 include/resourcemanager.hpp
+include/entities/tux.hpp
+src/entities/tux.cpp

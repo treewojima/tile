@@ -24,6 +24,7 @@
 #include <string>
 
 #include "camera.hpp"
+#include "texture.hpp"
 
 namespace Game
 {
@@ -64,6 +65,7 @@ namespace Game
     void setRunning(bool b);
 
     Camera &getCamera();
+    TextureManager &getTexMgr();
 
     Event::Handle registerEvent(SDL_Scancode key,
                                 Event::Callback callback,

@@ -26,38 +26,16 @@
 #include "exception.hpp"
 #include "game.hpp"
 
-#define IS_POWER_OF_TWO(n) ((n & (n - 1)) == 0)
+#ifdef _TEST_TEXTURE_DIMENSIONS
+#   define IS_POWER_OF_TWO(n) ((n & (n - 1)) == 0)
+#endif
 
-Texture::Texture(const std::string &filename) :
+Texture::Texture(const std::string &name,
+                 const std::string &filename) :
+    _name(name),
     _texture(0),
     _width(0),
     _height(0)
-{
-    load(filename);
-}
-
-Texture::Texture(SDL_Surface *surface, bool freeSurface, bool optimize) :
-    _texture(0),
-    _width(0),
-    _height(0)
-{
-    if (!surface)
-        throw SDLException("null surface passed to Texture constructor");
-
-    _texture = copySurfaceToGL(surface, optimize, &_width, &_height);
-
-    if (freeSurface)
-        SDL_FreeSurface(surface);
-}
-
-Texture::~Texture()
-{
-    LOG(DEBUG) << __FUNCTION__;
-
-    glDeleteTextures(1, &_texture);
-}
-
-void Texture::load(const std::string &filename)
 {
     auto surface = IMG_Load(filename.c_str());
     if (surface == nullptr)
@@ -67,26 +45,53 @@ void Texture::load(const std::string &filename)
         throw SDLImageException(ss.str());
     }
 
-    // TODO: There's currently no error checking for an invalid GL texture!
-    _texture = copySurfaceToGL(surface, true, &_width, &_height);
-
+    copySurfaceToGL(surface);
     SDL_FreeSurface(surface);
+
+    LOG(INFO) << "loaded texture \"" << _name << "\" from file \""
+              << filename << "\"";
+}
+
+Texture::Texture(const std::string &name,
+                 SDL_Surface *surface,
+                 bool freeSurface,
+                 bool optimize) :
+    _name(name),
+    _texture(0),
+    _width(0),
+    _height(0)
+{
+    if (!surface)
+        throw SDLException("null surface passed to Texture constructor");
+
+    copySurfaceToGL(surface, optimize);
+    if (freeSurface)
+        SDL_FreeSurface(surface);
+
+    LOG(INFO) << "loaded texture \"" << _name << "\" from SDL_Surface";
+}
+
+Texture::~Texture()
+{
+    glDeleteTextures(1, &_texture);
+
+    LOG(INFO) << "released texture \"" << getName() << "\"";
 }
 
 std::string Texture::toString() const
 {
     std::ostringstream ss;
-    ss << "Texture[glTexture = " << _texture << "]";
+    ss << "Texture[name = \"" << getName() << "\", glTexture = "
+       << getRawTexture() << "]";
     return ss.str();
 }
 
-GLuint Texture::copySurfaceToGL(SDL_Surface *surface,
-                                bool optimize,
-                                int *outWidth,
-                                int *outHeight)
+void Texture::copySurfaceToGL(SDL_Surface *surface,
+                              bool optimize)
 {
-    SDL_Surface *workingSurface = surface;
+    auto workingSurface = surface;
 
+    // Optimize the surface if requested
     if (optimize)
     {
         auto optimizedSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
@@ -104,21 +109,24 @@ GLuint Texture::copySurfaceToGL(SDL_Surface *surface,
         workingSurface = optimizedSurface;
     }
 
-    if (IS_POWER_OF_TWO(workingSurface->w))
+    _width = workingSurface->w;
+    _height = workingSurface->h;
+
+#ifdef _TEST_TEXTURE_DIMENSIONS
+    if (!IS_POWER_OF_TWO(_width))
     {
-        LOG(WARNING) << "width of texture is not a power of two: "
-                  << workingSurface->w;
+        LOG(WARNING) << "width of texture \"" << getName()
+                     << "\" is not a power of two: " << _width;
     }
 
-    if (IS_POWER_OF_TWO(workingSurface->h))
+    if (!IS_POWER_OF_TWO(_height))
     {
-        LOG(WARNING) << "height of texture is not a power of two: "
-                  << workingSurface->h;
+        LOG(WARNING) << "height of texture \"" << getName()
+                     << "\" is not a power of two: " << _height;
     }
+#endif
 
-    if (outWidth) *outWidth = workingSurface->w;
-    if (outHeight) *outHeight = workingSurface->h;
-
+    // Make sure the image is either 24 or 32 bpp
     GLenum colorFormat;
     auto numColors = workingSurface->format->BytesPerPixel;
     switch (numColors)
@@ -126,37 +134,42 @@ GLuint Texture::copySurfaceToGL(SDL_Surface *surface,
     case 4:
         colorFormat = GL_RGBA;
         break;
-
     case 3:
         colorFormat = GL_RGB;
         break;
 
     default:
-        throw SDLException("Surface is not truecolor");
+        {
+            std::ostringstream ss;
+            ss << "intermediate SDL_Surface for texture \"" << getName()
+               << "\" is not truecolor (24 or 32 bpp)";
+            throw SDLException(ss.str());
+        }
     }
 
-    GLuint glTexture;
-    glGenTextures(1, &glTexture);
-    glBindTexture(GL_TEXTURE_2D, glTexture);
+    // Prepare to create an OpenGL texture
+    glGenTextures(1, &_texture);
+    glBindTexture(GL_TEXTURE_2D, _texture);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
+    // Copy the actual texture data from the SDL_Surface to video memory
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  numColors,
-                 workingSurface->w,
-                 workingSurface->h,
+                 _width,
+                 _height,
                  0,
                  colorFormat,
                  GL_UNSIGNED_BYTE,
                  workingSurface->pixels);
 
-    if (optimize)
-        SDL_FreeSurface(workingSurface);
-
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    return glTexture;
+    // Clean up the optimized surface if necessary (the original working
+    // surface will be freed by the caller)
+    if (optimize)
+        SDL_FreeSurface(workingSurface);
 }
