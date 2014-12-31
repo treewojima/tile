@@ -18,6 +18,7 @@
 #include "defines.hpp"
 #include "texture.hpp"
 
+#include <cassert>
 #include <easylogging++.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -41,7 +42,7 @@ Texture::Texture(const std::string &name,
     if (surface == nullptr)
     {
         std::ostringstream ss;
-        ss << "unable to load \"" << filename << "\":" << IMG_GetError();
+        ss << "unable to load \"" << filename << "\": " << IMG_GetError();
         throw SDLImageException(ss.str());
     }
 
@@ -73,6 +74,7 @@ Texture::Texture(const std::string &name,
 
 Texture::~Texture()
 {
+    assert(glIsTexture(_texture));
     glDeleteTextures(1, &_texture);
 
     LOG(INFO) << "released texture \"" << getName() << "\"";

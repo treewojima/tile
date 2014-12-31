@@ -22,18 +22,29 @@
 
 #include <string>
 #include <tmxparser/TmxMap.h>
+#include <vector>
 
 #include "texture.hpp"
 
 class Map
 {
 public:
-    Map(const std::string &filename);
+    Map(const std::string &name, const std::string &filename);
     ~Map();
 
+    inline std::string getName() const { return _name; }
+
 private:
+    std::string _name;
     Tmx::Map *_map;
-    TextureManager::ResourcePtr _texture;
+    std::vector<TextureManager::ResourcePtr> _tilesetTextures;
+    TextureManager::ResourcePtr _renderedMapTexture;
+    GLuint _fbo;
+
+    void loadTilesetTextures();
+
+    // NOTE: This is NOT the best way to go about this
+    void render();
 };
 
 #endif

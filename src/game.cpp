@@ -53,6 +53,7 @@ namespace
 
     // List of game entities
     std::list<std::shared_ptr<Entity>> _entities;
+    std::unique_ptr<Map> _map;
 
     // Timer for tracking and calculating FPS
     Timer _fpsTimer;
@@ -113,6 +114,8 @@ void Game::run(Game::Options options)
     loadTextures();
     createEntities();
 
+    _map = std::unique_ptr<Map>(new Map("example", "res/example.tmx"));
+
     // Main loop variables
     Timer stepTimer;
     float dt = 0;
@@ -166,9 +169,10 @@ void Game::run(Game::Options options)
     _fpsTimer.stop();
 
     // Clean up
+    _map.reset();
+    destroyEntities();
     _texMgr.clear();
     Window::destroy();
-    destroyEntities();
     shutdownSDL();
 }
 
@@ -260,6 +264,12 @@ void initGL()
     LOG(INFO) << "using GLEW " << glewGetString(GLEW_VERSION);
     LOG(INFO) << "using OpenGL " << glGetString(GL_VERSION);
 
+    if (!GLEW_EXT_framebuffer_object)
+        throw GLEWException("platform does not support framebuffer objects");
+
+    if (!GLEW_EXT_framebuffer_blit)
+        throw GLEWException("platform does not support framebuffer object blitting");
+
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
 
@@ -318,7 +328,7 @@ void loadTextures()
 
 void createEntities()
 {
-    _entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));
+    //_entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));
 }
 
 void updateEntities(float dt)

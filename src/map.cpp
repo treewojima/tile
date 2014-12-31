@@ -17,12 +17,26 @@
 
 #include "map.hpp"
 
-#include "exception.hpp"
 #include <cassert>
 #include <sstream>
 #include <tmxparser/Tmx.h>
 
-Map::Map(const std::string &filename)
+#include "colors.hpp"
+#include "exception.hpp"
+#include "game.hpp"
+
+namespace
+{
+    // NOTE: these should really be moved to a more appropriate location
+    SDL_Surface *createBlankSDLSurface(Vector2i dimensions,
+                                       SDL_Color color = Colors::WHITE);
+    TextureManager::ResourcePtr createBlankTexture(const std::string &name,
+                                                   Vector2i dimensions,
+                                                   SDL_Color color = Colors::WHITE);
+}
+
+Map::Map(const std::string &name, const std::string &filename) :
+    _name(name)
 {
     // First, try to load the .tmx file
     _map = new Tmx::Map();
@@ -32,16 +46,107 @@ Map::Map(const std::string &filename)
     {
         std::ostringstream ss;
         ss << "Error " << static_cast<unsigned>(_map->GetErrorCode())
-           << ": " << _map->GetErrorText();
+           << " while loading Map \"" << _name << "\": " << _map->GetErrorText();
         delete _map;
         throw MapException(ss.str());
     }
 
-    // Try to load the associated tileset textures
+    loadTilesetTextures();
+    render();
 }
 
 Map::~Map()
 {
+    assert(glIsFramebufferEXT(_fbo));
+    glDeleteFramebuffersEXT(1, &_fbo);
+
     assert(_map != nullptr);
     delete _map;
+}
+
+void Map::loadTilesetTextures()
+{
+    auto tilesets = _map->GetTilesets();
+    _tilesetTextures.resize(tilesets.size());
+
+    for (auto tileset : tilesets)
+    {
+        TextureManager::ResourcePtr texture;
+
+        try
+        {
+            auto filename = "res/" + tileset->GetImage()->GetSource();
+            texture = std::make_shared<Texture>(tileset->GetName(),
+                                                filename);
+        }
+        catch (const SDLException &e)
+        {
+            std::ostringstream ss;
+            ss << "Couldn't load tileset texture for map \"" << getName()
+               << "\": " << e.what();
+            throw MapException(ss.str());
+        }
+
+        Game::getTexMgr().add(texture->getName(), texture);
+        _tilesetTextures.push_back(texture);
+    }
+}
+
+void Map::render()
+{
+    // First, try to create a framebuffer object
+    glGenFramebuffersEXT(1, &_fbo);
+    auto error = glGetError();
+    if (error != GL_NO_ERROR)
+        throw GLException(error);
+
+    // Create a blank surface
+    const int widthPixels = _map->GetWidth() * _map->GetTileWidth();
+    const int heightPixels = _map->GetHeight() * _map->GetTileHeight();
+    auto texture = createBlankTexture("renderedMap", Vector2i(widthPixels, heightPixels));
+
+    auto layers = _map->GetLayers();
+    for (Tmx::Layer *layer : layers)
+    {
+        for (int x = 0; x < layer->GetWidth(); x++)
+        {
+            for (int y = 0; y < layer->GetHeight(); y++)
+            {
+
+            }
+        }
+    }
+}
+
+// Local functions
+namespace {
+
+SDL_Surface *createBlankSDLSurface(Vector2i dimensions, SDL_Color color)
+{
+    auto surface = SDL_CreateRGBSurface(0,
+                                        dimensions.x,
+                                        dimensions.y,
+                                        32,
+                                        Colors::RMASK,
+                                        Colors::GMASK,
+                                        Colors::BMASK,
+                                        Colors::AMASK);
+    if (surface == nullptr)
+        throw SDLException();
+
+    SDL_FillRect(surface,
+                 nullptr,
+                 SDL_MapRGBA(surface->format, color.r, color.g, color.b, color.a));
+
+    return surface;
+}
+
+TextureManager::ResourcePtr createBlankTexture(const std::string &name,
+                                               Vector2i dimensions,
+                                               SDL_Color color)
+{
+    auto surface = createBlankSDLSurface(dimensions, color);
+    return std::make_shared<Texture>(name, surface);
+}
+
 }
