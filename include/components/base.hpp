@@ -15,24 +15,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
+#ifndef __COMPONENT_HPP__
+#define __COMPONENT_HPP__
 
 #include "defines.hpp"
-#include "entity.hpp"
+#include <easylogging++.h>
+#include <memory>
+#include <string>
 
-#include <vector>
-
-#include "game.hpp"
-
-class Tux : public Entity
+namespace Components
 {
-public:
-    Tux();
-    ~Tux();
+    class Base
+    {
+    public:
+        //typedef std::shared_ptr<Base> Ptr;
 
-private:
-    std::vector<Game::Event::Handle> _eventHandles;
-};
+        Base(const std::string &name);
+        virtual ~Base();
+
+        inline std::string getName() const { return _name; }
+
+        virtual std::string toString() const;
+
+    private:
+        std::string _name;
+    };
+}
+
+// Helper stream operators
+template <class T>
+inline std::ostream &operator<<(std::ostream &stream,
+                                const Components::Base &c)
+{
+    stream << c.toString();
+    return stream;
+}
+
+inline MAKE_LOGGABLE(Components::Base, c, stream)
+{
+    stream << c.toString();
+    return stream;
+}
 
 #endif

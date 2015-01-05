@@ -50,7 +50,7 @@ void Level::draw()
 {
     for (auto entity : _entities)
     {
-        entity->draw();
+        entity->graphics->draw();
     }
 }
 

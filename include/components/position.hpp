@@ -15,24 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
+#ifndef __COMPONENTS_POSITION_HPP__
+#define __COMPONENTS_POSITION_HPP__
 
 #include "defines.hpp"
-#include "entity.hpp"
+#include "components/base.hpp"
+#include "vector.hpp"
 
-#include <vector>
-
-#include "game.hpp"
-
-class Tux : public Entity
+namespace Components
 {
-public:
-    Tux();
-    ~Tux();
+    class Position : public Base
+    {
+    public:
+        // NOTE: Should these be replaced by getters/setters?
+        float x, y;
 
-private:
-    std::vector<Game::Event::Handle> _eventHandles;
-};
+        Position(const Vector2f pos = Vector2f::ZERO);
+        Position(float x_, float y_);
+
+        inline Vector2f toVector() const { return Vector2f(x, y); }
+
+        std::string toString() const;
+    };
+}
 
 #endif

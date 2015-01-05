@@ -31,7 +31,9 @@
 #include <sstream>
 #include <tclap/CmdLine.h>
 
-#include "entities/tiletest.hpp"
+#include "components/graphics.hpp"
+#include "components/position.hpp"
+//#include "entities/tiletest.hpp"
 #include "entities/tux.hpp"
 #include "exception.hpp"
 #include "helper_events.hpp"
@@ -328,6 +330,12 @@ void loadTextures()
 void createEntities()
 {
     //_entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));
+
+    //auto tux = std::make_shared<Tux>();
+    //tux->position = std::make_shared<Components::Position>();
+    //tux->graphics = std::make_shared<Components::Graphics>(_texMgr.get("tux"),
+    //                                                       tux->position);
+    //_entities.push_back(tux);
 }
 
 void updateEntities(float dt)
@@ -404,7 +412,10 @@ void drawScene()
 
     for (auto entity : _entities)
     {
-        entity->draw();
+        if (entity->graphics.get() != nullptr)
+        {
+            entity->graphics->draw();
+        }
     }
 
     _map->draw();

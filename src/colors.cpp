@@ -46,6 +46,8 @@ SDL_Color Colors::makeColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     return MAKE_COLOR(r, g, b, a);
 }
 
+
+
 uint32_t Colors::convertToUint32(const SDL_Color &color,
                                  const SDL_PixelFormat *format)
 {

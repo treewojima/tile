@@ -15,24 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
-
 #include "defines.hpp"
-#include "entity.hpp"
+#include "components/base.hpp"
+#include <sstream>
 
-#include <vector>
-
-#include "game.hpp"
-
-class Tux : public Entity
+Components::Base::Base(const std::string &name) :
+    _name(name)
 {
-public:
-    Tux();
-    ~Tux();
+}
 
-private:
-    std::vector<Game::Event::Handle> _eventHandles;
-};
-
+Components::Base::~Base()
+{
+#ifdef _DEBUG_COMPONENTS
+    LOG(DEBUG) << "destroyed component " << getName();
 #endif
+}
+
+std::string Components::Base::toString() const
+{
+    std::ostringstream ss;
+    ss << "Components::Base[name = \"" << getName() << "\"]";
+    return ss.str();
+}

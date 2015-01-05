@@ -17,44 +17,57 @@
 
 #include "defines.hpp"
 #include "entities/tux.hpp"
+#include "graphics.hpp"
 
-Tux::Tux() :
+Tux::Tux(const Vector2f &pos) :
     Entity("tux"),
+    _position(pos),
+    _texture(Game::getTexMgr().get(getName())),
     _eventHandles(4)
 {
 #ifdef _DEBUG_ENTITIES
     LOG(DEBUG) << "created entity " << toString();
 #endif
 
-    // NOTE: This should all be refactored into some sort of component
-
     static const int magnitude = 5;
 
     _eventHandles.push_back(Game::registerEvent(
         SDL_SCANCODE_UP,
-        [this](const SDL_Event &e) { position->y += magnitude; },
+        [this](const SDL_Event &e) { _position.y += magnitude; },
         "TuxUpEvent"));
 
     _eventHandles.push_back(Game::registerEvent(
         SDL_SCANCODE_DOWN,
-        [this](const SDL_Event &e) { position->y -= magnitude; },
+        [this](const SDL_Event &e) { _position.y -= magnitude; },
         "TuxDownEvent"));
 
     _eventHandles.push_back(Game::registerEvent(
         SDL_SCANCODE_LEFT,
-        [this](const SDL_Event &e) { position->x -= magnitude; },
+        [this](const SDL_Event &e) { _position.x -= magnitude; },
         "TuxLeftEvent"));
 
     _eventHandles.push_back(Game::registerEvent(
         SDL_SCANCODE_RIGHT,
-        [this](const SDL_Event &e) { position->x += magnitude; },
+        [this](const SDL_Event &e) { _position.x += magnitude; },
         "TuxRightEvent"));
 }
 
 Tux::~Tux()
 {
-    for (auto handle : _eventHandles)
+    for (const auto &handle : _eventHandles)
     {
         Game::unregisterEvent(handle);
     }
+}
+
+void Tux::draw() const
+{
+    Graphics::blitTexture(_texture, _position);
+}
+
+std::string Tux::toString() const
+{
+    std::ostringstream ss;
+    ss << "Tux[name = \"" << getName() << "\", position = " << _position << "]";
+    return ss.str();
 }

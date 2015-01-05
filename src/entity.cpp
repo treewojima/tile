@@ -26,6 +26,7 @@
 #include <sstream>
 
 Entity::Entity(const std::string &name) :
+    position(nullptr),
     _name(name),
     _markedForDeath(false)
 {
@@ -41,6 +42,9 @@ Entity::~Entity()
 std::string Entity::toString() const
 {
     std::ostringstream ss;
-    ss << "Entity[name = \"" << getName() << "\"]";
+    ss << "Entity[name = \"" << getName() << "\", position = "
+       << (position.get() != nullptr ? position->toString() : "<null>")
+       << ", graphics = "
+       << (graphics.get() != nullptr ? graphics->toString() : "<null>") << "]";
     return ss.str();
 }

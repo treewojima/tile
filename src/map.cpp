@@ -23,7 +23,10 @@
 #include <tmxparser/Tmx.h>
 
 #include "colors.hpp"
-#include "entities/tiletest.hpp"
+#include "components/graphics.hpp"
+#include "components/position.hpp"
+//#include "entities/tiletest.hpp"
+#include "entity.hpp"
 #include "exception.hpp"
 #include "game.hpp"
 #include "graphics.hpp"
@@ -58,9 +61,9 @@ Map::~Map()
 
 void Map::draw() const
 {
-    for (const auto entity : _entities)
+    for (auto entity : _entities)
     {
-        entity->draw();
+        entity->graphics->draw();
     }
 }
 
@@ -193,9 +196,15 @@ void Map::createTestEntities()
                 // Create the test entity
                 Vector2f pos(col * _map->GetTileWidth() + 50,
                              Window::getHeight() - (row * _map->GetTileHeight() + 50));
-                auto entity = std::make_shared<TileTest>(name.str(),
-                                                         pos,
-                                                         texture);
+                //auto entity = std::make_shared<TileTest>(name.str(),
+                //                                         pos,
+                //                                         texture);
+                auto entity = std::make_shared<Entity>(name.str());
+                entity->position = std::make_shared<Components::Position>(pos);
+                entity->graphics =
+                        std::make_shared<Components::Graphics>(texture,
+                                                               entity->position);
+
                 _entities.push_back(entity);
             }
         }

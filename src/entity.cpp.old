@@ -15,24 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
-
 #include "defines.hpp"
 #include "entity.hpp"
 
-#include <vector>
+#include <cassert>
+#include <cmath>
+#include <easylogging++.h>
+#include <GL/glew.h>
+#include <SDL2/SDL.h>
+#include <sstream>
 
-#include "game.hpp"
-
-class Tux : public Entity
+Entity::Entity(const std::string &name) :
+    _name(name),
+    _markedForDeath(false)
 {
-public:
-    Tux();
-    ~Tux();
+}
 
-private:
-    std::vector<Game::Event::Handle> _eventHandles;
-};
-
+Entity::~Entity()
+{
+#ifdef _DEBUG_ENTITIES
+    LOG(DEBUG) << "destroyed entity " << getName();
 #endif
+}
+
+std::string Entity::toString() const
+{
+    std::ostringstream ss;
+    ss << "Entity[name = \"" << getName() << "\"]";
+    return ss.str();
+}

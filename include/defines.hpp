@@ -24,5 +24,6 @@
 //#define _TEST_TEXTURE_DIMENSIONS
 //#define _DEBUG_EVENTS
 #define _DEBUG_ENTITIES
+#define _DEBUG_COMPONENTS
 
 #endif

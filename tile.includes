@@ -3,3 +3,5 @@ lib/include/
 src
 src/entities
 include/entities
+include/components
+src/components

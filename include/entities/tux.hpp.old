@@ -19,19 +19,27 @@
 #define __TUX_HPP__
 
 #include "defines.hpp"
-#include "entity.hpp"
 
 #include <vector>
 
+#include "entity.hpp"
 #include "game.hpp"
+#include "texture.hpp"
+#include "vector.hpp"
 
 class Tux : public Entity
 {
 public:
-    Tux();
+    Tux(const Vector2f &pos);
     ~Tux();
 
+    void draw() const;
+
+    std::string toString() const;
+
 private:
+    Vector2f _position;
+    TextureManager::ResourcePtr _texture;
     std::vector<Game::Event::Handle> _eventHandles;
 };
 
