@@ -39,3 +39,7 @@ src/map.cpp
 include/resourcemanager.hpp
 include/entities/tux.hpp
 src/entities/tux.cpp
+include/graphics.hpp
+src/graphics.cpp
+include/entities/tiletest.hpp
+src/entities/tiletest.cpp

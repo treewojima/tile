@@ -23,30 +23,27 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <sstream>
+
 #include "colors.hpp"
 #include "exception.hpp"
 #include "game.hpp"
+#include "graphics.hpp"
 
 #ifdef _TEST_TEXTURE_DIMENSIONS
 #   define IS_POWER_OF_TWO(n) ((n & (n - 1)) == 0)
 #endif
 
 Texture::Texture(const std::string &name,
-                 const std::string &filename) :
+                 const std::string &filename,
+                 const SDL_Color *colorKey) :
     _name(name),
     _texture(0),
     _width(0),
     _height(0)
 {
-    auto surface = IMG_Load(filename.c_str());
-    if (surface == nullptr)
-    {
-        std::ostringstream ss;
-        ss << "unable to load \"" << filename << "\": " << IMG_GetError();
-        throw SDLImageException(ss.str());
-    }
+    auto surface = Graphics::loadSDLSurface(filename);
 
-    copySurfaceToGL(surface);
+    copySurfaceToGL(surface, colorKey);
     SDL_FreeSurface(surface);
 
     LOG(INFO) << "loaded texture \"" << _name << "\" from file \""
@@ -55,6 +52,7 @@ Texture::Texture(const std::string &name,
 
 Texture::Texture(const std::string &name,
                  SDL_Surface *surface,
+                 const SDL_Color *colorKey,
                  bool freeSurface,
                  bool optimize) :
     _name(name),
@@ -65,7 +63,7 @@ Texture::Texture(const std::string &name,
     if (!surface)
         throw SDLException("null surface passed to Texture constructor");
 
-    copySurfaceToGL(surface, optimize);
+    copySurfaceToGL(surface, colorKey, optimize);
     if (freeSurface)
         SDL_FreeSurface(surface);
 
@@ -89,27 +87,13 @@ std::string Texture::toString() const
 }
 
 void Texture::copySurfaceToGL(SDL_Surface *surface,
+                              const SDL_Color *colorKey,
                               bool optimize)
 {
     auto workingSurface = surface;
 
     // Optimize the surface if requested
-    if (optimize)
-    {
-        auto optimizedSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                                     workingSurface->w,
-                                                     workingSurface->h,
-                                                     32,
-                                                     Colors::RMASK,
-                                                     Colors::GMASK,
-                                                     Colors::BMASK,
-                                                     Colors::AMASK);
-        if (!optimizedSurface)
-            throw SDLException();
-
-        SDL_BlitSurface(workingSurface, NULL, optimizedSurface, NULL);
-        workingSurface = optimizedSurface;
-    }
+    if (optimize) workingSurface = Graphics::optimizeSDLSurface(workingSurface);
 
     _width = workingSurface->w;
     _height = workingSurface->h;
@@ -129,49 +113,68 @@ void Texture::copySurfaceToGL(SDL_Surface *surface,
 #endif
 
     // Make sure the image is either 24 or 32 bpp
-    GLenum colorFormat;
-    auto numColors = workingSurface->format->BytesPerPixel;
-    switch (numColors)
+    const int bytesPerPixel = workingSurface->format->BytesPerPixel;
+    if (bytesPerPixel < 3)
     {
-    case 4:
-        colorFormat = GL_RGBA;
-        break;
-    case 3:
-        colorFormat = GL_RGB;
-        break;
-
-    default:
-        {
-            std::ostringstream ss;
-            ss << "intermediate SDL_Surface for texture \"" << getName()
-               << "\" is not truecolor (24 or 32 bpp)";
-            throw SDLException(ss.str());
-        }
+        std::ostringstream ss;
+        ss << "intermediate SDL_Surface for texture \"" << getName()
+           << "\" is not truecolor (24 or 32 bpp)";
+        throw SDLException(ss.str());
     }
+
+    // Loop through the surface pixel data and override the alpha value for any pixels
+    // that match the color key, if one was set
+    uint8_t *originalPixels = static_cast<uint8_t *>(workingSurface->pixels);
+    uint8_t *keyedPixels = new uint8_t[_width * _height * 4];
+    assert(keyedPixels != nullptr);
+    int i, j;
+    for (i = 0, j = 0;
+         i < _width * _height * bytesPerPixel;
+         i += bytesPerPixel, j += 4)
+    {
+        // This RELIES on short-circuit evaluation
+        if (colorKey != nullptr &&
+            originalPixels[i]     == colorKey->r &&
+            originalPixels[i + 1] == colorKey->g &&
+            originalPixels[i + 2] == colorKey->b)
+        {
+            // If the color key matches, set the alpha byte to zero
+            keyedPixels[j + 3] = 0;
+        }
+        else
+        {
+            keyedPixels[j + 3] = 255;
+        }
+
+        keyedPixels[j]     = originalPixels[i];
+        keyedPixels[j + 1] = originalPixels[i + 1];
+        keyedPixels[j + 2] = originalPixels[i + 2];
+    }
+
+    // Free the now-unnecessary SDL_Surface if it was optimized
+    if (optimize)
+        SDL_FreeSurface(workingSurface);
 
     // Prepare to create an OpenGL texture
     glGenTextures(1, &_texture);
     glBindTexture(GL_TEXTURE_2D, _texture);
-
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-    // Copy the actual texture data from the SDL_Surface to video memory
+    // Copy the texture into video memory
     glTexImage2D(GL_TEXTURE_2D,
                  0,
-                 numColors,
+                 GL_RGBA,
                  _width,
                  _height,
                  0,
-                 colorFormat,
+                 GL_RGBA,
                  GL_UNSIGNED_BYTE,
-                 workingSurface->pixels);
+                 keyedPixels);
+
+    // Free the original pixel data
+    delete[] keyedPixels;
 
     glGenerateMipmap(GL_TEXTURE_2D);
-
-    // Clean up the optimized surface if necessary (the original working
-    // surface will be freed by the caller)
-    if (optimize)
-        SDL_FreeSurface(workingSurface);
 }

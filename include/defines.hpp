@@ -23,5 +23,6 @@
 #define _USE_MATH_DEFINES
 //#define _TEST_TEXTURE_DIMENSIONS
 //#define _DEBUG_EVENTS
+#define _DEBUG_ENTITIES
 
 #endif

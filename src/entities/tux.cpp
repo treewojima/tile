@@ -17,7 +17,7 @@
 
 #include "defines.hpp"
 #include "entities/tux.hpp"
-#include "window.hpp"
+#include "graphics.hpp"
 
 Tux::Tux(const Vector2f &pos) :
     Entity("tux"),
@@ -25,6 +25,10 @@ Tux::Tux(const Vector2f &pos) :
     _texture(Game::getTexMgr().get(getName())),
     _eventHandles(4)
 {
+#ifdef _DEBUG_ENTITIES
+    LOG(DEBUG) << "created entity " << toString();
+#endif
+
     static const int magnitude = 5;
 
     _eventHandles.push_back(Game::registerEvent(
@@ -56,9 +60,9 @@ Tux::~Tux()
     }
 }
 
-void Tux::draw()
+void Tux::draw() const
 {
-    Window::blitTexture(_texture, _position);
+    Graphics::blitTexture(_texture, _position);
 }
 
 std::string Tux::toString() const

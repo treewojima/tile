@@ -33,7 +33,7 @@ public:
     Tux(const Vector2f &pos);
     ~Tux();
 
-    void draw();
+    void draw() const;
 
     std::string toString() const;
 

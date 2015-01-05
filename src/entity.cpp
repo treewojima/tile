@@ -33,7 +33,9 @@ Entity::Entity(const std::string &name) :
 
 Entity::~Entity()
 {
+#ifdef _DEBUG_ENTITIES
     LOG(DEBUG) << "destroyed entity " << getName();
+#endif
 }
 
 std::string Entity::toString() const

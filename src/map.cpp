@@ -18,22 +18,16 @@
 #include "map.hpp"
 
 #include <cassert>
+#include <iostream>
 #include <sstream>
 #include <tmxparser/Tmx.h>
 
 #include "colors.hpp"
+#include "entities/tiletest.hpp"
 #include "exception.hpp"
 #include "game.hpp"
-
-namespace
-{
-    // NOTE: these should really be moved to a more appropriate location
-    SDL_Surface *createBlankSDLSurface(Vector2i dimensions,
-                                       SDL_Color color = Colors::WHITE);
-    TextureManager::ResourcePtr createBlankTexture(const std::string &name,
-                                                   Vector2i dimensions,
-                                                   SDL_Color color = Colors::WHITE);
-}
+#include "graphics.hpp"
+#include "window.hpp"
 
 Map::Map(const std::string &name, const std::string &filename) :
     _name(name)
@@ -41,7 +35,6 @@ Map::Map(const std::string &name, const std::string &filename) :
     // First, try to load the .tmx file
     _map = new Tmx::Map();
     _map->ParseFile(filename);
-
     if (_map->HasError())
     {
         std::ostringstream ss;
@@ -52,101 +45,159 @@ Map::Map(const std::string &name, const std::string &filename) :
     }
 
     loadTilesetTextures();
-    render();
+    createTestEntities();
 }
 
 Map::~Map()
 {
-    assert(glIsFramebufferEXT(_fbo));
-    glDeleteFramebuffersEXT(1, &_fbo);
+    _entities.clear();
 
     assert(_map != nullptr);
     delete _map;
 }
 
-void Map::loadTilesetTextures()
+void Map::draw() const
 {
-    auto tilesets = _map->GetTilesets();
-    _tilesetTextures.resize(tilesets.size());
-
-    for (auto tileset : tilesets)
+    for (const auto entity : _entities)
     {
-        TextureManager::ResourcePtr texture;
-
-        try
-        {
-            auto filename = "res/" + tileset->GetImage()->GetSource();
-            texture = std::make_shared<Texture>(tileset->GetName(),
-                                                filename);
-        }
-        catch (const SDLException &e)
-        {
-            std::ostringstream ss;
-            ss << "Couldn't load tileset texture for map \"" << getName()
-               << "\": " << e.what();
-            throw MapException(ss.str());
-        }
-
-        Game::getTexMgr().add(texture->getName(), texture);
-        _tilesetTextures.push_back(texture);
+        entity->draw();
     }
 }
 
-void Map::render()
+void Map::loadTilesetTextures()
 {
-    // First, try to create a framebuffer object
-    glGenFramebuffersEXT(1, &_fbo);
-    auto error = glGetError();
-    if (error != GL_NO_ERROR)
-        throw GLException(error);
+    // NOTE: This is likely very, very wrong for multiple tilesets
+    int gid = 0;
 
-    // Create a blank surface
-    const int widthPixels = _map->GetWidth() * _map->GetTileWidth();
-    const int heightPixels = _map->GetHeight() * _map->GetTileHeight();
-    auto texture = createBlankTexture("renderedMap", Vector2i(widthPixels, heightPixels));
+    // NOTE: This is very, very hacky
+    const SDL_Color colorKey = Colors::makeColor(0xFF, 0, 0xFF);
 
-    auto layers = _map->GetLayers();
-    for (Tmx::Layer *layer : layers)
+    const int numTilesets = _map->GetNumTilesets();
+    for (int i = 0; i < numTilesets; i++)
     {
-        for (int x = 0; x < layer->GetWidth(); x++)
-        {
-            for (int y = 0; y < layer->GetHeight(); y++)
-            {
+        const Tmx::Tileset *tileset = _map->GetTileset(i);
 
+        const int tileWidth = tileset->GetTileWidth();
+        const int tileHeight = tileset->GetTileHeight();
+        const int tilesetWidth = tileset->GetImage()->GetWidth();
+        const int tilesetHeight = tileset->GetImage()->GetHeight();
+        const int margin = tileset->GetMargin();
+        const int numCols = tilesetWidth / tileWidth;
+        const int numRows = tilesetHeight / tileHeight;
+        const int firstGid = tileset->GetFirstGid();
+
+        std::cout << "tileWidth     = "   << tileWidth
+                  << "\ntileHeight    = " << tileHeight
+                  << "\ntilesetWidth  = " << tilesetWidth
+                  << "\ntilesetHeight = " << tilesetHeight
+                  << "\nmargin        = " << margin
+                  << "\nnumCols       = " << numCols
+                  << "\nnumRows       = " << numRows
+                  << "\nfirstGid      = " << firstGid << std::endl;
+
+        auto filename = tileset->GetImage()->GetSource();
+        auto tilesetSurface = Graphics::loadSDLSurface("res/" + filename);
+
+        // NOTE: This is likely very, very wrong for multiple tilesets
+        gid = firstGid;
+
+        for (int row = 0; row < numRows; row++)
+        {            
+            for (int col = 0; col < numCols; col++)
+            {
+                SDL_Rect srcRect;
+                srcRect.x = (margin * (col + 1)) + (tileWidth * col);
+                srcRect.y = (margin * (row + 1)) + (tileHeight * row);
+                srcRect.w = tileWidth;
+                srcRect.h = tileHeight;
+
+                //std::cout << "srcRect[" << col << ", " << row << "] = {"
+                //          << srcRect.x << ", " << srcRect.y << ", "
+                //          << srcRect.w << ", " << srcRect.h << "}" << std::endl;
+
+                auto destSurface = Graphics::createBlankSDLSurface(tileWidth, tileHeight);
+                assert(destSurface != nullptr);
+
+                SDL_BlitSurface(tilesetSurface,
+                                &srcRect,
+                                destSurface,
+                                nullptr);
+
+                std::ostringstream name;
+                //name << tileset->GetName() << "-" << col << "-" << row;
+                name << tileset->GetName() << "-" << gid;
+
+                // NOTE: For some reason, freeing destSurface causes segfaults
+                //       or similar errors. It seems to be random exactly which
+                //       iteration of the loop it occurs, so I'm not sure what's
+                //       causing it. It's odd because the surface optimization
+                //       process frees an intermediate surface per iteration as
+                //       well, but with no errors.
+                //
+                //       By setting freeSurface to false this issue is avoided.
+                //       However, it leaves the intermediate surface in memory,
+                //       which is a leak!
+                auto texture = std::make_shared<Texture>(name.str(),
+                                                         destSurface,
+                                                         &colorKey,
+                                                         false,       // do NOT free the surface
+                                                         true);
+
+                Game::getTexMgr().add(texture->getName(), texture);
+
+                // Create a test entity
+                //Vector2f pos(srcRect.x + 50 + (margin + col * 2),
+                //             srcRect.y + 50 + (margin + row * 2));
+                //auto entity = std::make_shared<TileTest>(texture->getName(),
+                //                                         pos);
+                //_entities.push_back(entity);
+
+                gid++;
+            }
+        }
+
+        SDL_FreeSurface(tilesetSurface);
+    }
+}
+
+void Map::createTestEntities()
+{
+    const int numLayers = _map->GetNumLayers();
+    for (int i = 0; i < numLayers; i++)
+    {
+        //if (i > 0) break;
+
+        const Tmx::Layer *layer = _map->GetLayer(i);
+
+        //std::cout << "**************\n"
+        //          << "Layer " << layer->GetName()
+        //          << "\n**************" << std::endl;
+
+        for (int col = 0; col < layer->GetWidth(); col++)
+        {
+            for (int row = 0; row < layer->GetHeight(); row++)
+            {
+                auto tile = layer->GetTile(col, row);                
+
+                // HACK ALERT HACK ALERT HACK ALERT
+                if (tile.id == 0) continue;
+
+                // NOTE: This is a HUGE HACK!
+                std::ostringstream name, textureName;
+                name << "sewer_tileset-" << col << "-" << row;
+                textureName << "sewer_tileset-" << tile.id + 1;
+
+                // NOTE: This is a HUGE HACK!
+                auto texture = Game::getTexMgr().get(textureName.str());
+
+                // Create the test entity
+                Vector2f pos(col * _map->GetTileWidth() + 50,
+                             Window::getHeight() - (row * _map->GetTileHeight() + 50));
+                auto entity = std::make_shared<TileTest>(name.str(),
+                                                         pos,
+                                                         texture);
+                _entities.push_back(entity);
             }
         }
     }
-}
-
-// Local functions
-namespace {
-
-SDL_Surface *createBlankSDLSurface(Vector2i dimensions, SDL_Color color)
-{
-    auto surface = SDL_CreateRGBSurface(0,
-                                        dimensions.x,
-                                        dimensions.y,
-                                        32,
-                                        Colors::RMASK,
-                                        Colors::GMASK,
-                                        Colors::BMASK,
-                                        Colors::AMASK);
-    if (surface == nullptr)
-        throw SDLException();
-
-    SDL_FillRect(surface,
-                 nullptr,
-                 SDL_MapRGBA(surface->format, color.r, color.g, color.b, color.a));
-
-    return surface;
-}
-
-TextureManager::ResourcePtr createBlankTexture(const std::string &name,
-                                               Vector2i dimensions,
-                                               SDL_Color color)
-{
-    auto surface = createBlankSDLSurface(dimensions, color);
-    return std::make_shared<Texture>(name, surface);
-}
-
 }

@@ -31,6 +31,7 @@
 #include <sstream>
 #include <tclap/CmdLine.h>
 
+#include "entities/tiletest.hpp"
 #include "entities/tux.hpp"
 #include "exception.hpp"
 #include "helper_events.hpp"
@@ -114,7 +115,7 @@ void Game::run(Game::Options options)
     loadTextures();
     createEntities();
 
-    _map = std::unique_ptr<Map>(new Map("example", "res/example.tmx"));
+    _map = std::unique_ptr<Map>(new Map("sewers", "res/sewers.tmx"));
 
     // Main loop variables
     Timer stepTimer;
@@ -264,14 +265,12 @@ void initGL()
     LOG(INFO) << "using GLEW " << glewGetString(GLEW_VERSION);
     LOG(INFO) << "using OpenGL " << glGetString(GL_VERSION);
 
-    if (!GLEW_EXT_framebuffer_object)
-        throw GLEWException("platform does not support framebuffer objects");
-
-    if (!GLEW_EXT_framebuffer_blit)
-        throw GLEWException("platform does not support framebuffer object blitting");
-
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
+
+    // Enable alpha blending/transparency
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0);
 
     //glViewport(0, 0, windowWidth, windowHeight);
 
@@ -407,6 +406,8 @@ void drawScene()
     {
         entity->draw();
     }
+
+    _map->draw();
 
     Window::flip();
 }

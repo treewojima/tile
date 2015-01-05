@@ -37,7 +37,7 @@ public:
 
     // Update and draw functions, called in every tick of the loop
     virtual void update(float dt) {}
-    virtual void draw() = 0;
+    virtual void draw() const = 0;
 
     // Various getters
     inline std::string getName() const { return _name; }

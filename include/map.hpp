@@ -20,10 +20,11 @@
 
 #include "defines.hpp"
 
+#include <list>
 #include <string>
 #include <tmxparser/TmxMap.h>
-#include <vector>
 
+#include "entity.hpp"
 #include "texture.hpp"
 
 class Map
@@ -32,19 +33,18 @@ public:
     Map(const std::string &name, const std::string &filename);
     ~Map();
 
+    void draw() const;
+
     inline std::string getName() const { return _name; }
 
 private:
     std::string _name;
     Tmx::Map *_map;
-    std::vector<TextureManager::ResourcePtr> _tilesetTextures;
+    std::list<std::shared_ptr<Entity>> _entities;
     TextureManager::ResourcePtr _renderedMapTexture;
-    GLuint _fbo;
 
     void loadTilesetTextures();
-
-    // NOTE: This is NOT the best way to go about this
-    void render();
+    void createTestEntities();
 };
 
 #endif

@@ -72,45 +72,6 @@ void Window::clear(float r, float g, float b, float a)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Window::blitTexture(TextureManager::ConstResourcePtr texture,
-                         float x,
-                         float y)
-{
-    const auto width = texture->getWidth();
-    const auto height = texture->getHeight();
-    const float centeredWidth = width / 2.f;
-    const float centeredHeight = height / 2.f;
-
-    // NOTE: Should there be a glLoadIdentity() here as well?
-
-    glBindTexture(GL_TEXTURE_2D, texture->getRawTexture());
-    glTranslatef(x - centeredWidth, y - centeredHeight, 0);
-    glBegin(GL_QUADS);
-        glTexCoord2i(1, 1);
-        glVertex2f(width, 0);
-        glTexCoord2i(0, 1);
-        glVertex2f(0, 0);
-        glTexCoord2i(0, 0);
-        glVertex2f(0, height);
-        glTexCoord2i(1, 0);
-        glVertex2f(width, height);
-    glEnd();
-
-    glLoadIdentity();
-}
-
-void Window::blitTexture(TextureManager::ConstResourcePtr texture,
-                         const Vector2f &pos)
-{
-    blitTexture(texture, pos.x, pos.y);
-}
-
-void Window::blitTexture(TextureManager::ConstResourcePtr texture,
-                         const Vector2i &pos)
-{
-    blitTexture(texture, pos.x, pos.y);
-}
-
 void Window::flip()
 {
     SDL_GL_SwapWindow(_window);
@@ -119,4 +80,11 @@ void Window::flip()
 void Window::setTitle(const std::string &title)
 {
     SDL_SetWindowTitle(_window, title.c_str());
+}
+
+Vector2i Window::getDimensions()
+{
+    Vector2i ret;
+    SDL_GetWindowSize(_window, &ret.x, &ret.y);
+    return ret;
 }

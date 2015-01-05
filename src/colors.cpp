@@ -41,7 +41,13 @@ const uint32_t Colors::BMASK = 0x00ff0000;
 const uint32_t Colors::AMASK = 0xff000000;
 #endif
 
-SDL_Color Colors::makeColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+SDL_Color Colors::makeColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
     return MAKE_COLOR(r, g, b, a);
+}
+
+uint32_t Colors::convertToUint32(const SDL_Color &color,
+                                 const SDL_PixelFormat *format)
+{
+    return SDL_MapRGBA(format, color.r, color.g, color.b, color.a);
 }

@@ -28,9 +28,11 @@ class Texture
 {
 public:
     Texture(const std::string &name,
-            const std::string &filename);
+            const std::string &filename,
+            const SDL_Color *colorKey = nullptr);
     Texture(const std::string &name,
             SDL_Surface *surface,
+            const SDL_Color *colorKey = nullptr,
             bool freeSurface = true,
             bool optimize = true);
     ~Texture();
@@ -48,6 +50,7 @@ private:
     int _width, _height;
 
     void copySurfaceToGL(SDL_Surface *surface,
+                         const SDL_Color *colorKey = nullptr,
                          bool optimize = true);
 };
 

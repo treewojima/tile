@@ -33,15 +33,11 @@ namespace Window
     void clear(float r = 0, float g = 0, float b = 0, float a = 0);
     void flip();
 
-    void blitTexture(TextureManager::ConstResourcePtr texture,
-                     float x,
-                     float y);
-    void blitTexture(TextureManager::ConstResourcePtr texture,
-                     const Vector2f &pos);
-    void blitTexture(TextureManager::ConstResourcePtr texture,
-                     const Vector2i &pos);
-
     void setTitle(const std::string &title);
+
+    Vector2i getDimensions();
+    inline int getWidth() { return getDimensions().x; }
+    inline int getHeight() { return getDimensions().y; }
 }
 
 #endif

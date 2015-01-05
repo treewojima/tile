@@ -15,32 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COLORS_HPP__
-#define __COLORS_HPP__
-
 #include "defines.hpp"
-#include <cstdint>
-#include <SDL2/SDL.h>
+#include "entities/tiletest.hpp"
 
-namespace Colors
+#include <iostream>
+
+#include "game.hpp"
+#include "graphics.hpp"
+
+TileTest::TileTest(const std::string &name,
+                   const Vector2f &pos,
+                   TextureManager::ResourcePtr texture) :
+    Entity(name),
+    _position(pos),
+    _texture(texture)
 {
-    extern const SDL_Color BLACK;
-    extern const SDL_Color WHITE;
-    extern const SDL_Color RED;
-    extern const SDL_Color GREEN;
-    extern const SDL_Color BLUE;
-    extern const SDL_Color BROWN;
-    extern const SDL_Color GRAY;
-
-    extern const uint32_t RMASK;
-    extern const uint32_t GMASK;
-    extern const uint32_t BMASK;
-    extern const uint32_t AMASK;
-
-    SDL_Color makeColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
-    //SDL_Color makeColor(uint32_t color);
-    uint32_t convertToUint32(const SDL_Color &color,
-                             const SDL_PixelFormat *format);
+#ifdef _DEBUG_ENTITIES
+    std::cout << "created entity " << toString() << std::endl;
+#endif
 }
 
-#endif
+void TileTest::draw() const
+{
+    Graphics::blitTexture(_texture, _position);
+}
+
+std::string TileTest::toString() const
+{
+    std::ostringstream ss;
+    ss << "TileTest[name = \"" << getName() << "\", position = " << _position << "]";
+    return ss.str();
+}
