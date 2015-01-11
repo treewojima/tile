@@ -29,26 +29,11 @@ namespace Components
     class Graphics : public Base
     {
     public:
-        Graphics(TextureManager::ConstResourcePtr texture,
-                 std::shared_ptr<Components::Position> positionComponent);
+        Graphics(const std::string &name = "graphics");
 
-    protected:
-        Graphics();
-
-    public:
-        virtual void draw();
-
-        inline TextureManager::ConstResourcePtr getTexture() const
-            { return _texture; }
+        virtual void draw() = 0;
 
         std::string toString() const;
-
-    protected:
-        void setTexture(TextureManager::ConstResourcePtr texture);
-
-    private:
-        TextureManager::ConstResourcePtr _texture;
-        std::shared_ptr<Components::Position> _position;
     };
 }
 

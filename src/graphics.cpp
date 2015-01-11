@@ -27,7 +27,7 @@
 SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
                                       bool optimize)
 {
-    auto surface = IMG_Load(filename.c_str());
+    SDL_Surface *surface = IMG_Load(filename.c_str());
     if (surface == nullptr)
     {
         std::ostringstream ss;

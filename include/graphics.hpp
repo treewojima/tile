@@ -30,14 +30,18 @@
 // Miscellaneous graphics routines
 namespace Graphics
 {
+    // NOTE: The default arguments for "optimize" and "freeSurface" were
+    //       originally true, but have been changed to false because
+    //       SDL_FreeSurface kept erroring out. Investigate this later!
+
     // SDL_Surface creation/manipulation
     SDL_Surface *loadSDLSurface(const std::string &filename,
-                                bool optimize = true);
+                                bool optimize = false);
     //SDL_Surface *loadSDLSurface(const std::string &filename,
     //                            SDL_Color colorKey,
     //                            bool optimize = true);
     SDL_Surface *optimizeSDLSurface(SDL_Surface *surface,
-                                    bool freeSurface = true);
+                                    bool freeSurface = false);
     SDL_Surface *createBlankSDLSurface(int width,
                                        int height,
                                        SDL_Color color = Colors::WHITE);

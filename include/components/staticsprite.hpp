@@ -15,18 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __COMPONENTS_STATICSPRITE_HPP__
+#define __COMPONENTS_STATICSPRITE_HPP__
+
 #include "defines.hpp"
 #include "components/graphics.hpp"
-#include "graphics.hpp"
+#include "components/position.hpp"
+#include "texture.hpp"
+#include "vector.hpp"
 
-Components::Graphics::Graphics(const std::string &name) :
-    Components::Base(name)
+namespace Components
 {
+    class StaticSprite : public Graphics
+    {
+    public:
+        StaticSprite(TextureManager::ConstResourcePtr texture,
+                     std::shared_ptr<Components::Position> positionComponent);
+
+        void draw();
+
+        inline TextureManager::ConstResourcePtr getTexture() const
+            { return _texture; }
+
+        std::string toString() const;
+
+    protected:
+        void setTexture(TextureManager::ConstResourcePtr texture);
+
+    private:
+        TextureManager::ConstResourcePtr _texture;
+        std::shared_ptr<Components::Position> _position;
+    };
 }
 
-std::string Components::Graphics::toString() const
-{
-    std::ostringstream ss;
-    ss << "Components::Graphics[name = \"" << getName() << "\" ]";
-    return ss.str();
-}
+#endif

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="desert" tilewidth="32" tileheight="32">
+  <image source="desert.png" trans="ff00ff" width="416" height="800"/>
+ </tileset>
+ <layer name="layer1" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJx9zbsOgkAUhOGhEdQSUEtvrVKhCVgZE7BSXoP3bzRq/AnHaES3+JKT2c3MRdIVMW6444EV1kjs7nmSjwB9DDBExluOndo7JIsQY4QxJih4K3G0vinZDHMssPTa/HM3U7c//5EXeven2Jituruv/j1qc3Dsfv/7t3vC2VSO3cRxN91Pqt8Ytw==
+  </data>
+ </layer>
+ <layer name="layer2" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYBh8oAuIu4lQNx2IZ+CRXwDEC4m0cx0euQ4g7iTCjKlAPI0IdYvwyAEAFEwHEg==
+  </data>
+ </layer>
+</map>

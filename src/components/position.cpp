@@ -18,31 +18,11 @@
 #include "defines.hpp"
 #include "components/position.hpp"
 
-#if 0
-class Position : public Base
-{
-public:
-    // NOTE: Should these be replaced by getters/setters?
-    float x, y;
-
-    Position(const Vector2f pos = Vector2f::ZERO);
-    Position(float x, float y);
-    ~Position();
-
-    inline Vector2f toVector() const { return Vector2f(x, y); }
-
-    std::string toString() const;
-};
-#endif
-
 Components::Position::Position(const Vector2f pos) :
     Components::Base("position"),
     x(pos.x),
     y(pos.y)
 {
-#ifdef _DEBUG_COMPONENTS
-    LOG(DEBUG) << "created component " << toString();
-#endif
 }
 
 Components::Position::Position(float x_, float y_) :
@@ -50,9 +30,6 @@ Components::Position::Position(float x_, float y_) :
     x(x_),
     y(y_)
 {
-#ifdef _DEBUG_COMPONENTS
-    LOG(DEBUG) << "created component " << toString();
-#endif
 }
 
 std::string Components::Position::toString() const

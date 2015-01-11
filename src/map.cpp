@@ -23,8 +23,8 @@
 #include <tmxparser/Tmx.h>
 
 #include "colors.hpp"
-#include "components/graphics.hpp"
 #include "components/position.hpp"
+#include "components/staticsprite.hpp"
 //#include "entities/tiletest.hpp"
 #include "entity.hpp"
 #include "exception.hpp"
@@ -102,7 +102,7 @@ void Map::loadTilesetTextures()
         auto tilesetSurface = Graphics::loadSDLSurface("res/" + filename);
 
         // NOTE: This is likely very, very wrong for multiple tilesets
-        gid = firstGid;
+        //gid = firstGid;
 
         for (int row = 0; row < numRows; row++)
         {            
@@ -182,28 +182,23 @@ void Map::createTestEntities()
             {
                 auto tile = layer->GetTile(col, row);                
 
+                //if (tile.id == 0) continue;
+
                 // HACK ALERT HACK ALERT HACK ALERT
-                if (tile.id == 0) continue;
-
-                // NOTE: This is a HUGE HACK!
                 std::ostringstream name, textureName;
-                name << "sewer_tileset-" << col << "-" << row;
-                textureName << "sewer_tileset-" << tile.id + 1;
+                name << "desert-" << col << "-" << row;
+                textureName << "desert-" << tile.id;
 
-                // NOTE: This is a HUGE HACK!
                 auto texture = Game::getTexMgr().get(textureName.str());
 
                 // Create the test entity
                 Vector2f pos(col * _map->GetTileWidth() + 50,
                              Window::getHeight() - (row * _map->GetTileHeight() + 50));
-                //auto entity = std::make_shared<TileTest>(name.str(),
-                //                                         pos,
-                //                                         texture);
                 auto entity = std::make_shared<Entity>(name.str());
                 entity->position = std::make_shared<Components::Position>(pos);
                 entity->graphics =
-                        std::make_shared<Components::Graphics>(texture,
-                                                               entity->position);
+                        std::make_shared<Components::StaticSprite>(texture,
+                                                                   entity->position);
 
                 _entities.push_back(entity);
             }

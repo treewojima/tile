@@ -41,7 +41,7 @@ Texture::Texture(const std::string &name,
     _width(0),
     _height(0)
 {
-    auto surface = Graphics::loadSDLSurface(filename);
+    SDL_Surface *surface = Graphics::loadSDLSurface(filename);
 
     copySurfaceToGL(surface, colorKey);
     SDL_FreeSurface(surface);

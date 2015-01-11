@@ -31,9 +31,10 @@
 #include <sstream>
 #include <tclap/CmdLine.h>
 
-#include "components/graphics.hpp"
+#include "colors.hpp"
+#include "components/animatedsprite.hpp"
 #include "components/position.hpp"
-//#include "entities/tiletest.hpp"
+#include "components/staticsprite.hpp"
 #include "entities/tux.hpp"
 #include "exception.hpp"
 #include "helper_events.hpp"
@@ -117,7 +118,7 @@ void Game::run(Game::Options options)
     loadTextures();
     createEntities();
 
-    _map = std::unique_ptr<Map>(new Map("sewers", "res/sewers.tmx"));
+    _map = std::unique_ptr<Map>(new Map("desert", "res/desert.tmx"));
 
     // Main loop variables
     Timer stepTimer;
@@ -172,7 +173,10 @@ void Game::run(Game::Options options)
     _fpsTimer.stop();
 
     // Clean up
-    _map.reset();
+
+    // This check is just for debugging purposes
+    if (_map.get() != nullptr) _map.reset();
+
     destroyEntities();
     _texMgr.clear();
     Window::destroy();
@@ -321,21 +325,46 @@ void shutdownSDL()
 
 void loadTextures()
 {
+    const SDL_Color colorKey = Colors::makeColor(255, 0, 255);
     TextureManager::ResourcePtr texture;
 
-    texture = std::make_shared<Texture>("tux", "res/tux.png");
+    texture = std::make_shared<Texture>("tux", "res/tux.png", &colorKey);
     _texMgr.add(texture->getName(), texture);
+
+    texture = std::make_shared<Texture>("beastie", "res/beastie.png", &colorKey);
+    _texMgr.add(texture->getName(), texture);
+
+    for (int i = 1; i <= 4; i++)
+    {
+        std::ostringstream ss;
+        ss << "foo" << i;
+        texture = std::make_shared<Texture>(ss.str(), "res/" + ss.str() + ".png", &colorKey);
+        _texMgr.add(texture->getName(), texture);
+    }
 }
 
 void createEntities()
 {
     //_entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));
 
-    //auto tux = std::make_shared<Tux>();
-    //tux->position = std::make_shared<Components::Position>();
-    //tux->graphics = std::make_shared<Components::Graphics>(_texMgr.get("tux"),
-    //                                                       tux->position);
-    //_entities.push_back(tux);
+    auto tux = std::make_shared<Tux>();
+    tux->position = std::make_shared<Components::Position>(Window::getWidth() / 2,
+                                                           Window::getHeight() / 2);
+
+    Components::AnimatedSprite::TextureList textures;
+    //textures.push_back(_texMgr.get("tux"));
+    //textures.push_back(_texMgr.get("beastie"));
+    for (int i = 1; i <= 4; i++)
+    {
+        std::ostringstream ss;
+        ss << "foo" << i;
+        textures.push_back(_texMgr.get(ss.str()));
+    }
+
+    tux->graphics = std::make_shared<Components::AnimatedSprite>(textures,
+                                                                 tux->position);
+
+    _entities.push_back(tux);
 }
 
 void updateEntities(float dt)
@@ -408,7 +437,9 @@ void handleEvents()
 
 void drawScene()
 {
-    Window::clear();
+    Window::clear(255, 255, 255, 255);
+
+    if (_map.get() != nullptr) _map->draw();
 
     for (auto entity : _entities)
     {
@@ -416,9 +447,7 @@ void drawScene()
         {
             entity->graphics->draw();
         }
-    }
-
-    _map->draw();
+    }    
 
     Window::flip();
 }

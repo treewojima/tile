@@ -15,18 +15,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __COMPONENTS_ANIMATEDSPRITE_HPP__
+#define __COMPONENTS_ANIMATEDSPRITE_HPP__
+
 #include "defines.hpp"
+#include <list>
 #include "components/graphics.hpp"
-#include "graphics.hpp"
+#include "components/position.hpp"
+#include "texture.hpp"
+#include "timer.hpp"
+#include "vector.hpp"
 
-Components::Graphics::Graphics(const std::string &name) :
-    Components::Base(name)
+namespace Components
 {
+    class AnimatedSprite : public Graphics
+    {
+    public:
+        typedef std::list<TextureManager::ConstResourcePtr> TextureList;
+
+        AnimatedSprite(TextureList textures,
+                       std::shared_ptr<Components::Position> positionComponent);
+
+        void draw();
+
+        std::string toString() const;
+
+    private:
+        TextureList _textures;
+        TextureList::iterator _currentTextureIter;
+        std::shared_ptr<Components::Position> _position;
+        Timer _timer;
+    };
 }
 
-std::string Components::Graphics::toString() const
-{
-    std::ostringstream ss;
-    ss << "Components::Graphics[name = \"" << getName() << "\" ]";
-    return ss.str();
-}
+#endif
+

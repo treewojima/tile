@@ -53,3 +53,7 @@ include/components/graphics.hpp
 src/components/graphics.cpp
 include/entities/tux.hpp
 src/entities/tux.cpp
+include/components/staticsprite.hpp
+src/components/staticsprite.cpp
+include/components/animatedsprite.hpp
+src/components/animatedsprite.cpp
