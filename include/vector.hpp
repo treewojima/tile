@@ -72,9 +72,6 @@ public:
     }
 };
 
-typedef Vector2<int> Vector2i;
-typedef Vector2<float> Vector2f;
-
 template <class T>
 inline Vector2<T> operator+(Vector2<T> lhs, const T &rhs)
 {
@@ -117,5 +114,8 @@ inline MAKE_LOGGABLE(Vector2<T>, v, stream)
     stream << v.toString();
     return stream;
 }
+
+typedef Vector2<int> Vector2i;
+typedef Vector2<float> Vector2f;
 
 #endif

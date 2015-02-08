@@ -28,12 +28,6 @@ Timer::Timer() :
 {
 }
 
-Timer::~Timer()
-{
-    // This serves no purpose other than to print the debug message
-    //stop();
-}
-
 void Timer::start()
 {
     _state = State::RUNNING;
@@ -63,7 +57,7 @@ void Timer::pause()
         _pausedTicks = SDL_GetTicks() - _startTicks;
         _startTicks = 0;
 
-        LOG(DEBUG) << "pausing timer at " << getTicks() << " ticks";
+        //LOG(DEBUG) << "pausing timer at " << getTicks() << " ticks";
     }
 }
 
@@ -79,7 +73,7 @@ void Timer::resume()
         _startTicks = SDL_GetTicks() - _pausedTicks;
         _pausedTicks = 0;
 
-        LOG(DEBUG) << "resuming timer at " << getTicks() << " ticks";
+        //LOG(DEBUG) << "resuming timer at " << getTicks() << " ticks";
     }
 }
 

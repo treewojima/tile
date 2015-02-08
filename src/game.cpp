@@ -123,7 +123,7 @@ void Game::run(Game::Options options)
     // Main loop variables
     Timer stepTimer;
     float dt = 0;
-    int countedFrames = 0;
+    unsigned long countedFrames = 0;
     Uint32 oldTicks = 0, currentTicks = 0;
 
     // Enter the main loop
@@ -417,14 +417,12 @@ void registerEvents()
 void handleEvents()
 {
     // Inject an event to check our keyboard state
-    //SDL_PumpEvents();
     SDL_Event event = {0};
     event.type = Game::Event::CUSTOM_KEYPRESS_EVENT;
     event.user.data1 = const_cast<Uint8 *>(SDL_GetKeyboardState(nullptr));
     SDL_PushEvent(&event);
 
     // Run the normal event loop
-    //memset(&event, 0, sizeof(SDL_Event));
     event = {0};
     while (SDL_PollEvent(&event))
     {

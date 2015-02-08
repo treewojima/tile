@@ -132,7 +132,6 @@ void Texture::copySurfaceToGL(SDL_Surface *surface,
          i < _width * _height * bytesPerPixel;
          i += bytesPerPixel, j += 4)
     {
-        // This RELIES on short-circuit evaluation
         if (colorKey != nullptr &&
             originalPixels[i]     == colorKey->r &&
             originalPixels[i + 1] == colorKey->g &&

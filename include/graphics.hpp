@@ -55,6 +55,7 @@ namespace Graphics
     void blitTexture(TextureManager::ConstResourcePtr texture,
                      float x,
                      float y);
+
     inline void blitTexture(TextureManager::ConstResourcePtr texture,
                      const Vector2f &pos)
     {

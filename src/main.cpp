@@ -44,12 +44,12 @@ int main(int argc, char *argv[])
     catch (TCLAP::ArgException &e)
     {
         LOG(ERROR) << "ARG EXCEPTION: " << e.error();
-        return 1;
+        std::exit(1);
     }
     catch (std::exception &e)
     {
         LOG(ERROR) << "EXCEPTION: " << e.what();
-        return 1;
+        std::exit(1);
     }
 
     LOG(INFO) << "shut down cleanly";
