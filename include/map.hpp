@@ -21,8 +21,10 @@
 #include "defines.hpp"
 
 #include <list>
+#include <memory>
 #include <string>
-#include <tmxparser/TmxMap.h>
+//#include <tmxparser/TmxMap.h>
+#include <tmx/Map.h>
 
 #include "entity.hpp"
 #include "texture.hpp"
@@ -38,13 +40,24 @@ public:
     inline std::string getName() const { return _name; }
 
 private:
+    class LayerVisitor : public tmx::LayerVisitor
+    {
+    public:
+        LayerVisitor(Map *parent) : _parent(parent) { assert(parent); }
+
+        void visitTileLayer(const tmx::Map &map, const tmx::TileLayer &layer) override;
+
+    private:
+        Map *_parent;
+    };
+
     std::string _name;
-    Tmx::Map *_map;
+    //Tmx::Map *_map;
+    std::unique_ptr<tmx::Map> _map;
     std::list<std::shared_ptr<Entity>> _entities;
     TextureManager::ResourcePtr _renderedMapTexture;
 
     void loadTilesetTextures();
-    void createTestEntities();
 };
 
 #endif

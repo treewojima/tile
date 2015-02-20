@@ -20,9 +20,7 @@
 #include <cassert>
 #include <iostream>
 #include <sstream>
-#include <tmx/Cell.h>
-//#include <tmx/LayerVisitor.h>
-#include <tmx/TileLayer.h>
+//#include <tmxparser/Tmx.h>
 
 #include "colors.hpp"
 #include "components/position.hpp"
@@ -37,14 +35,7 @@
 Map::Map(const std::string &name, const std::string &filename) :
     _name(name)
 {
-    _map = tmx::Map::parseFile(filename);
-
-    loadTilesetTextures();
-
-    LayerVisitor visitor(this);
-    _map->visitLayers(visitor);
-
-#if 0
+    // First, try to load the .tmx file
     _map = new Tmx::Map();
     _map->ParseFile(filename);
     if (_map->HasError())
@@ -55,15 +46,17 @@ Map::Map(const std::string &name, const std::string &filename) :
         delete _map;
         throw MapException(ss.str());
     }
-#endif
+
+    loadTilesetTextures();
+    createTestEntities();
 }
 
 Map::~Map()
 {
     _entities.clear();
 
-    //assert(_map != nullptr);
-    //delete _map;
+    assert(_map != nullptr);
+    delete _map;
 }
 
 void Map::draw() const
@@ -76,21 +69,25 @@ void Map::draw() const
 
 void Map::loadTilesetTextures()
 {
+    // NOTE: This is likely very, very wrong for multiple tilesets
+    int gid = 0;
+
     // NOTE: This is very, very hacky
     const SDL_Color colorKey = Colors::makeColor(0xFF, 0, 0xFF);
 
-    for (auto tileset : _map->getTileSets())
+    const int numTilesets = _map->GetNumTilesets();
+    for (int i = 0; i < numTilesets; i++)
     {
-        auto image = tileset->getImage();
-        auto tilesetSurface = Graphics::loadSDLSurface(image->getSource().string());
+        const Tmx::Tileset *tileset = _map->GetTileset(i);
 
-        const int tileWidth = tileset->getTileWidth();
-        const int tileHeight = tileset->getTileHeight();
-        const int tilesetWidth = tilesetSurface->w;
-        const int tilesetHeight = tilesetSurface->h;
+        const int tileWidth = tileset->GetTileWidth();
+        const int tileHeight = tileset->GetTileHeight();
+        const int tilesetWidth = tileset->GetImage()->GetWidth();
+        const int tilesetHeight = tileset->GetImage()->GetHeight();
+        const int margin = tileset->GetMargin();
         const int numCols = tilesetWidth / tileWidth;
         const int numRows = tilesetHeight / tileHeight;
-        const int margin = tileset->getMargin();
+        const int firstGid = tileset->GetFirstGid();
 
         std::cout << "tileWidth     = "   << tileWidth
                   << "\ntileHeight    = " << tileHeight
@@ -99,18 +96,27 @@ void Map::loadTilesetTextures()
                   << "\nmargin        = " << margin
                   << "\nnumCols       = " << numCols
                   << "\nnumRows       = " << numRows
-                  << "\nfirstGid      = " << tileset->getFirstGID() << std::endl;
+                  << "\nfirstGid      = " << firstGid << std::endl;
 
-        auto gid = tileset->getFirstGID();
-        SDL_Rect srcRect;
+        auto filename = tileset->GetImage()->GetSource();
+        auto tilesetSurface = Graphics::loadSDLSurface("res/" + filename);
+
+        // NOTE: This is likely very, very wrong for multiple tilesets
+        //gid = firstGid;
+
         for (int row = 0; row < numRows; row++)
-        {
+        {            
             for (int col = 0; col < numCols; col++)
             {
+                SDL_Rect srcRect;
                 srcRect.x = (margin * (col + 1)) + (tileWidth * col);
                 srcRect.y = (margin * (row + 1)) + (tileHeight * row);
                 srcRect.w = tileWidth;
                 srcRect.h = tileHeight;
+
+                //std::cout << "srcRect[" << col << ", " << row << "] = {"
+                //          << srcRect.x << ", " << srcRect.y << ", "
+                //          << srcRect.w << ", " << srcRect.h << "}" << std::endl;
 
                 auto destSurface = Graphics::createBlankSDLSurface(tileWidth, tileHeight);
                 assert(destSurface != nullptr);
@@ -121,7 +127,8 @@ void Map::loadTilesetTextures()
                                 nullptr);
 
                 std::ostringstream name;
-                name << tileset->getName() << "-" << gid++;
+                //name << tileset->GetName() << "-" << col << "-" << row;
+                name << tileset->GetName() << "-" << gid;
 
                 // NOTE: For some reason, freeing destSurface causes segfaults
                 //       or similar errors. It seems to be random exactly which
@@ -138,7 +145,17 @@ void Map::loadTilesetTextures()
                                                          &colorKey,
                                                          false,       // do NOT free the surface
                                                          true);
+
                 Game::getTexMgr().add(texture->getName(), texture);
+
+                // Create a test entity
+                //Vector2f pos(srcRect.x + 50 + (margin + col * 2),
+                //             srcRect.y + 50 + (margin + row * 2));
+                //auto entity = std::make_shared<TileTest>(texture->getName(),
+                //                                         pos);
+                //_entities.push_back(entity);
+
+                gid++;
             }
         }
 
@@ -146,44 +163,45 @@ void Map::loadTilesetTextures()
     }
 }
 
-void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer &layer)
+void Map::createTestEntities()
 {
-    if (!layer.isVisible()) return;
-
-    auto layerName = layer.getName();
-    int cellID = 0;
-    for (auto &cell : layer)
+    const int numLayers = _map->GetNumLayers();
+    for (int i = 0; i < numLayers; i++)
     {
-        auto gid = cell.getGID();
-        if (!gid) continue;
+        //if (i > 0) break;
 
-        // Extrapolate the texture resource from the tileset name and cell GID
-        auto tileset = map.getTileSetFromGID(gid);
-        std::ostringstream textureName;
-        textureName << tileset->getName() << "-" << gid;
+        const Tmx::Layer *layer = _map->GetLayer(i);
 
+        //std::cout << "**************\n"
+        //          << "Layer " << layer->GetName()
+        //          << "\n**************" << std::endl;
 
-        // Calculate the tile's position on the screen/within the map
-        auto col = cellID % map.getWidth();
-        auto row = cellID / map.getWidth();
-        assert(row < map.getHeight());
-        float x = col * map.getTileWidth();
-        float y = row * map.getTileHeight();
-        cellID++;
+        for (int col = 0; col < layer->GetWidth(); col++)
+        {
+            for (int row = 0; row < layer->GetHeight(); row++)
+            {
+                auto tile = layer->GetTile(col, row);                
 
-        // Create the ***TEST*** entity
-        std::ostringstream entityName;
-        entityName << layerName << "-" << col << "-" << row;
+                //if (tile.id == 0) continue;
 
-        auto entity = std::make_shared<Entity>(entityName.str());
+                // HACK ALERT HACK ALERT HACK ALERT
+                std::ostringstream name, textureName;
+                name << "desert-" << col << "-" << row;
+                textureName << "desert-" << tile.id;
 
-        Vector2f pos(x + 50, Window::getHeight() - (y + 50));
-        entity->position = std::make_shared<Components::Position>(pos);
+                auto texture = Game::getTexMgr().get(textureName.str());
 
-        auto texture = Game::getTexMgr().get(textureName.str());
-        entity->graphics = std::make_shared<Components::StaticSprite>(texture,
-                                                                      entity->position);
+                // Create the test entity
+                Vector2f pos(col * _map->GetTileWidth() + 50,
+                             Window::getHeight() - (row * _map->GetTileHeight() + 50));
+                auto entity = std::make_shared<Entity>(name.str());
+                entity->position = std::make_shared<Components::Position>(pos);
+                entity->graphics =
+                        std::make_shared<Components::StaticSprite>(texture,
+                                                                   entity->position);
 
-        _parent->_entities.push_back(entity);
+                _entities.push_back(entity);
+            }
+        }
     }
 }

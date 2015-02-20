@@ -67,7 +67,9 @@ Texture::Texture(const std::string &name,
     if (freeSurface)
         SDL_FreeSurface(surface);
 
+#ifdef _DEBUG_TEXTURES
     LOG(INFO) << "loaded texture \"" << _name << "\" from SDL_Surface";
+#endif
 }
 
 Texture::~Texture()
@@ -75,7 +77,9 @@ Texture::~Texture()
     assert(glIsTexture(_texture));
     glDeleteTextures(1, &_texture);
 
+#ifdef _DEBUG_TEXTURES
     LOG(INFO) << "released texture \"" << getName() << "\"";
+#endif
 }
 
 std::string Texture::toString() const

@@ -5,3 +5,5 @@ src/entities
 include/entities
 include/components
 src/components
+lib/libtmx/src
+lib/libtmx/include/tmx
