@@ -20,22 +20,26 @@
 
 #include <cassert>
 #include <cmath>
-#include <easylogging++.h>
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <sstream>
+
+#include "logger.hpp"
 
 Entity::Entity(const std::string &name) :
     position(nullptr),
     _name(name),
     _markedForDeath(false)
 {
+#ifdef _DEBUG_ENTITIES
+    LOG_DEBUG << "created entity " << getName();
+#endif
 }
 
 Entity::~Entity()
 {
 #ifdef _DEBUG_ENTITIES
-    LOG(DEBUG) << "destroyed entity " << getName();
+    LOG_DEBUG << "destroyed entity " << getName();
 #endif
 }
 

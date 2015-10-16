@@ -76,7 +76,7 @@ void Map::draw() const
 
 void Map::loadTilesetTextures()
 {
-    // NOTE: This is very, very hacky
+    // NOTE: This is very, very hacky and ignores the settings in the map file
     const SDL_Color colorKey = Colors::makeColor(0xFF, 0, 0xFF);
 
     for (auto tileset : _map->getTileSets())
@@ -151,39 +151,43 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
     if (!layer.isVisible()) return;
 
     auto layerName = layer.getName();
-    int cellID = 0;
+    unsigned cellID = 0;
     for (auto &cell : layer)
     {
         auto gid = cell.getGID();
-        if (!gid) continue;
+        if (gid)
+        {
+            // Extrapolate the texture resource from the tileset name and cell GID
+            auto tileset = map.getTileSetFromGID(gid);
+            //gid -= tileset->getFirstGID();
+            std::ostringstream textureName;
+            textureName << tileset->getName() << "-" << gid;
 
-        // Extrapolate the texture resource from the tileset name and cell GID
-        auto tileset = map.getTileSetFromGID(gid);
-        std::ostringstream textureName;
-        textureName << tileset->getName() << "-" << gid;
+            // Calculate the tile's position on the screen/within the map
+            auto col = cellID % map.getWidth();
+            auto row = cellID / map.getWidth();
+            assert(row < map.getHeight());
+            float x = col * map.getTileWidth();
+            float y = row * map.getTileHeight();
 
+            // Create the ***TEST*** entity
+            std::ostringstream entityName;
+            entityName << layerName << "-" << col << "-" << row
+                       << "-" << textureName.str();
+            auto entity = std::make_shared<Entity>(entityName.str());
 
-        // Calculate the tile's position on the screen/within the map
-        auto col = cellID % map.getWidth();
-        auto row = cellID / map.getWidth();
-        assert(row < map.getHeight());
-        float x = col * map.getTileWidth();
-        float y = row * map.getTileHeight();
+            Vector2f pos(x + 50, Window::getHeight() - (y + 50));
+            entity->position =
+                    std::make_shared<Components::Position>(pos);
+
+            auto texture = Game::getTexMgr().get(textureName.str());
+            entity->graphics =
+                    std::make_shared<Components::StaticSprite>(texture,
+                                                               entity->position);
+
+            _parent->_entities.push_back(entity);
+        }
+
         cellID++;
-
-        // Create the ***TEST*** entity
-        std::ostringstream entityName;
-        entityName << layerName << "-" << col << "-" << row;
-
-        auto entity = std::make_shared<Entity>(entityName.str());
-
-        Vector2f pos(x + 50, Window::getHeight() - (y + 50));
-        entity->position = std::make_shared<Components::Position>(pos);
-
-        auto texture = Game::getTexMgr().get(textureName.str());
-        entity->graphics = std::make_shared<Components::StaticSprite>(texture,
-                                                                      entity->position);
-
-        _parent->_entities.push_back(entity);
     }
 }

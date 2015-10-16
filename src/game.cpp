@@ -19,7 +19,6 @@
 #include "game.hpp"
 
 #include <algorithm>
-#include <easylogging++.h>
 #include <GL/glew.h>
 #include <list>
 #include <map>
@@ -27,9 +26,10 @@
 #include <random>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
+#ifdef _ENABLE_AUDIO
+#   include <SDL2/SDL_mixer.h>
+#endif
 #include <sstream>
-#include <tclap/CmdLine.h>
 
 #include "colors.hpp"
 #include "components/animatedsprite.hpp"
@@ -37,8 +37,10 @@
 #include "components/staticsprite.hpp"
 #include "entities/tux.hpp"
 #include "exception.hpp"
+#include "graphics.hpp"
 #include "helper_events.hpp"
 #include "level.hpp"
+#include "logger.hpp"
 #include "map.hpp"
 #include "texture.hpp"
 #include "timer.hpp"
@@ -71,7 +73,9 @@ namespace
     // Subsystem initialization and shutdown functions
     void initSDL();
     void initGL();
+#ifdef _ENABLE_AUDIO
     void initAudio();
+#endif
     void shutdownSDL();
 
     // Resource and entity allocation/destruction/management functions
@@ -89,11 +93,11 @@ namespace
     void drawScene();
 }
 
-void Game::run(Game::Options options)
+void Game::run(const Game::Options &options)
 {
     // Initialize SDL and create the window
     initSDL();
-    Window::create(options.windowWidth, options.windowHeight);
+    Window::create(options.windowWidth, options.windowHeight, options.vsync);
 
     // Set up the camera view
     //auto screenRatio = static_cast<float>(options.windowWidth) /
@@ -105,11 +109,13 @@ void Game::run(Game::Options options)
                    Vector2f(options.windowWidth, options.windowHeight),   // screenMax
                    Vector2f::ZERO,                                        // screenMinInWorld
                    Vector2f(options.windowWidth, options.windowHeight))); // screenMaxInWorld
-    //LOG(DEBUG) << *_camera;
+    //BOOST_LOG_TRIVIAL(debug) << *_camera;
 
     // Further initialization for OpenGL and audio
     initGL();
+#ifdef _ENABLE_AUDIO
     initAudio();
+#endif
 
     // Set up event handling details
     registerEvents();
@@ -118,9 +124,8 @@ void Game::run(Game::Options options)
     loadTextures();
     createEntities();
 
-    _map = std::unique_ptr<Map>(new Map("desert", "res/desert.tmx"));
-
     // Main loop variables
+    _map = std::unique_ptr<Map>(new Map("desert", "res/desert.tmx"));
     Timer stepTimer;
     float dt = 0;
     unsigned long countedFrames = 0;
@@ -132,7 +137,7 @@ void Game::run(Game::Options options)
     stepTimer.start();
     while (isRunning())
     {
-        // Update the FPS counter every second or so
+        // Update the FPS counter every second
         currentTicks = _fpsTimer.getTicks();
         if (currentTicks - oldTicks >= 1000)
         {
@@ -163,7 +168,7 @@ void Game::run(Game::Options options)
         }
         catch (std::exception &e)
         {
-            LOG(ERROR) << "EXCEPTION: " << e.what();
+            LOG_ERROR << "EXCEPTION: " << e.what();
             setRunning(false);
         }
 
@@ -174,7 +179,7 @@ void Game::run(Game::Options options)
 
     // Clean up
 
-    // This check is just for debugging purposes
+    // NOTE: Why does the game hang when this line is omitted?
     if (_map.get() != nullptr) _map.reset();
 
     destroyEntities();
@@ -219,7 +224,7 @@ Game::Event::Handle Game::registerEvent(std::shared_ptr<Game::Event> event)
 
 #ifdef _DEBUG_EVENTS
     if (!event->debugString.empty())
-        LOG(DEBUG) << "registered event " << event->debugString;
+        LOG_DEBUG << "registered event " << event->debugString;
 #endif
 
     return currentHandle;
@@ -228,12 +233,19 @@ Game::Event::Handle Game::registerEvent(std::shared_ptr<Game::Event> event)
 void Game::unregisterEvent(Game::Event::Handle handle)
 {
 #ifdef _DEBUG_EVENTS
-    //LOG(DEBUG) << "trying to unregister event handle " << handle;
+    //BOOST_LOG_TRIVIAL(debug) << "trying to unregister event handle " << handle;
     if (_events.count(handle))
-        LOG(DEBUG) << "unregistered event " << _events[handle]->debugString;
+        LOG_DEBUG << "unregistered event " << _events[handle]->debugString;
 #endif
 
     _events.erase(handle);
+}
+
+Game::Event::~Event()
+{
+#ifdef _DEBUG_EVENTS
+		LOG_DEBUG << "destroyed event \"" << debugString << "\"";
+#endif
 }
 
 // Local functions
@@ -241,16 +253,22 @@ namespace {
 
 void initSDL()
 {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
-        throw SDLException();
+	int flags = SDL_INIT_VIDEO;
+#ifdef _ENABLE_AUDIO
+	flags |= SDL_INIT_AUDIO;
+#endif
+	if (SDL_Init(flags))
+	{
+		throw SDLException();
+	}
 
     SDL_version version;
     SDL_GetVersion(&version);
-    LOG(INFO) << "using SDL " << static_cast<int>(version.major) << "."
-              << static_cast<int>(version.minor) << "."
-              << static_cast<int>(version.patch);
+    LOG_INFO << "using SDL " << static_cast<int>(version.major) << "."
+             << static_cast<int>(version.minor) << "."
+             << static_cast<int>(version.patch);
 
-    auto flags = IMG_INIT_PNG | IMG_INIT_JPG;
+    flags = IMG_INIT_PNG | IMG_INIT_JPG;
     if (!(IMG_Init(flags) & flags))
     {
         SDL_Quit();
@@ -268,8 +286,8 @@ void initGL()
         throw GLEWException(errorCode);
     }
 
-    LOG(INFO) << "using GLEW " << glewGetString(GLEW_VERSION);
-    LOG(INFO) << "using OpenGL " << glGetString(GL_VERSION);
+    LOG_INFO << "using GLEW " << glewGetString(GLEW_VERSION);
+    LOG_INFO << "using OpenGL " << glGetString(GL_VERSION);
 
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
@@ -300,6 +318,7 @@ void initGL()
     }
 }
 
+#ifdef _ENABLE_AUDIO
 void initAudio()
 {
     static const int DEFAULT_AUDIO_FREQ = 44100;
@@ -315,10 +334,13 @@ void initAudio()
         throw SDLMixerException(ss.str());
     }
 }
+#endif
 
 void shutdownSDL()
 {
+#ifdef _ENABLE_AUDIO
     Mix_Quit();
+#endif
     IMG_Quit();
     SDL_Quit();
 }
@@ -328,11 +350,11 @@ void loadTextures()
     const SDL_Color colorKey = Colors::makeColor(255, 0, 255);
     TextureManager::ResourcePtr texture;
 
-    texture = std::make_shared<Texture>("tux", "res/tux.png", &colorKey);
-    _texMgr.add(texture->getName(), texture);
+    //texture = std::make_shared<Texture>("tux", "res/tux.png", &colorKey);
+    //_texMgr.add(texture->getName(), texture);
 
-    texture = std::make_shared<Texture>("beastie", "res/beastie.png", &colorKey);
-    _texMgr.add(texture->getName(), texture);
+    //texture = std::make_shared<Texture>("beastie", "res/beastie.png", &colorKey);
+    //_texMgr.add(texture->getName(), texture);
 
     for (int i = 1; i <= 4; i++)
     {
@@ -435,7 +457,7 @@ void handleEvents()
 
 void drawScene()
 {
-    Window::clear(255, 255, 255, 255);
+    Window::clear(255, 255, 255);
 
     if (_map.get() != nullptr) _map->draw();
 
@@ -445,7 +467,9 @@ void drawScene()
         {
             entity->graphics->draw();
         }
-    }    
+    }
+
+    //Graphics::blitTexture(Game::getTexMgr().get("desert-138"), 50, 50);
 
     Window::flip();
 }

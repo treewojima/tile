@@ -16,43 +16,37 @@
  */
 
 #include "defines.hpp"
-#include <easylogging++.h>
-#include <SDL2/SDL.h>
-#include <tclap/CmdLine.h>
-#include "game.hpp"
-#include "level.hpp"
 
-_INITIALIZE_EASYLOGGINGPP
+#include <boost/filesystem/path.hpp>
+#include <boost/program_options.hpp>
+
+#include "game.hpp"
+#include "logger.hpp"
 
 // Locals
 namespace
 {
-    const int DEFAULT_WINDOW_WIDTH = 640;
-    const int DEFAULT_WINDOW_HEIGHT = 480;
+    const int DEFAULT_WINDOW_WIDTH  = 800;
+    const int DEFAULT_WINDOW_HEIGHT = 600;
 
-    Game::Options parseArgs(int argc, char *argv[]);
+	Game::Options parseArgs(int argc, char *argv[]);
 }
 
 int main(int argc, char *argv[])
 {
-    _START_EASYLOGGINGPP(argc, argv);
-
     try
     {
-        Game::run(parseArgs(argc, argv));
-    }
-    catch (TCLAP::ArgException &e)
-    {
-        LOG(ERROR) << "ARG EXCEPTION: " << e.error();
-        std::exit(1);
+		auto options = parseArgs(argc, argv);
+		Logger::init(options);
+		Game::run(options);
     }
     catch (std::exception &e)
     {
-        LOG(ERROR) << "EXCEPTION: " << e.what();
+        LOG_ERROR << "EXCEPTION: " << e.what();
         std::exit(1);
     }
 
-    LOG(INFO) << "shut down cleanly";
+	LOG_INFO << "shut down cleanly";
     return 0;
 }
 
@@ -61,42 +55,45 @@ namespace {
 
 Game::Options parseArgs(int argc, char *argv[])
 {
-    TCLAP::ValueArg<int> argWidth("w",
-                                  "width",
-                                  "window width",
-                                  false,
-                                  DEFAULT_WINDOW_WIDTH,
-                                  "positive integer value");
-    TCLAP::ValueArg<int> argHeight("h",
-                                   "height",
-                                   "window height",
-                                   false,
-                                   DEFAULT_WINDOW_HEIGHT,
-                                   "positive integer value");
-    TCLAP::CmdLine cmdLine("game", ' ', "0.1", false);
+	namespace fs = boost::filesystem;
+	namespace po = boost::program_options;
 
-    cmdLine.add(argWidth);
-    cmdLine.add(argHeight);
-    cmdLine.parse(argc, argv);
+	Game::Options options;
 
-    auto width = argWidth.getValue();
-    auto height = argHeight.getValue();
+	fs::path programPath(argv[0]);
+	options.programName = programPath.filename().replace_extension().string();
 
-    std::ostringstream ss;
-    if (width < 0)
-    {
-        ss << "expected positive integer for window width (got "
-           << width << ")";
-        throw TCLAP::ArgException(ss.str());
-    }
-    else if (height < 0)
-    {
-        ss << "expected positive integer for window height (got "
-           << height << ")";
-        throw TCLAP::ArgException(ss.str());
-    }
+	std::ostringstream defaultLogFile;
+	defaultLogFile << "logs/" << options.programName << ".txt";
 
-    return Game::Options { width, height };
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help", "produce help message")
+		("width,w", po::value<int>(&options.windowWidth)->default_value(DEFAULT_WINDOW_WIDTH), "set window width")
+		("height,h", po::value<int>(&options.windowHeight)->default_value(DEFAULT_WINDOW_HEIGHT), "set window height")
+		("vsync,v", "enable vsync")
+		("log-file", po::value<std::string>(&options.logFile)->default_value(defaultLogFile.str()), "set output log file");
+
+    po::variables_map map;
+    po::store(po::parse_command_line(argc, argv, desc), map);
+    po::notify(map);
+
+    if (map.count("help"))
+	{
+		std::cout << desc << std::endl;
+		std::exit(0);
+	}
+
+    if (map.count("vsync"))
+	{
+		options.vsync = true;
+	}
+	else
+	{
+		options.vsync = false;
+	}
+
+	return options;
 }
 
 }

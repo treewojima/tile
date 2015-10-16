@@ -19,6 +19,7 @@
 #define __RESOURCEMANAGER_HPP__
 
 #include "defines.hpp"
+#include <functional>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -38,6 +39,8 @@ public:
     void add(const std::string &name, ResourcePtr ptr);
     ResourcePtr get(const std::string &name) const;
     void clear();
+
+    void forEach(std::function<void(ResourcePtr)> f);
 
 private:
     typedef std::unordered_map<std::string, ResourcePtr> ResourceMap;
@@ -92,6 +95,15 @@ void ResourceManager<T>::clear()
     //       internal map enough?
 
     _map.clear();
+}
+
+template <class T>
+void ResourceManager<T>::forEach(std::function<void(ResourcePtr)> f)
+{
+    for (auto iter = _map.begin() ; iter != _map.end(); iter++)
+    {
+        f((*iter).second);
+    }
 }
 
 #endif

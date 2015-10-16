@@ -19,7 +19,6 @@
 #define __CAMERA_HPP__
 
 #include "defines.hpp"
-#include <easylogging++.h>
 #include <iostream>
 #include "vector.hpp"
 
@@ -75,15 +74,8 @@ private:
     //float _rotation;
 };
 
-// Helper stream operators
-template <class T>
+// Helper stream operator
 inline std::ostream &operator<<(std::ostream &stream, const Camera &c)
-{
-    stream << c.toString();
-    return stream;
-}
-
-inline MAKE_LOGGABLE(Camera, c, stream)
 {
     stream << c.toString();
     return stream;

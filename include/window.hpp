@@ -27,7 +27,7 @@
 
 namespace Window
 {
-    void create(int width, int height);
+    void create(int width, int height, bool vsync);
     void destroy();
 
     void clear(float r = 0, float g = 0, float b = 0, float a = 0);

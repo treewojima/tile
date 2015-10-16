@@ -22,7 +22,9 @@
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
+#ifdef _ENABLE_AUDIO
+#   include <SDL2/SDL_mixer.h>
+#endif
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -47,12 +49,14 @@ public:
     SDLImageException() : SDLException(IMG_GetError()) {}
 };
 
+#ifdef _ENABLE_AUDIO
 class SDLMixerException : public SDLException
 {
 public:
     SDLMixerException(const std::string &msg) : SDLException(msg) {}
     SDLMixerException() : SDLException(Mix_GetError()) {}
 };
+#endif
 
 class GLException : public Exception
 {

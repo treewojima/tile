@@ -1,0 +1,33 @@
+CC         := clang++
+WARNINGS   := -Wall -Wnon-virtual-dtor -Wno-ctor-dtor-privacy -Werror
+BOOST_VER  := 
+BOOST_LIBS := -lboost_filesystem$(BOOST_VER) -lboost_log$(BOOST_VER) \
+              -lboost_program_options$(BOOST_VER) -lboost_system$(BOOST_VER) \
+              -lboost_thread$(BOOST_VER)
+CFLAGS     := -c -pipe -ggdb3 -std=c++11 -D_REENTRANT -DBOOST_ALL_DYN_LINK \
+              -Iinclude $(WARNINGS)
+LFLAGS     := -lSDL2 -lSDL2_image -lSDL2_mixer -lpthread -lGLEW -lGL -lGLU \
+              -ltinyxml2 -lz $(BOOST_LIBS)
+PROJDIRS   := src include
+SOURCES    := $(shell find $(PROJDIRS) -type f -name "*.cpp")
+#HEADERS    := $(shell find $(PROJDIRS) -type f -name "*.hpp")
+OBJECTS    := $(patsubst %.cpp, %.o, $(SOURCES))
+DEPFILES   := $(patsubst %.cpp, %.dep, $(SOURCES))
+TARGET     := tile
+
+.PHONY: all clean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CC) -o $(TARGET) $^ $(LFLAGS)
+
+clean:
+	rm -f $(TARGET) $(OBJECTS) $(DEPFILES)
+	find . -type f -iname "*~" -exec rm -f {} \;
+
+-include $(DEPFILES)
+
+%.o: %.cpp
+	$(CC) -o $@ $(CFLAGS) -MMD -MP -MF$*.dep $<
+

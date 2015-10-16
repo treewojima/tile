@@ -18,7 +18,6 @@
 #ifndef __VECTOR_HPP__
 #define __VECTOR_HPP__
 
-#include <easylogging++.h>
 #include <sstream>
 #include <string>
 #include <typeinfo>
@@ -100,21 +99,16 @@ inline Vector2<T> operator-(Vector2<T> lhs, const Vector2<T> &rhs)
     return lhs;
 }
 
-// Helper stream operators
-template <class T, class U>
-inline std::ostream &operator<<(std::ostream &stream, const Vector2<U> &v)
-{
-    stream << v.toString();
-    return stream;
-}
-
+// Helper stream operator
 template <class T>
-inline MAKE_LOGGABLE(Vector2<T>, v, stream)
+inline std::ostream &operator<<(std::ostream &stream, const Vector2<T> &v)
 {
-    stream << v.toString();
-    return stream;
+	stream << v.toString();
+	return stream;
 }
 
+
+// Common typedefs
 typedef Vector2<int> Vector2i;
 typedef Vector2<float> Vector2f;
 

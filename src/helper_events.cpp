@@ -18,8 +18,9 @@
 #include "defines.hpp"
 #include "helper_events.hpp"
 
-#include <easylogging++.h>
 #include <iostream>
+
+#include "logger.hpp"
 
 bool Game::KeyEvent::test(const SDL_Event &e)
 {
@@ -42,5 +43,5 @@ bool Game::QuitEvent::test(const SDL_Event &e)
 void Game::QuitEvent::fire(const SDL_Event &e)
 {
     Game::setRunning(false);
-    LOG(INFO) << "received quit signal";
+    LOG_INFO << "received quit signal";
 }

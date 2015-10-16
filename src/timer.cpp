@@ -18,8 +18,9 @@
 #include "defines.hpp"
 #include "timer.hpp"
 
-#include <easylogging++.h>
 #include <SDL2/SDL.h>
+
+#include "logger.hpp"
 
 Timer::Timer() :
     _startTicks(0),
@@ -34,12 +35,12 @@ void Timer::start()
     _startTicks = SDL_GetTicks();
     _pausedTicks = 0;
 
-    //LOG(DEBUG) << "starting timer";
+    //BOOST_LOG_TRIVIAL(debug) << "starting timer";
 }
 
 void Timer::stop()
 {
-    //LOG(DEBUG) << "stopped timer after " << getTicks() << " ticks";
+    //BOOST_LOG_TRIVIAL(debug) << "stopped timer after " << getTicks() << " ticks";
 
     _state = State::STOPPED;
     _startTicks = _pausedTicks = 0;
@@ -49,7 +50,7 @@ void Timer::pause()
 {
     if (_state != State::RUNNING)
     {
-        LOG(WARNING) << "tried to pause non-running timer";
+        LOG_WARNING << "tried to pause non-running timer";
     }
     else
     {
@@ -57,7 +58,7 @@ void Timer::pause()
         _pausedTicks = SDL_GetTicks() - _startTicks;
         _startTicks = 0;
 
-        //LOG(DEBUG) << "pausing timer at " << getTicks() << " ticks";
+        //BOOST_LOG_TRIVIAL(debug) << "pausing timer at " << getTicks() << " ticks";
     }
 }
 
@@ -65,7 +66,7 @@ void Timer::resume()
 {
     if (_state != State::PAUSED)
     {
-        LOG(WARNING) << "tried to resume non-paused timer";
+		LOG_WARNING << "tried to resume non-paused timer";
     }
     else
     {
@@ -73,7 +74,7 @@ void Timer::resume()
         _startTicks = SDL_GetTicks() - _pausedTicks;
         _pausedTicks = 0;
 
-        //LOG(DEBUG) << "resuming timer at " << getTicks() << " ticks";
+        //BOOST_LOG_TRIVIAL(debug) << "resuming timer at " << getTicks() << " ticks";
     }
 }
 

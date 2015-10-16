@@ -18,8 +18,8 @@
 #include "defines.hpp"
 #include "texture.hpp"
 
+#include <boost/log/trivial.hpp>
 #include <cassert>
-#include <easylogging++.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <sstream>
@@ -28,9 +28,12 @@
 #include "exception.hpp"
 #include "game.hpp"
 #include "graphics.hpp"
+#include "logger.hpp"
 
 #ifdef _TEST_TEXTURE_DIMENSIONS
 #   define IS_POWER_OF_TWO(n) ((n & (n - 1)) == 0)
+#else
+#   define IS_POWER_OF_TWO(n) true
 #endif
 
 Texture::Texture(const std::string &name,
@@ -46,8 +49,10 @@ Texture::Texture(const std::string &name,
     copySurfaceToGL(surface, colorKey);
     SDL_FreeSurface(surface);
 
-    LOG(INFO) << "loaded texture \"" << _name << "\" from file \""
-              << filename << "\"";
+#ifdef _DEBUG_TEXTURES
+    LOG_INFO << "loaded texture \"" << _name << "\" from file \""
+             << filename << "\"";
+#endif
 }
 
 Texture::Texture(const std::string &name,
@@ -68,7 +73,7 @@ Texture::Texture(const std::string &name,
         SDL_FreeSurface(surface);
 
 #ifdef _DEBUG_TEXTURES
-    LOG(INFO) << "loaded texture \"" << _name << "\" from SDL_Surface";
+    LOG_INFO << "loaded texture \"" << _name << "\" from SDL_Surface";
 #endif
 }
 
@@ -78,7 +83,7 @@ Texture::~Texture()
     glDeleteTextures(1, &_texture);
 
 #ifdef _DEBUG_TEXTURES
-    LOG(INFO) << "released texture \"" << getName() << "\"";
+	LOG_INFO << "released texture \"" << getName() << "\"";
 #endif
 }
 
@@ -102,19 +107,17 @@ void Texture::copySurfaceToGL(SDL_Surface *surface,
     _width = workingSurface->w;
     _height = workingSurface->h;
 
-#ifdef _TEST_TEXTURE_DIMENSIONS
     if (!IS_POWER_OF_TWO(_width))
     {
-        LOG(WARNING) << "width of texture \"" << getName()
-                     << "\" is not a power of two: " << _width;
+        LOG_WARNING << "width of texture \"" << getName()
+                    << "\" is not a power of two: " << _width;
     }
 
     if (!IS_POWER_OF_TWO(_height))
     {
-        LOG(WARNING) << "height of texture \"" << getName()
-                     << "\" is not a power of two: " << _height;
+        LOG_WARNING << "height of texture \"" << getName()
+                    << "\" is not a power of two: " << _height;
     }
-#endif
 
     // Make sure the image is either 24 or 32 bpp
     const int bytesPerPixel = workingSurface->format->BytesPerPixel;

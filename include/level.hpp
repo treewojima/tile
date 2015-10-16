@@ -36,8 +36,6 @@ public:
 
 private:
     std::list<std::shared_ptr<Entity>> _entities;
-
-    void loadFile(const std::string &filename);
 };
 
 #endif

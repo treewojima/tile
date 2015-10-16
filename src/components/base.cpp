@@ -27,7 +27,7 @@ Components::Base::Base(const std::string &name) :
 Components::Base::~Base()
 {
 #ifdef _DEBUG_COMPONENTS
-    LOG(DEBUG) << "destroyed component " << getName();
+    BOOST_LOG_TRIVIAL(debug) << "destroyed component " << getName();
 #endif
 }
 

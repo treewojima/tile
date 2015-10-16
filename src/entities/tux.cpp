@@ -22,13 +22,9 @@ Tux::Tux() :
     Entity("tux"),
     _eventHandles(4)
 {
-#ifdef _DEBUG_ENTITIES
-    LOG(DEBUG) << "created entity " << toString();
-#endif
-
     // NOTE: This should all be refactored into some sort of component
 
-    static const int magnitude = 5;
+    static const float magnitude = 5;
 
     _eventHandles.push_back(Game::registerEvent(
         SDL_SCANCODE_UP,

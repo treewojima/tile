@@ -18,11 +18,12 @@
 #include "window.hpp"
 
 #include <cassert>
-#include <easylogging++.h>
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
+
 #include "exception.hpp"
 #include "game.hpp"
+#include "logger.hpp"
 
 // Locals
 namespace
@@ -31,13 +32,15 @@ namespace
     SDL_GLContext _glContext;
 }
 
-void Window::create(int width, int height)
+void Window::create(int width, int height, bool vsync)
 {
     assert(width > 0);
     assert(height > 0);
 
+	// Double buffering
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
+	// Create the window
     _window = SDL_CreateWindow("sdl",
                                SDL_WINDOWPOS_UNDEFINED,
                                SDL_WINDOWPOS_UNDEFINED,
@@ -47,15 +50,42 @@ void Window::create(int width, int height)
     if (_window == nullptr)
         throw SDLException();
 
-    LOG(INFO) << "created window (width = " << width
-              << ", height = " << height << ")";
+    LOG_INFO << "created window (width = " << width
+             << ", height = " << height << ")";
 
+	// Create the OpenGL context
     _glContext = SDL_GL_CreateContext(_window);
     if (!_glContext)
     {
         SDL_DestroyWindow(_window);
         throw SDLException();
     }
+
+	if (vsync)
+	{
+		// First, try to enable late swap tearing
+		if (SDL_GL_SetSwapInterval(-1) < 0)
+		{
+			// Late swap tearing isn't supported, so fall back onto normal vsync
+			if (SDL_GL_SetSwapInterval(1) < 0)
+			{
+				// Couldn't enable vsync
+				throw SDLException();
+			}
+
+			LOG_INFO << "vsync enabled";
+		}
+		else
+		{
+			LOG_INFO << "vsync with late swap tearing enabled";
+		}
+	}
+	else
+	{
+		if (SDL_GL_SetSwapInterval(0) < 0)
+			throw SDLException();
+		LOG_INFO << "vsync disabled";
+	}
 }
 
 void Window::destroy()
@@ -63,7 +93,7 @@ void Window::destroy()
     SDL_GL_DeleteContext(_glContext);
     SDL_DestroyWindow(_window);
 
-    LOG(INFO) << "destroyed window";
+    LOG_INFO << "destroyed window";
 }
 
 void Window::clear(float r, float g, float b, float a)

@@ -19,6 +19,7 @@
 #define __GAME_HPP__
 
 #include "defines.hpp"
+
 #include <functional>
 #include <SDL2/SDL.h>
 #include <string>
@@ -30,7 +31,10 @@ namespace Game
 {
     struct Options
     {
+		std::string programName;
         int windowWidth, windowHeight;
+		bool vsync;
+		std::string logFile;
     };
 
     class Event
@@ -42,12 +46,7 @@ namespace Game
         Event(const std::string &debugString_ = std::string()) :
             debugString(debugString_) {}
 
-        virtual ~Event()
-        {
-#ifdef _DEBUG_EVENTS
-            LOG(DEBUG) << "destroyed event \"" << debugString << "\"";
-#endif
-        }
+		virtual ~Event();
 
         virtual bool test(const SDL_Event &e) = 0;
         virtual void fire(const SDL_Event &e) = 0;
@@ -55,11 +54,11 @@ namespace Game
         std::string debugString;
 
         // This doesn't quite work as const since the value can't be determined
-        // at runtime, so... don't fuck with this!
+        // at compile time, so... don't fuck with this after it's set!
         static Uint32 CUSTOM_KEYPRESS_EVENT;
     };
 
-    void run(Options options);
+    void run(const Options &options);
 
     bool isRunning();
     void setRunning(bool b);

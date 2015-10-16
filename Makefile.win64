@@ -1,0 +1,37 @@
+CC         := g++
+WARNINGS   := -Wall -Wnon-virtual-dtor -Wno-ctor-dtor-privacy
+BOOST_VER  := -mgw49-mt-d-1_57
+BOOST_LIBS := -lboost_filesystem$(BOOST_VER) -lboost_log$(BOOST_VER) \
+              -lboost_program_options$(BOOST_VER) -lboost_system$(BOOST_VER) \
+              -lboost_thread$(BOOST_VER)
+CFLAGS     := -m64 -c -pipe -ggdb3 -std=c++11 -I/c/devel/SDL2-2.0.3/x86_64-w64-mingw32/include -Dmain=SDL_main \
+              $(WARNINGS) -DBOOST_ALL_DYN_LINK -DGLEW_STATIC -Iinclude -I/c/devel/tinyxml2/x86_64-w64-mingw32/include \
+              -I/c/devel/boost_1_57_0/x86_64-w64-mingw32/include/boost-1_57 -I/c/devel/glew-1.12.0/include \
+              -I/c/devel/zlib128/include
+LFLAGS     := -m64 -L/c/devel/boost_1_57_0/x86_64-w64-mingw32/lib -L/c/devel/glew-1.12.0/lib/Release/x64 \
+              -L/c/devel/zlib128/x86_64-w64-mingw32/lib -L/c/devel/tinyxml2/x86_64-w64-mingw32/lib -L/c/devel/SDL2-2.0.3/x86_64-w64-mingw32/lib \
+              -mwindows -mconsole -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer \
+              -lglew32s -lopengl32 -lglu32 -ltinyxml2 -lzdll $(BOOST_LIBS) -Wl,-Map=tile.exe.map
+PROJDIRS   := src include
+SOURCES    := $(shell find $(PROJDIRS) -type f -name "*.cpp")
+#HEADERS    := $(shell find $(PROJDIRS) -type f -name "*.hpp")
+OBJECTS    := $(patsubst %.cpp, %.o, $(SOURCES))
+DEPFILES   := $(patsubst %.cpp, %.dep, $(SOURCES))
+TARGET     := tile.exe
+
+.PHONY: all clean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CC) -o $(TARGET) $^ $(LFLAGS)
+
+clean:
+	rm -f $(TARGET) $(OBJECTS) $(DEPFILES)
+	find . -type f -iname "*~" -exec rm -f {} \;
+
+-include $(DEPFILES)
+
+%.o: %.cpp
+	$(CC) -o $@ $(CFLAGS) -MMD -MP -MF $(patsubst %.cpp, %.dep, $<) $<
+

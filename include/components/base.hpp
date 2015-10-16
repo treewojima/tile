@@ -19,7 +19,6 @@
 #define __COMPONENT_HPP__
 
 #include "defines.hpp"
-#include <easylogging++.h>
 #include <memory>
 #include <string>
 
@@ -42,16 +41,8 @@ namespace Components
     };
 }
 
-// Helper stream operators
-template <class T>
-inline std::ostream &operator<<(std::ostream &stream,
-                                const Components::Base &c)
-{
-    stream << c.toString();
-    return stream;
-}
-
-inline MAKE_LOGGABLE(Components::Base, c, stream)
+// Helper stream operator
+inline std::ostream &operator<<(std::ostream &stream, const Components::Base &c)
 {
     stream << c.toString();
     return stream;

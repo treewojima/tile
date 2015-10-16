@@ -43,7 +43,8 @@ SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
     return surface;
 }
 
-/*SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
+#if 0
+SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
                                       SDL_Color colorKey,
                                       bool optimize)
 {
@@ -52,7 +53,8 @@ SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
                     SDL_TRUE,
                     Colors::convertToUint32(colorKey, surface->format));
     return surface;
-}*/
+}
+#endif
 
 SDL_Surface *Graphics::optimizeSDLSurface(SDL_Surface *surface, bool freeSurface)
 {

@@ -7,3 +7,5 @@ include/components
 src/components
 lib/libtmx/src
 lib/libtmx/include/tmx
+src/tmx
+include/tmx

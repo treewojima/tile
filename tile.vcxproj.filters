@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\tmx">
+      <UniqueIdentifier>{081e590f-68b4-47b0-a18f-ad1604db0b53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\components">
+      <UniqueIdentifier>{b70df2ab-f242-4949-8675-b693ac331952}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\entities">
+      <UniqueIdentifier>{4f0ee5f2-fa41-4517-8076-0a4c1d35d94a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\components">
+      <UniqueIdentifier>{0f8250a2-e3ec-4870-be6c-abebd4dc62f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\entities">
+      <UniqueIdentifier>{94d81aea-ecce-4dd9-8d87-d5e37e87f446}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tmx">
+      <UniqueIdentifier>{d4a5bacb-96d6-4274-9ce5-4dfd0aeb46a5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\camera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\colors.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\defines.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\entity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\exception.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\game.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\helper_events.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\level.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\map.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\resourcemanager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\texture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\timer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vector.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\window.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Adaptor.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Cell.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Component.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Geometry.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Image.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\ImageLayer.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Layer.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\LayerVisitor.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Map.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Object.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\ObjectLayer.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Terrain.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\Tile.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\TileLayer.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tmx\TileSet.h">
+      <Filter>Header Files\tmx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\animatedsprite.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\base.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\graphics.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\position.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\staticsprite.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\entities\tux.hpp">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\logger.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\colors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helper_events.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\animatedsprite.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\base.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\position.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\staticsprite.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entities\tux.cpp">
+      <Filter>Source Files\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tmx\Component.cpp">
+      <Filter>Source Files\tmx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tmx\Layers.cpp">
+      <Filter>Source Files\tmx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tmx\LayerVisitor.cpp">
+      <Filter>Source Files\tmx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tmx\Map.cpp">
+      <Filter>Source Files\tmx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tmx\Object.cpp">
+      <Filter>Source Files\tmx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tmx\Parser.cpp">
+      <Filter>Source Files\tmx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tmx\TileSet.cpp">
+      <Filter>Source Files\tmx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

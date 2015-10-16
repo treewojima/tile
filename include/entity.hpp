@@ -20,7 +20,6 @@
 
 #include "defines.hpp"
 
-#include <easylogging++.h>
 #include <memory>
 
 #include "components/graphics.hpp"
@@ -51,15 +50,8 @@ private:
     bool _markedForDeath;
 };
 
-// Helper stream operators
-template <class T>
+// Helper stream operator
 inline std::ostream &operator<<(std::ostream &stream, const Entity &e)
-{
-    stream << e.toString();
-    return stream;
-}
-
-inline MAKE_LOGGABLE(Entity, e, stream)
 {
     stream << e.toString();
     return stream;
