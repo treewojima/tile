@@ -1,6 +1,7 @@
 #include "defines.hpp"
 #include "logger.hpp"
 
+#include <boost/core/null_deleter.hpp>
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/sources/severity_logger.hpp>
@@ -8,7 +9,7 @@
 #include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/utility/setup.hpp>
-#include <boost/utility/empty_deleter.hpp>
+//#include <boost/utility/empty_deleter.hpp>
 #include <fstream>
 #include <iostream>
 
@@ -48,7 +49,7 @@ void Logger::init(const Game::Options &options)
 	sink->locked_backend()->add_stream(boost::make_shared<std::ofstream>(options.logFile));
 
 	// std::cout stream
-	sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::clog, boost::empty_deleter()));
+	sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::clog, boost::null_deleter()));
 
 	// Set the log format
 	auto formatter = expr::stream
