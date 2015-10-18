@@ -9,3 +9,4 @@ test64
 *.dll
 *.exe
 *.exe.map
+*.*sdf
