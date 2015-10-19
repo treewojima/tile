@@ -1,7 +1,7 @@
 CC         := g++
 WARNINGS   := -Wall -Wnon-virtual-dtor -Wno-ctor-dtor-privacy
 CFLAGS     := -m64 -c -pipe -ggdb3 -std=c++11 -Dmain=SDL_main $(WARNINGS) \
-              -DBOOST_ALL_DYN_LINK -Iinclude -fdiagnostics-color=always
+              -D_REENTRANT -DBOOST_ALL_DYN_LINK -Iinclude -fdiagnostics-color=always
 LFLAGS     := -m64 -mwindows -mconsole -lmingw32 -lSDL2main -lSDL2 -lSDL2_image \
               -lSDL2_mixer -lglew32.dll -lopengl32 -lglu32 -ltinyxml2 -lz.dll \
               -lboost_filesystem-mt -lboost_log-mt -lboost_program_options-mt \
