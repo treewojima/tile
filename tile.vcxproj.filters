@@ -13,29 +13,23 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\tmx">
+      <UniqueIdentifier>{081e590f-68b4-47b0-a18f-ad1604db0b53}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files\components">
-      <UniqueIdentifier>{8df8398e-1c41-407d-b616-1855a9dee1b8}</UniqueIdentifier>
+      <UniqueIdentifier>{b70df2ab-f242-4949-8675-b693ac331952}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\entities">
-      <UniqueIdentifier>{d2017e20-0f47-4ef6-9c66-2b302724ef80}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\tmx">
-      <UniqueIdentifier>{a553ca60-cb8c-4f85-bb53-b1198c171e8e}</UniqueIdentifier>
+      <UniqueIdentifier>{4f0ee5f2-fa41-4517-8076-0a4c1d35d94a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\components">
-      <UniqueIdentifier>{8a52089d-12f4-4bac-8d6b-80b957ca86da}</UniqueIdentifier>
+      <UniqueIdentifier>{0f8250a2-e3ec-4870-be6c-abebd4dc62f4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\entities">
-      <UniqueIdentifier>{a87492ca-6a16-4fc6-9996-d783e761bd96}</UniqueIdentifier>
+      <UniqueIdentifier>{94d81aea-ecce-4dd9-8d87-d5e37e87f446}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\tmx">
-      <UniqueIdentifier>{673d26d1-7125-4b8f-868a-9210f0b542bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\states">
-      <UniqueIdentifier>{9ed73758-dddd-49f0-969e-5339a6e35c45}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\states">
-      <UniqueIdentifier>{9ff00265-6913-4d43-ab84-96882de94c46}</UniqueIdentifier>
+      <UniqueIdentifier>{d4a5bacb-96d6-4274-9ce5-4dfd0aeb46a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -66,19 +60,10 @@
     <ClInclude Include="include\level.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\logger.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\resourcemanager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\state.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\statemanager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\texture.hpp">
@@ -92,24 +77,6 @@
     </ClInclude>
     <ClInclude Include="include\window.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\animatedsprite.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\base.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\graphics.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\position.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\staticsprite.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\entities\tux.hpp">
-      <Filter>Header Files\entities</Filter>
     </ClInclude>
     <ClInclude Include="include\tmx\Adaptor.h">
       <Filter>Header Files\tmx</Filter>
@@ -156,11 +123,26 @@
     <ClInclude Include="include\tmx\TileSet.h">
       <Filter>Header Files\tmx</Filter>
     </ClInclude>
-    <ClInclude Include="include\states\maingamestate.hpp">
-      <Filter>Header Files\states</Filter>
+    <ClInclude Include="include\components\animatedsprite.hpp">
+      <Filter>Header Files\components</Filter>
     </ClInclude>
-    <ClInclude Include="include\states\pausedstate.hpp">
-      <Filter>Header Files\states</Filter>
+    <ClInclude Include="include\components\base.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\graphics.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\position.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\staticsprite.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\entities\tux.hpp">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\logger.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -185,16 +167,10 @@
     <ClCompile Include="src\level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\map.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\statemanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\texture.cpp">
@@ -248,14 +224,8 @@
     <ClCompile Include="src\tmx\TileSet.cpp">
       <Filter>Source Files\tmx</Filter>
     </ClCompile>
-    <ClCompile Include="src\state.cpp">
+    <ClCompile Include="src\logger.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\states\maingamestate.cpp">
-      <Filter>Source Files\states</Filter>
-    </ClCompile>
-    <ClCompile Include="src\states\pausedstate.cpp">
-      <Filter>Source Files\states</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -23,7 +23,6 @@
 
 #include "exception.hpp"
 #include "game.hpp"
-#include "graphics.hpp"
 #include "logger.hpp"
 
 // Locals

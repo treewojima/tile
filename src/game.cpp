@@ -42,8 +42,6 @@
 #include "level.hpp"
 #include "logger.hpp"
 #include "map.hpp"
-#include "states/maingamestate.hpp"
-#include "states/pausedstate.hpp"
 #include "texture.hpp"
 #include "timer.hpp"
 #include "window.hpp"
@@ -59,14 +57,15 @@ namespace
     // Map of event handles to event instances
     std::map<Game::Event::Handle, std::shared_ptr<Game::Event>> _events;
 
+    // List of game entities
+    std::list<std::shared_ptr<Entity>> _entities;
+    std::unique_ptr<Map> _map;
+
     // Timer for tracking and calculating FPS
     Timer _fpsTimer;
 
     // Camera view
     std::unique_ptr<Camera> _camera;
-
-	// State stack
-	StateManager _stateMgr;
 
     // Resource managers
     TextureManager _texMgr;
@@ -79,11 +78,19 @@ namespace
 #endif
     void shutdownSDL();
 
+    // Resource and entity allocation/destruction/management functions
+    void loadTextures();
+    void createEntities();
+    void updateEntities(float dt);
+    void cullDeadEntities();
+    void destroyEntities();
+
     // Event handling functions
     void registerEvents();
     void handleEvents();
 
-	void togglePause();
+    // Scene update functions
+    void drawScene();
 }
 
 void Game::run(const Game::Options &options)
@@ -113,10 +120,12 @@ void Game::run(const Game::Options &options)
     // Set up event handling details
     registerEvents();
 
-	// Create the initial main game state
-	_stateMgr.push(std::make_shared<MainGameState>());
+    // Load resources and create entities
+    loadTextures();
+    createEntities();
 
     // Main loop variables
+    _map = std::unique_ptr<Map>(new Map("desert", "res/desert.tmx"));
     Timer stepTimer;
     float dt = 0;
     unsigned long countedFrames = 0;
@@ -142,30 +151,20 @@ void Game::run(const Game::Options &options)
         // Update scene
         try
         {
-			// First, make sure we even have a state to begin with
-			auto state = _stateMgr.peek();
-			if (!state)
-			{
-				throw EmptyStateStackException();
-			}
-
-			// Pre-processing
-			state->preLoop();
-			
-			// Process the event queue
+            // Process the event queue
             handleEvents();
 
             // Update entities, making sure to let them know how long it's been
             // since the last step
             dt = stepTimer.getTicks() / 1000.f;
-			state->update(dt);
+            updateEntities(dt);
             stepTimer.start();
 
             // Update the screen
-			state->draw();
+            drawScene();
 
-            // Post-processing
-			state->postLoop();
+            // Collect dead entities
+            cullDeadEntities();
         }
         catch (std::exception &e)
         {
@@ -179,7 +178,11 @@ void Game::run(const Game::Options &options)
     _fpsTimer.stop();
 
     // Clean up
-	_stateMgr.destroy();
+
+    // NOTE: Why does the game hang when this line is omitted?
+    if (_map.get() != nullptr) _map.reset();
+
+    destroyEntities();
     _texMgr.clear();
     Window::destroy();
     shutdownSDL();
@@ -198,11 +201,6 @@ void Game::setRunning(bool b)
 Camera &Game::getCamera()
 {
     return *_camera;
-}
-
-StateManager &Game::getStateMgr()
-{
-	return _stateMgr;
 }
 
 TextureManager &Game::getTexMgr()
@@ -347,6 +345,71 @@ void shutdownSDL()
     SDL_Quit();
 }
 
+void loadTextures()
+{
+    const SDL_Color colorKey = Colors::makeColor(255, 0, 255);
+    TextureManager::ResourcePtr texture;
+
+    //texture = std::make_shared<Texture>("tux", "res/tux.png", &colorKey);
+    //_texMgr.add(texture->getName(), texture);
+
+    //texture = std::make_shared<Texture>("beastie", "res/beastie.png", &colorKey);
+    //_texMgr.add(texture->getName(), texture);
+
+    for (int i = 1; i <= 4; i++)
+    {
+        std::ostringstream ss;
+        ss << "foo" << i;
+        texture = std::make_shared<Texture>(ss.str(), "res/" + ss.str() + ".png", &colorKey);
+        _texMgr.add(texture->getName(), texture);
+    }
+}
+
+void createEntities()
+{
+    //_entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));
+
+    auto tux = std::make_shared<Tux>();
+    tux->position = std::make_shared<Components::Position>(Window::getWidth() / 2,
+                                                           Window::getHeight() / 2);
+
+    Components::AnimatedSprite::TextureList textures;
+    //textures.push_back(_texMgr.get("tux"));
+    //textures.push_back(_texMgr.get("beastie"));
+    for (int i = 1; i <= 4; i++)
+    {
+        std::ostringstream ss;
+        ss << "foo" << i;
+        textures.push_back(_texMgr.get(ss.str()));
+    }
+
+    tux->graphics = std::make_shared<Components::AnimatedSprite>(textures,
+                                                                 tux->position);
+
+    _entities.push_back(tux);
+}
+
+void updateEntities(float dt)
+{
+    for (auto entity : _entities)
+    {
+        entity->update(dt);
+    }
+}
+
+void cullDeadEntities()
+{
+    _entities.remove_if([](std::shared_ptr<Entity> e)
+    {
+        return e->isMarkedForDeath();
+    });
+}
+
+void destroyEntities()
+{
+    _entities.clear();
+}
+
 void registerEvents()
 {
     // Set up an event filter to drop normal keyboard events from the queue
@@ -371,11 +434,6 @@ void registerEvents()
             SDL_SCANCODE_ESCAPE,
             [](const SDL_Event &e) { Game::setRunning(false); },
             "EscapeEvent");
-
-	Game::registerEvent(
-			SDL_SCANCODE_SPACE,
-			[](const SDL_Event &e) { togglePause(); },
-			"SpaceEvent");
 }
 
 void handleEvents()
@@ -397,16 +455,23 @@ void handleEvents()
     }
 }
 
-void togglePause()
+void drawScene()
 {
-	if (_stateMgr.peek()->getType() == State::Type::Paused)
-	{
-		_stateMgr.pop();
-	}
-	else
-	{
-		_stateMgr.push(std::make_shared<PausedState>());
-	}
+    Window::clear(255, 255, 255);
+
+    if (_map.get() != nullptr) _map->draw();
+
+    for (auto entity : _entities)
+    {
+        if (entity->graphics.get() != nullptr)
+        {
+            entity->graphics->draw();
+        }
+    }
+
+    //Graphics::blitTexture(Game::getTexMgr().get("desert-138"), 50, 50);
+
+    Window::flip();
 }
 
 }

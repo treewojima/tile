@@ -27,7 +27,6 @@
 #include <tmx/Map.h>
 
 #include "entity.hpp"
-#include "exception.hpp"
 #include "texture.hpp"
 
 class Map
@@ -59,12 +58,6 @@ private:
     TextureManager::ResourcePtr _renderedMapTexture;
 
     void loadTilesetTextures();
-};
-
-class MapException : public Exception
-{
-public:
-	using Exception::Exception;
 };
 
 #endif
