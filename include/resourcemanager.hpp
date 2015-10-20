@@ -31,10 +31,12 @@ template <class T>
 class ResourceManager
 {
 public:
-    typedef std::shared_ptr<T> ResourcePtr;
-    typedef std::shared_ptr<const T> ConstResourcePtr;
+	typedef std::shared_ptr<T> ResourcePtr;
+	typedef std::shared_ptr<const T> ConstResourcePtr;
 
+	ResourceManager() : _destroyed(false) {}
     ~ResourceManager();
+	void destroy();
 
     void add(const std::string &name, ResourcePtr ptr);
     ResourcePtr get(const std::string &name) const;
@@ -45,16 +47,25 @@ public:
 private:
     typedef std::unordered_map<std::string, ResourcePtr> ResourceMap;
 
+	bool _destroyed;
     ResourceMap _map;
 };
 
 template <class T>
 ResourceManager<T>::~ResourceManager()
 {
-    // NOTE: Should this just rely on clearing the map, or should it be ensured
-    //       that every ResourcePtr is dropped properly?
+	if (!_destroyed) destroy();
+}
 
-    _map.clear();
+template <class T>
+void ResourceManager<T>::destroy()
+{
+	// NOTE: Should this just rely on clearing the map, or should it be ensured
+	//       that every ResourcePtr is dropped properly?
+
+	_map.clear();
+
+	_destroyed = true;
 }
 
 template <class T>
