@@ -1,11 +1,12 @@
-CC         := clang++
-WARNINGS   := -Wall -Wnon-virtual-dtor -Wno-ctor-dtor-privacy -Werror
-BOOST_VER  := 
+CC         := g++
+WARNINGS   := -Wall -Wnon-virtual-dtor -Wno-ctor-dtor-privacy
+BOOST_VER  :=
 BOOST_LIBS := -lboost_filesystem$(BOOST_VER) -lboost_log$(BOOST_VER) \
               -lboost_program_options$(BOOST_VER) -lboost_system$(BOOST_VER) \
               -lboost_thread$(BOOST_VER)
-CFLAGS     := -c -pipe -ggdb3 -std=c++11 -D_REENTRANT -DBOOST_ALL_DYN_LINK \
-              -Iinclude $(WARNINGS)
+CFLAGS     := -c -pipe -ggdb3 -std=c++14 $(WARNINGS) \
+              -D_REENTRANT -DBOOST_ALL_DYN_LINK -Iinclude \
+              -fdiagnostics-color=always
 LFLAGS     := -lSDL2 -lSDL2_image -lSDL2_mixer -lpthread -lGLEW -lGL -lGLU \
               -ltinyxml2 -lz $(BOOST_LIBS)
 PROJDIRS   := src include

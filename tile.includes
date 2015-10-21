@@ -9,3 +9,5 @@ lib/libtmx/src
 lib/libtmx/include/tmx
 src/tmx
 include/tmx
+include/states
+src/states
