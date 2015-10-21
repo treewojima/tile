@@ -39,6 +39,7 @@ public:
 	void destroy();
 
     void add(const std::string &name, ResourcePtr ptr);
+	bool has(const std::string &name) const;
     ResourcePtr get(const std::string &name) const;
     void clear();
 
@@ -85,9 +86,17 @@ void ResourceManager<T>::add(const std::string &name, ResourcePtr ptr)
     }
 }
 
+template <class T>
+bool ResourceManager<T>::has(const std::string &name) const
+{
+	return _map.count(name);
+}
+
 template <class T> typename
 ResourceManager<T>::ResourcePtr ResourceManager<T>::get(const std::string &name) const
 {
+	// NOTE: Should this use has() instead?
+
     try
     {
         return _map.at(name);
