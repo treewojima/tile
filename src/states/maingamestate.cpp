@@ -35,7 +35,7 @@ void MainGameState::initialize()
 	loadTextures();
 	createEntities();
 
-	_map = std::unique_ptr<Map>(new Map("desert", "res/desert.tmx"));
+    _map = std::make_unique<Map>("desert", "res/desert.tmx");
 }
 
 void MainGameState::destroy()

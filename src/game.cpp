@@ -96,16 +96,13 @@ void Game::run(const Game::Options &options)
     Window::create(options.windowWidth, options.windowHeight, options.vsync);
 
     // Set up the camera view
-    //auto screenRatio = static_cast<float>(options.windowWidth) /
-    //                   static_cast<float>(options.windowHeight);
-    _camera = std::unique_ptr<Camera>(
-        new Camera(Vector2f::ZERO,                                        // worldMin
+    _camera = std::make_unique<Camera>(
+                   Vector2f::ZERO,                                        // worldMin
                    Vector2f(options.windowWidth, options.windowHeight),   // worldMax
                    Vector2f::ZERO,                                        // screenMin
                    Vector2f(options.windowWidth, options.windowHeight),   // screenMax
                    Vector2f::ZERO,                                        // screenMinInWorld
-                   Vector2f(options.windowWidth, options.windowHeight))); // screenMaxInWorld
-    //BOOST_LOG_TRIVIAL(debug) << *_camera;
+                   Vector2f(options.windowWidth, options.windowHeight));  // screenMaxInWorld
 
     // Further initialization for OpenGL and audio
     initGL();
@@ -415,10 +412,8 @@ void togglePause()
 void listTextures()
 {
 	std::ostringstream ss;
-	ss << "Texture dump:\n";
-	// NOTE: only in C++14... port code later?
-	//_texMgr.forEach([&ss](auto ptr) { ss << ptr; });
-	_texMgr.forEach([&ss](TextureManager::ResourcePtr ptr) { ss << *ptr << "\n"; });
+    ss << "Texture dump:\n";
+    _texMgr.forEach([&ss](auto ptr) { ss << *ptr << "\n"; });
 	ss << "\n";
 	LOG_DEBUG << ss.str();
 }

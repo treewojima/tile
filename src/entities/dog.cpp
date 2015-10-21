@@ -24,7 +24,7 @@
 #include "window.hpp"
 
 bool Dog::_texturesLoaded = false;
-const int Dog::NUM_FRAMES = 3;
+const int Dog::NUM_FRAMES = 4;
 const char *Dog::_strings[Dog::Direction::NUM_DIRECTIONS] =
 	{ "up", "down", "left", "right" };
 
