@@ -162,6 +162,9 @@
     <ClInclude Include="include\states\pausedstate.hpp">
       <Filter>Header Files\states</Filter>
     </ClInclude>
+    <ClInclude Include="include\entities\dog.hpp">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp">
@@ -256,6 +259,9 @@
     </ClCompile>
     <ClCompile Include="src\states\pausedstate.cpp">
       <Filter>Source Files\states</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entities\dog.cpp">
+      <Filter>Source Files\entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

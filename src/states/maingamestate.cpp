@@ -21,6 +21,7 @@
 
 #include "colors.hpp"
 #include "components/animatedsprite.hpp"
+#include "entities/dog.hpp"
 #include "entities/tux.hpp"
 #include "game.hpp"
 #include "logger.hpp"
@@ -101,6 +102,7 @@ void MainGameState::loadTextures()
 
 void MainGameState::createEntities()
 {
+#if 0
 	//_entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));
 
 	auto tux = std::make_shared<Tux>();
@@ -121,4 +123,7 @@ void MainGameState::createEntities()
 		tux->position);
 
 	_entities.push_back(tux);
+#endif
+
+	_entities.push_back(std::make_shared<Dog>());
 }

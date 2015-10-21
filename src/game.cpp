@@ -418,7 +418,7 @@ void listTextures()
 	ss << "Texture dump:\n";
 	// NOTE: only in C++14... port code later?
 	//_texMgr.forEach([&ss](auto ptr) { ss << ptr; });
-	_texMgr.forEach([&ss](TextureManager::ResourcePtr ptr) { ss << ptr << "\n"; });
+	_texMgr.forEach([&ss](TextureManager::ResourcePtr ptr) { ss << *ptr << "\n"; });
 	ss << "\n";
 	LOG_DEBUG << ss.str();
 }

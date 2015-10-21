@@ -137,6 +137,7 @@
     <ClInclude Include="include\components\position.hpp" />
     <ClInclude Include="include\components\staticsprite.hpp" />
     <ClInclude Include="include\defines.hpp" />
+    <ClInclude Include="include\entities\dog.hpp" />
     <ClInclude Include="include\entities\tux.hpp" />
     <ClInclude Include="include\entity.hpp" />
     <ClInclude Include="include\exception.hpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="src\components\graphics.cpp" />
     <ClCompile Include="src\components\position.cpp" />
     <ClCompile Include="src\components\staticsprite.cpp" />
+    <ClCompile Include="src\entities\dog.cpp" />
     <ClCompile Include="src\entities\tux.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\game.cpp" />
