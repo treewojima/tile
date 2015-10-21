@@ -46,6 +46,9 @@ public:
     void forEach(std::function<void(ResourcePtr)> f);
 
 private:
+    // unordered_map is faster than map for random access, but slower
+    // for sequential access - which is optimal for what the ResourceManager
+    // is used for
     typedef std::unordered_map<std::string, ResourcePtr> ResourceMap;
 
 	bool _destroyed;
@@ -72,17 +75,24 @@ void ResourceManager<T>::destroy()
 template <class T>
 void ResourceManager<T>::add(const std::string &name, ResourcePtr ptr)
 {
-    // TODO: Check if ptr is null
+    if (!ptr)
+    {
+        std::ostringstream ss;
+        ss << "could not insert new resource \"" << name
+           << "\" into ResourceManager: NULL pointer";
+        throw Exception(ss.str());
+    }
 
     auto ret = _map.insert(std::make_pair(name, ptr));
     if (!ret.second)
     {
         // NOTE: Should this be a logged warning instead?
+        //       ... Yes, yes it should.
 
-        std::ostringstream ss;
-        ss << "Could not insert new Resource \"" << name
-           << "\" into ResourceManager: duplicate key";
-        throw Exception(ss.str());
+        //std::ostringstream ss;
+        LOG_DEBUG << "could not insert new resource \"" << name
+                  << "\" into ResourceManager: duplicate key";
+        //throw Exception(ss.str());
     }
 }
 
