@@ -56,4 +56,11 @@ private:
 
 typedef ResourceManager<Texture> TextureManager;
 
+// Helper stream operator
+inline std::ostream &operator<<(std::ostream &stream, const Texture &t)
+{
+	stream << t.toString();
+	return stream;
+}
+
 #endif
