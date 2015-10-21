@@ -54,6 +54,7 @@ private:
                          bool optimize = true);
 };
 
+extern template class ResourceManager<Texture>;
 typedef ResourceManager<Texture> TextureManager;
 
 // Helper stream operator

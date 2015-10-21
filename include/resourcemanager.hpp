@@ -19,13 +19,16 @@
 #define __RESOURCEMANAGER_HPP__
 
 #include "defines.hpp"
+
 #include <functional>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <utility>
+
 #include "exception.hpp"
+//#include "logger.hpp"
 
 template <class T>
 class ResourceManager
@@ -90,8 +93,8 @@ void ResourceManager<T>::add(const std::string &name, ResourcePtr ptr)
         //       ... Yes, yes it should.
 
         //std::ostringstream ss;
-        LOG_DEBUG << "could not insert new resource \"" << name
-                  << "\" into ResourceManager: duplicate key";
+        //LOG_DEBUG << "could not insert new resource \"" << name
+        //          << "\" into ResourceManager: duplicate key";
         //throw Exception(ss.str());
     }
 }
