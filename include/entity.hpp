@@ -24,8 +24,10 @@
 
 #include "components/graphics.hpp"
 #include "components/position.hpp"
+#include "components/propertylist.hpp"
+#include "istringable.hpp"
 
-class Entity
+class Entity : public IStringable
 {
 public:
     Entity(const std::string &name);
@@ -33,13 +35,14 @@ public:
 
     std::shared_ptr<Components::Position> position;
     std::shared_ptr<Components::Graphics> graphics;
+    std::shared_ptr<Components::PropertyList> properties;
 
     virtual void update(float dt) {}
 
     inline std::string getName() const { return _name; }
     inline bool isMarkedForDeath() const { return _markedForDeath; }
 
-    virtual std::string toString() const;
+    std::string toString() const;
 
 protected:
     // This is the most badass function name ever
@@ -49,12 +52,5 @@ private:
     std::string _name;
     bool _markedForDeath;
 };
-
-// Helper stream operator
-inline std::ostream &operator<<(std::ostream &stream, const Entity &e)
-{
-    stream << e.toString();
-    return stream;
-}
 
 #endif

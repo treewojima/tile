@@ -28,6 +28,8 @@
 
 Entity::Entity(const std::string &name) :
     position(nullptr),
+    graphics(nullptr),
+    properties(std::make_shared<Components::PropertyList>()),
     _name(name),
     _markedForDeath(false)
 {

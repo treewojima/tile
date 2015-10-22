@@ -28,14 +28,15 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include "istringable.hpp"
 
-class Exception : public std::runtime_error
+class Exception : public std::runtime_error, public IStringable
 {
 public:
 	using std::runtime_error::runtime_error;
+
+    std::string toString() const { return what(); }
 };
-
-
 
 #ifdef _ENABLE_AUDIO
 #error move this class to another file
@@ -46,9 +47,5 @@ public:
     SDLMixerException() : SDLException(Mix_GetError()) {}
 };
 #endif
-
-
-
-
 
 #endif

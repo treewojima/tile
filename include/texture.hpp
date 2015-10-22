@@ -19,12 +19,15 @@
 #define __TEXTURE_HPP__
 
 #include "defines.hpp"
+
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <string>
+
+#include "istringable.hpp"
 #include "resourcemanager.hpp"
 
-class Texture
+class Texture : public IStringable
 {
 public:
     Texture(const std::string &name,

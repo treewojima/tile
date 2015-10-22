@@ -22,8 +22,10 @@
 #include <string>
 #include <typeinfo>
 
+#include "istringable.hpp"
+
 template <class T>
-class Vector2
+class Vector2 : public IStringable
 {
 public:
     T x, y;
@@ -100,13 +102,14 @@ inline Vector2<T> operator-(Vector2<T> lhs, const Vector2<T> &rhs)
 }
 
 // Helper stream operator
+#if 0
 template <class T>
 inline std::ostream &operator<<(std::ostream &stream, const Vector2<T> &v)
 {
 	stream << v.toString();
 	return stream;
 }
-
+#endif
 
 // Common typedefs
 typedef Vector2<int> Vector2i;

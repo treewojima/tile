@@ -37,8 +37,15 @@ public:
     typedef Container<T> ResourcePtr;
     typedef Container<const T> ConstResourcePtr;
 
+private:
+    // unordered_map is faster than map for random access, but slower
+    // for sequential access - which is optimal for what the ResourceManager
+    // is used for
+    typedef std::unordered_map<std::string, ResourcePtr> ResourceMap;
+
+public:
 	ResourceManager() : _destroyed(false) {}
-    ~ResourceManager();
+    virtual ~ResourceManager();
 	void destroy();
 
     void add(const std::string &name, ResourcePtr ptr);
@@ -46,14 +53,11 @@ public:
     ResourcePtr get(const std::string &name) const;
     void clear();
 
+    //pair<const key_type,mapped_type>
+    void forEachPair(std::function<void(typename ResourceMap::value_type)> f);
     void forEach(std::function<void(ResourcePtr)> f);
 
 private:
-    // unordered_map is faster than map for random access, but slower
-    // for sequential access - which is optimal for what the ResourceManager
-    // is used for
-    typedef std::unordered_map<std::string, ResourcePtr> ResourceMap;
-
 	bool _destroyed;
     ResourceMap _map;
 };
@@ -78,6 +82,7 @@ void ResourceManager<T, C>::destroy()
 template <class T, template <class> class C>
 void ResourceManager<T, C>::add(const std::string &name, ResourcePtr ptr)
 {
+#if 0
     if (!ptr)
     {
         std::ostringstream ss;
@@ -85,6 +90,7 @@ void ResourceManager<T, C>::add(const std::string &name, ResourcePtr ptr)
            << "\" into ResourceManager: NULL pointer";
         throw Exception(ss.str());
     }
+#endif
 
     auto ret = _map.insert(std::make_pair(name, ptr));
     if (!ret.second)
@@ -92,10 +98,10 @@ void ResourceManager<T, C>::add(const std::string &name, ResourcePtr ptr)
         // NOTE: Should this be a logged warning instead?
         //       ... Yes, yes it should.
 
-        //std::ostringstream ss;
-        //LOG_DEBUG << "could not insert new resource \"" << name
-        //          << "\" into ResourceManager: duplicate key";
-        //throw Exception(ss.str());
+        std::ostringstream ss;
+        ss << "could not insert new resource \"" << name
+                  << "\" into ResourceManager: duplicate key";
+        throw Exception(ss.str());
     }
 }
 
@@ -131,12 +137,27 @@ void ResourceManager<T, C>::clear()
 }
 
 template <class T, template <class> class C>
+void ResourceManager<T, C>::forEachPair(std::function<void(typename ResourceMap::value_type)> f)
+{
+    for (auto iter = _map.begin() ; iter != _map.end(); iter++)
+    {
+        f(*iter);
+    }
+}
+
+template <class T, template <class> class C>
 void ResourceManager<T, C>::forEach(std::function<void(ResourcePtr)> f)
 {
+#if 0
     for (auto iter = _map.begin() ; iter != _map.end(); iter++)
     {
         f((*iter).second);
     }
+#endif
+    forEachPair([&f](auto pair)
+    {
+        f(pair.second);
+    });
 }
 
 #endif
