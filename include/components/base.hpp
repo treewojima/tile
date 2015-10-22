@@ -21,10 +21,11 @@
 #include "defines.hpp"
 #include <memory>
 #include <string>
+#include "istringable.hpp"
 
 namespace Components
 {
-    class Base
+    class Base : public IStringable
     {
     public:
         //typedef std::shared_ptr<Base> Ptr;
@@ -34,18 +35,11 @@ namespace Components
 
         inline std::string getName() const { return _name; }
 
-        virtual std::string toString() const;
+        std::string toString() const;
 
     private:
         std::string _name;
     };
-}
-
-// Helper stream operator
-inline std::ostream &operator<<(std::ostream &stream, const Components::Base &c)
-{
-    stream << c.toString();
-    return stream;
 }
 
 #endif

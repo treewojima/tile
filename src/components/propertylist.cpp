@@ -15,32 +15,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "defines.hpp"
-#include "entity.hpp"
+#include "components/propertylist.hpp"
 
-#include <cassert>
-#include <cmath>
-#include <easylogging++.h>
-#include <GL/glew.h>
-#include <SDL2/SDL.h>
 #include <sstream>
 
-Entity::Entity(const std::string &name) :
-    _name(name),
-    _markedForDeath(false)
+Components::PropertyList::PropertyList(const std::string &name) :
+    Base(name),
+	ResourceManager<Variant>()
 {
 }
 
-Entity::~Entity()
-{
-#ifdef _DEBUG_ENTITIES
-    LOG(DEBUG) << "destroyed entity " << getName();
-#endif
-}
-
-std::string Entity::toString() const
+std::string Components::PropertyList::toString() const
 {
     std::ostringstream ss;
-    ss << "Entity[name = \"" << getName() << "\"]";
+    ss << "Components::PropertyList[name = \"" << getName()
+       << "\", properties = { ";
+
+    forEach([&ss](auto pair)
+    {
+        const auto &key = pair.key;
+        const auto &value = pair.value;
+
+		ss << "\"" << key << "\" : ";
+		
+		switch (value.which())
+		{
+		// std::string
+		case 0:
+			ss << "\"" << value << "\"";
+			break;
+
+		// bool
+		case 1:
+			ss << (boost::get<bool>(value) ? "true" : "false");
+			break;
+
+		default:
+			ss << value;
+		}
+
+        ss << ", ";
+    });
+
+    ss << "<end> }]";
     return ss.str();
 }

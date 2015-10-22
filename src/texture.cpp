@@ -36,8 +36,6 @@
 #   define IS_POWER_OF_TWO(n) true
 #endif
 
-template class ResourceManager<Texture>;
-
 Texture::Texture(const std::string &name,
                  const std::string &filename,
                  const SDL_Color *colorKey) :

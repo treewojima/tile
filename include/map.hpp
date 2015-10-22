@@ -56,7 +56,7 @@ private:
     //Tmx::Map *_map;
     std::unique_ptr<tmx::Map> _map;
     std::list<std::shared_ptr<Entity>> _entities;
-    TextureManager::ResourcePtr _renderedMapTexture;
+    std::shared_ptr<Texture> _renderedMapTexture;
 
     void loadTilesetTextures();
 };

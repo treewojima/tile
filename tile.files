@@ -150,3 +150,6 @@ src/texture.cpp
 src/timer.cpp
 src/vector.cpp
 src/window.cpp
+include/components/propertylist.hpp
+src/components/propertylist.cpp
+include/istringable.hpp

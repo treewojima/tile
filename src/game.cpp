@@ -34,6 +34,7 @@
 #include "colors.hpp"
 #include "components/animatedsprite.hpp"
 #include "components/position.hpp"
+#include "components/propertylist.hpp"
 #include "components/staticsprite.hpp"
 #include "entities/tux.hpp"
 #include "exception.hpp"
@@ -413,7 +414,7 @@ void listTextures()
 {
 	std::ostringstream ss;
     ss << "Texture dump:\n";
-    _texMgr.forEach([&ss](auto ptr) { ss << *ptr << "\n"; });
+    _texMgr.forEach([&ss](auto pair) { ss << pair.value << "\n"; });
 	ss << "\n";
 	LOG_DEBUG << ss.str();
 }

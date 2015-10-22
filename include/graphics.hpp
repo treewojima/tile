@@ -55,17 +55,17 @@ namespace Graphics
     }
 
     // Screen blitting
-    void blitTexture(TextureManager::ConstResourcePtr texture,
+    void blitTexture(std::shared_ptr<Texture> texture,
                      float x,
                      float y);
 
-    inline void blitTexture(TextureManager::ConstResourcePtr texture,
+    inline void blitTexture(std::shared_ptr<Texture> texture,
                      const Vector2f &pos)
     {
         blitTexture(texture, pos.x, pos.y);
     }
 
-    inline void blitTexture(TextureManager::ConstResourcePtr texture,
+    inline void blitTexture(std::shared_ptr<Texture> texture,
                      const Vector2i &pos)
     {
         blitTexture(texture, pos.x, pos.y);

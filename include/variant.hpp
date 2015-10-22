@@ -15,45 +15,15 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __DOG_HPP__
-#define __DOG_HPP__
+#ifndef __VARIANT_HPP__
+#define __VARIANT_HPP__
 
 #include "defines.hpp"
 
-#include <memory>
-#include <vector>
+#include <boost/variant.hpp>
+#include <string>
 
-#include "components/animatedsprite.hpp"
-#include "entity.hpp"
-#include "game.hpp"
-
-class Dog : public Entity
-{
-public:
-	Dog();
-    ~Dog();
-
-private:
-	enum Direction
-	{
-		Up,
-		Down,
-		Left,
-		Right,
-		NUM_DIRECTIONS
-	};
-
-	static bool _texturesLoaded;
-	static const int NUM_FRAMES;
-	static const char *_strings[];
-	
-	std::shared_ptr<Components::AnimatedSprite> _directions[NUM_DIRECTIONS];
-	std::vector<Game::Event::Handle> _eventHandles;
-
-	static void loadTextures();
-
-	void registerEvents();
-};
+// Keep this updated with various types as needed
+typedef boost::variant<std::string, bool, int> Variant;
 
 #endif
-

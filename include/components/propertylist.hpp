@@ -15,32 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
+#ifndef __COMPONENTS_PROPERTYLIST_HPP__
+#define __COMPONENTS_PROPERTYLIST_HPP__
 
 #include "defines.hpp"
 
-#include <vector>
+#include "components/base.hpp"
+#include "resourcemanager.hpp"
+#include "variant.hpp"
 
-#include "entity.hpp"
-#include "game.hpp"
-#include "texture.hpp"
-#include "vector.hpp"
-
-class Tux : public Entity
+namespace Components
 {
-public:
-    Tux(const Vector2f &pos);
-    ~Tux();
+    class PropertyList : public Base, public ResourceManager<Variant>
+    {
+    public:
+		PropertyList(const std::string &name = "PropertyList");
 
-    void draw() const;
-
-    std::string toString() const;
-
-private:
-    Vector2f _position;
-    TextureManager::ResourcePtr _texture;
-    std::vector<Game::Event::Handle> _eventHandles;
-};
+        std::string toString() const;
+    };
+}
 
 #endif

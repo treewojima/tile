@@ -19,10 +19,13 @@
 #define __CAMERA_HPP__
 
 #include "defines.hpp"
+
 #include <iostream>
+
+#include "istringable.hpp"
 #include "vector.hpp"
 
-class Camera
+class Camera : public IStringable
 {
 public:
     Camera(const Vector2f &worldMin, const Vector2f &worldMax,
@@ -73,12 +76,5 @@ private:
     //b2Vec2 _rotationOrigin;
     //float _rotation;
 };
-
-// Helper stream operator
-inline std::ostream &operator<<(std::ostream &stream, const Camera &c)
-{
-    stream << c.toString();
-    return stream;
-}
 
 #endif

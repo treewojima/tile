@@ -15,45 +15,26 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __DOG_HPP__
-#define __DOG_HPP__
+#ifndef __ISTRINGABLE_HPP__
+#define __ISTRINGABLE_HPP__
 
 #include "defines.hpp"
 
-#include <memory>
-#include <vector>
+#include <string>
 
-#include "components/animatedsprite.hpp"
-#include "entity.hpp"
-#include "game.hpp"
-
-class Dog : public Entity
+// Interface that guarantees a toString() method
+class IStringable
 {
 public:
-	Dog();
-    ~Dog();
-
-private:
-	enum Direction
-	{
-		Up,
-		Down,
-		Left,
-		Right,
-		NUM_DIRECTIONS
-	};
-
-	static bool _texturesLoaded;
-	static const int NUM_FRAMES;
-	static const char *_strings[];
-	
-	std::shared_ptr<Components::AnimatedSprite> _directions[NUM_DIRECTIONS];
-	std::vector<Game::Event::Handle> _eventHandles;
-
-	static void loadTextures();
-
-	void registerEvents();
+    virtual ~IStringable() {}
+    virtual std::string toString() const = 0;
 };
 
-#endif
+// Helper ostream operator
+inline std::ostream &operator<<(std::ostream &stream, const IStringable &obj)
+{
+    stream << obj.toString();
+    return stream;
+}
 
+#endif

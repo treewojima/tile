@@ -135,6 +135,7 @@
     <ClInclude Include="include\components\base.hpp" />
     <ClInclude Include="include\components\graphics.hpp" />
     <ClInclude Include="include\components\position.hpp" />
+    <ClInclude Include="include\components\propertylist.hpp" />
     <ClInclude Include="include\components\staticsprite.hpp" />
     <ClInclude Include="include\defines.hpp" />
     <ClInclude Include="include\entities\dog.hpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="include\game.hpp" />
     <ClInclude Include="include\graphics.hpp" />
     <ClInclude Include="include\helper_events.hpp" />
+    <ClInclude Include="include\istringable.hpp" />
     <ClInclude Include="include\level.hpp" />
     <ClInclude Include="include\logger.hpp" />
     <ClInclude Include="include\map.hpp" />
@@ -169,6 +171,7 @@
     <ClInclude Include="include\tmx\Tile.h" />
     <ClInclude Include="include\tmx\TileLayer.h" />
     <ClInclude Include="include\tmx\TileSet.h" />
+    <ClInclude Include="include\variant.hpp" />
     <ClInclude Include="include\vector.hpp" />
     <ClInclude Include="include\window.hpp" />
   </ItemGroup>
@@ -179,6 +182,7 @@
     <ClCompile Include="src\components\base.cpp" />
     <ClCompile Include="src\components\graphics.cpp" />
     <ClCompile Include="src\components\position.cpp" />
+    <ClCompile Include="src\components\propertylist.cpp" />
     <ClCompile Include="src\components\staticsprite.cpp" />
     <ClCompile Include="src\entities\dog.cpp" />
     <ClCompile Include="src\entities\tux.cpp" />

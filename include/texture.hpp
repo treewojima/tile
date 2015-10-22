@@ -19,12 +19,16 @@
 #define __TEXTURE_HPP__
 
 #include "defines.hpp"
+
 #include <GL/glew.h>
+#include <memory>
 #include <SDL2/SDL.h>
 #include <string>
+
+#include "istringable.hpp"
 #include "resourcemanager.hpp"
 
-class Texture
+class Texture : public IStringable
 {
 public:
     Texture(const std::string &name,
@@ -54,8 +58,7 @@ private:
                          bool optimize = true);
 };
 
-extern template class ResourceManager<Texture>;
-typedef ResourceManager<Texture> TextureManager;
+typedef ResourceManager<std::shared_ptr<Texture>> TextureManager;
 
 // Helper stream operator
 inline std::ostream &operator<<(std::ostream &stream, const Texture &t)

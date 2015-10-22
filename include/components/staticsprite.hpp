@@ -29,21 +29,21 @@ namespace Components
     class StaticSprite : public Graphics
     {
     public:
-        StaticSprite(TextureManager::ConstResourcePtr texture,
+        StaticSprite(std::shared_ptr<Texture> texture,
                      std::shared_ptr<Components::Position> positionComponent);
 
         void draw();
 
-        inline TextureManager::ConstResourcePtr getTexture() const
+        inline std::shared_ptr<Texture> getTexture() const
             { return _texture; }
 
         std::string toString() const;
 
     protected:
-        void setTexture(TextureManager::ConstResourcePtr texture);
+        void setTexture(std::shared_ptr<Texture> texture);
 
     private:
-        TextureManager::ConstResourcePtr _texture;
+        std::shared_ptr<Texture> _texture;
         std::shared_ptr<Components::Position> _position;
     };
 }
