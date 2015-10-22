@@ -99,7 +99,7 @@ SDL_Surface *Graphics::createBlankSDLSurface(int width, int height, SDL_Color co
     return surface;
 }
 
-void Graphics::blitTexture(TextureManager::ConstResourcePtr texture,
+void Graphics::blitTexture(std::shared_ptr<Texture> texture,
                            float x,
                            float y)
 {

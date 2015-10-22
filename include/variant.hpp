@@ -15,26 +15,15 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ISTRINGABLE_HPP__
-#define __ISTRINGABLE_HPP__
+#ifndef __VARIANT_HPP__
+#define __VARIANT_HPP__
 
 #include "defines.hpp"
 
+#include <boost/variant.hpp>
 #include <string>
 
-// Interface that guarantees a toString() method
-class IStringable
-{
-public:
-    virtual ~IStringable() {}
-    virtual std::string toString() const = 0;
-};
-
-// Helper ostream operator
-inline std::ostream &operator<<(std::ostream &stream, const IStringable &obj)
-{
-    stream << obj.toString();
-    return stream;
-}
+// Keep this updated with various types as needed
+typedef boost::variant<std::string, bool, int> Variant;
 
 #endif

@@ -25,7 +25,6 @@
 #include <string>
 
 #include "camera.hpp"
-#include "resourcemanager.hpp"
 #include "statemanager.hpp"
 #include "texture.hpp"
 
@@ -67,7 +66,7 @@ namespace Game
 
     Camera &getCamera();
 	StateManager &getStateMgr();
-    ResourceManager<Texture> &getTexMgr();
+    TextureManager &getTexMgr();
 
     Event::Handle registerEvent(SDL_Scancode key,
                                 Event::Callback callback,

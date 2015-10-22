@@ -20,7 +20,7 @@
 #include "graphics.hpp"
 
 Components::StaticSprite::StaticSprite(
-        TextureManager::ConstResourcePtr texture,
+        std::shared_ptr<Texture> texture,
         std::shared_ptr<Components::Position> positionComponent) :
     Components::Graphics("graphics"),
     _position(positionComponent)
@@ -48,7 +48,7 @@ std::string Components::StaticSprite::toString() const
     return ss.str();
 }
 
-void Components::StaticSprite::setTexture(TextureManager::ConstResourcePtr texture)
+void Components::StaticSprite::setTexture(std::shared_ptr<Texture> texture)
 {
     _texture = texture;
 }

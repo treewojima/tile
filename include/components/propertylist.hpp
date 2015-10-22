@@ -20,51 +20,18 @@
 
 #include "defines.hpp"
 
-//#include <boost/any.hpp>
-#include <boost/spirit/home/support/detail/hold_any.hpp>
-
 #include "components/base.hpp"
 #include "resourcemanager.hpp"
-
-// TODO: swap out ResourceManager for unordered_map; the abstraction
-// makes it near impossible to subscript... OR, tweak ResourceManager
-// to allow for proper subscripting itself
+#include "variant.hpp"
 
 namespace Components
 {
-    class PropertyList : public Base
+    class PropertyList : public Base, public ResourceManager<Variant>
     {
     public:
-        typedef boost::spirit::hold_any AnyType;
-
-        //using Base::Base;
-        PropertyList(const std::string &name = "PropertyList");
-        ~PropertyList();
-
-        void add(const std::string &name, AnyType &value);
-        bool has(const std::string &name) const;
-        AnyType get(const std::string &name) const;
-        void clear();
-
-        AnyType &operator[](const std::string &key);
-        const AnyType &operator[](const std::string &key) const;
+		PropertyList(const std::string &name = "PropertyList");
 
         std::string toString() const;
-
-    private:
-        // Dummy container for ResourceManager
-        template <class T>
-        class DummyContainer
-        {
-        public:
-            DummyContainer(T &v) : value(v) {}
-
-            T value;
-        };
-
-        typedef ResourceManager<AnyType, DummyContainer> PropertyManager;
-
-        PropertyManager _propMgr;
     };
 }
 

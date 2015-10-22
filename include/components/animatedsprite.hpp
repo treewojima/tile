@@ -31,7 +31,7 @@ namespace Components
     class AnimatedSprite : public Graphics
     {
     public:
-        typedef std::list<TextureManager::ConstResourcePtr> TextureList;
+        typedef std::list<std::shared_ptr<Texture>> TextureList;
 
         AnimatedSprite(TextureList textures,
                        std::shared_ptr<Components::Position> positionComponent);

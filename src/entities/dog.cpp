@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include "colors.hpp"
+#include "logger.hpp"
 #include "texture.hpp"
 #include "window.hpp"
 
@@ -37,8 +38,9 @@ Dog::Dog() :
 
 	loadTextures();
 
-	position = std::make_shared<Components::Position>(Window::getWidth() / 2,
-		Window::getHeight() / 2);
+	auto startX = Window::getWidth() / 4;
+	auto startY = Window::getHeight() - (Window::getHeight() / 4);
+	position = std::make_shared<Components::Position>(startX, startY);
 	
 	for (int dir = 0; dir < Direction::NUM_DIRECTIONS; dir++)
 	{
@@ -53,7 +55,11 @@ Dog::Dog() :
 		_directions[dir] = std::make_shared<Components::AnimatedSprite>(textures,
 																		position);
 	}
-	graphics = _directions[Direction::Up];
+	graphics = _directions[Direction::Down];
+
+	(*properties)["string"] = std::string("hai2u");
+	(*properties)["bool"] = true;
+	(*properties)["int"] = 17;
 }
 
 Dog::~Dog()
@@ -62,6 +68,8 @@ Dog::~Dog()
 	{
 		Game::unregisterEvent(handle);
 	}
+
+	LOG_DEBUG << *properties;
 }
 
 void Dog::loadTextures()
@@ -69,7 +77,7 @@ void Dog::loadTextures()
 	if (_texturesLoaded) return;
 
 	const SDL_Color colorKey = Colors::makeColor(255, 0, 255);
-	TextureManager::ResourcePtr texture;
+	std::shared_ptr<Texture> texture;
 
 	for (int dir = 0; dir < Direction::NUM_DIRECTIONS; dir++)
 	{

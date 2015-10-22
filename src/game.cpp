@@ -414,7 +414,7 @@ void listTextures()
 {
 	std::ostringstream ss;
     ss << "Texture dump:\n";
-    _texMgr.forEach([&ss](auto ptr) { ss << *ptr << "\n"; });
+    _texMgr.forEach([&ss](auto pair) { ss << pair.value << "\n"; });
 	ss << "\n";
 	LOG_DEBUG << ss.str();
 }

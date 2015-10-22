@@ -165,6 +165,15 @@
     <ClInclude Include="include\entities\dog.hpp">
       <Filter>Header Files\entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\components\propertylist.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\istringable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\variant.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp">
@@ -262,6 +271,9 @@
     </ClCompile>
     <ClCompile Include="src\entities\dog.cpp">
       <Filter>Source Files\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\propertylist.cpp">
+      <Filter>Source Files\components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

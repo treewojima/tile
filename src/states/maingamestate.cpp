@@ -83,7 +83,7 @@ void MainGameState::draw()
 void MainGameState::loadTextures()
 {
 	const SDL_Color colorKey = Colors::makeColor(255, 0, 255);
-	TextureManager::ResourcePtr texture;
+	std::shared_ptr<Texture> texture;
 
 	//texture = std::make_shared<Texture>("tux", "res/tux.png", &colorKey);
 	//_texMgr.add(texture->getName(), texture);
