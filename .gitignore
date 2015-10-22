@@ -10,3 +10,4 @@ test64
 *.exe
 *.exe.map
 *.*sdf
+*.autosave

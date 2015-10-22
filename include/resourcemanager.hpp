@@ -30,12 +30,12 @@
 #include "exception.hpp"
 //#include "logger.hpp"
 
-template <class T>
+template <class T, template <class> class Container = std::shared_ptr>
 class ResourceManager
 {
 public:
-	typedef std::shared_ptr<T> ResourcePtr;
-	typedef std::shared_ptr<const T> ConstResourcePtr;
+    typedef Container<T> ResourcePtr;
+    typedef Container<const T> ConstResourcePtr;
 
 	ResourceManager() : _destroyed(false) {}
     ~ResourceManager();
@@ -58,14 +58,14 @@ private:
     ResourceMap _map;
 };
 
-template <class T>
-ResourceManager<T>::~ResourceManager()
+template <class T, template <class> class C>
+ResourceManager<T, C>::~ResourceManager()
 {
 	if (!_destroyed) destroy();
 }
 
-template <class T>
-void ResourceManager<T>::destroy()
+template <class T, template <class> class C>
+void ResourceManager<T, C>::destroy()
 {
 	// NOTE: Should this just rely on clearing the map, or should it be ensured
 	//       that every ResourcePtr is dropped properly?
@@ -75,8 +75,8 @@ void ResourceManager<T>::destroy()
 	_destroyed = true;
 }
 
-template <class T>
-void ResourceManager<T>::add(const std::string &name, ResourcePtr ptr)
+template <class T, template <class> class C>
+void ResourceManager<T, C>::add(const std::string &name, ResourcePtr ptr)
 {
     if (!ptr)
     {
@@ -99,14 +99,14 @@ void ResourceManager<T>::add(const std::string &name, ResourcePtr ptr)
     }
 }
 
-template <class T>
-bool ResourceManager<T>::has(const std::string &name) const
+template <class T, template <class> class C>
+bool ResourceManager<T, C>::has(const std::string &name) const
 {
 	return _map.count(name);
 }
 
-template <class T> typename
-ResourceManager<T>::ResourcePtr ResourceManager<T>::get(const std::string &name) const
+template <class T, template <class> class C>
+typename ResourceManager<T, C>::ResourcePtr ResourceManager<T, C>::get(const std::string &name) const
 {
 	// NOTE: Should this use has() instead?
 
@@ -121,8 +121,8 @@ ResourceManager<T>::ResourcePtr ResourceManager<T>::get(const std::string &name)
     }
 }
 
-template <class T>
-void ResourceManager<T>::clear()
+template <class T, template <class> class C>
+void ResourceManager<T, C>::clear()
 {
     // NOTE: Should every ResourcePtr be properly dropped, or is clearing the
     //       internal map enough?
@@ -130,8 +130,8 @@ void ResourceManager<T>::clear()
     _map.clear();
 }
 
-template <class T>
-void ResourceManager<T>::forEach(std::function<void(ResourcePtr)> f)
+template <class T, template <class> class C>
+void ResourceManager<T, C>::forEach(std::function<void(ResourcePtr)> f)
 {
     for (auto iter = _map.begin() ; iter != _map.end(); iter++)
     {
