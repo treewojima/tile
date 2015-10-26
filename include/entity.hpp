@@ -20,7 +20,8 @@
 
 #include "defines.hpp"
 
-#include <memory>
+#include <memory> 
+#include <ostream>
 
 #include "components/graphics.hpp"
 #include "components/position.hpp"
@@ -51,6 +52,30 @@ protected:
 private:
     std::string _name;
     bool _markedForDeath;
+
+public:
+	enum class Type
+	{
+		Terrain,
+		Actor
+	};
 };
+
+// Helper stream operator for Entity::Type
+inline std::ostream &operator<<(std::ostream &os, const Entity::Type &type)
+{
+	switch (type)
+	{
+	case Entity::Type::Terrain:
+		os << "Terrain";
+		break;
+
+	case Entity::Type::Actor:
+		os << "Actor";
+		break;
+	}
+
+	return os;
+}
 
 #endif

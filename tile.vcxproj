@@ -129,8 +129,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\actions\base.hpp" />
+    <ClInclude Include="include\actions\movement.hpp" />
     <ClInclude Include="include\camera.hpp" />
     <ClInclude Include="include\colors.hpp" />
+    <ClInclude Include="include\components\actionqueue.hpp" />
     <ClInclude Include="include\components\animatedsprite.hpp" />
     <ClInclude Include="include\components\base.hpp" />
     <ClInclude Include="include\components\graphics.hpp" />
@@ -176,8 +179,11 @@
     <ClInclude Include="include\window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\actions\base.cpp" />
+    <ClCompile Include="src\actions\movement.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\colors.cpp" />
+    <ClCompile Include="src\components\actionqueue.cpp" />
     <ClCompile Include="src\components\animatedsprite.cpp" />
     <ClCompile Include="src\components\base.cpp" />
     <ClCompile Include="src\components\graphics.cpp" />

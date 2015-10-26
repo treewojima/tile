@@ -154,6 +154,8 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
     unsigned cellID = 0;
     for (auto &cell : layer)
     {
+		bool passable = (layer.getProperty("passable", "true") == "true" ? true : false);
+
         auto gid = cell.getGID();
         if (gid)
         {
@@ -184,6 +186,8 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
             entity->graphics =
                     std::make_shared<Components::StaticSprite>(texture,
                                                                entity->position);
+
+			
 
             _parent->_entities.push_back(entity);
         }

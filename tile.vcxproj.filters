@@ -37,6 +37,12 @@
     <Filter Include="Source Files\states">
       <UniqueIdentifier>{9ff00265-6913-4d43-ab84-96882de94c46}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\actions">
+      <UniqueIdentifier>{a6b08cb5-b082-4ef5-a1f6-aca36fbe313d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\actions">
+      <UniqueIdentifier>{63e864fb-8713-443b-a2a0-710da48932e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.hpp">
@@ -174,6 +180,15 @@
     <ClInclude Include="include\variant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\components\actionqueue.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\actions\base.hpp">
+      <Filter>Header Files\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\actions\movement.hpp">
+      <Filter>Header Files\actions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp">
@@ -273,6 +288,15 @@
       <Filter>Source Files\entities</Filter>
     </ClCompile>
     <ClCompile Include="src\components\propertylist.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\actions\base.cpp">
+      <Filter>Source Files\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\actions\movement.cpp">
+      <Filter>Source Files\actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\actionqueue.cpp">
       <Filter>Source Files\components</Filter>
     </ClCompile>
   </ItemGroup>
