@@ -15,15 +15,15 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __SYSTEMS_BASE_HPP__
-#define __SYSTEMS_BASE_HPP__
+#ifndef __SYSTEMS_RENDER_HPP__
+#define __SYSTEMS_RENDER_HPP__
 
 #include "defines.hpp"
-#include "istringable.hpp"
+#include "systems/base.hpp"
 
 namespace Systems
 {
-    class Base : public IStringable
+    class Render : public Base
     {
     public:
         std::string toString() const;
@@ -31,3 +31,4 @@ namespace Systems
 }
 
 #endif
+
