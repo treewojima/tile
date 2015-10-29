@@ -11,3 +11,7 @@ src/tmx
 include/tmx
 include/states
 src/states
+include/actions
+src/actions
+include/systems
+src/systems
