@@ -22,6 +22,7 @@
 
 #ifdef _USE_NEW_ENTITY
 
+#include <boost/functional/hash.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <memory>
 #include <sstream>
@@ -48,12 +49,13 @@ public:
     ~Entity();
 
     inline UUID getUUID() const { return _uuid; }
+	inline std::string getDebugName() const { return _debugName; }
 
     std::string toString() const;
 
 private:
     UUID _uuid;
-    std::string _debugName;
+	std::string _debugName;
 };
 
 namespace Events
@@ -68,6 +70,21 @@ namespace Events
             entity(entity_) {}
     };
 }
+
+// Specialization of std::hash for boost::uuids::uuid
+#if 0
+namespace std
+{
+	template <>
+	struct hash<boost::uuids::uuid>
+	{
+		size_t operator()(const boost::uuids::uuid &uuid)
+		{
+			return boost::hash<boost::uuids::uuid>()(uuid);
+		}
+	};
+}
+#endif
 
 #endif
 

@@ -43,6 +43,24 @@
     <Filter Include="Source Files\actions">
       <UniqueIdentifier>{63e864fb-8713-443b-a2a0-710da48932e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\components\graphics">
+      <UniqueIdentifier>{a0fe9675-9031-47fe-ae42-6b8f13465de3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\components\graphics">
+      <UniqueIdentifier>{9e2379d7-8a5a-4ecf-b9e7-9fdad688aff0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\systems">
+      <UniqueIdentifier>{c79780df-7e5c-4a69-b6f8-2f0c93b14b99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\systems">
+      <UniqueIdentifier>{cb4122ec-43e2-4f48-8828-fa9785b0c4ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\events">
+      <UniqueIdentifier>{91df5f14-ccb8-4370-8df0-809c89b92a49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\events">
+      <UniqueIdentifier>{6cd5e047-b866-43de-b980-369f7f880d75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.hpp">
@@ -174,9 +192,6 @@
     <ClInclude Include="include\components\propertylist.hpp">
       <Filter>Header Files\components</Filter>
     </ClInclude>
-    <ClInclude Include="include\istringable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\variant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -188,6 +203,42 @@
     </ClInclude>
     <ClInclude Include="include\actions\movement.hpp">
       <Filter>Header Files\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\graphics\base.hpp">
+      <Filter>Header Files\components\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\graphics\sprite.hpp">
+      <Filter>Header Files\components\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\new_base.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\states\new_maingamestate.hpp">
+      <Filter>Header Files\states</Filter>
+    </ClInclude>
+    <ClInclude Include="include\entitymanager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\new_entity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stringable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\systems\base.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\systems\graphics.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\base.hpp">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\dispatcher.hpp">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\subscriber.hpp">
+      <Filter>Header Files\events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -298,6 +349,33 @@
     </ClCompile>
     <ClCompile Include="src\components\actionqueue.cpp">
       <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\base.cpp">
+      <Filter>Source Files\components\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\graphics\sprite.cpp">
+      <Filter>Source Files\components\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\new_base.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\states\new_maingamestate.cpp">
+      <Filter>Source Files\states</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\base.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\graphics.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\events\dispatcher.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entitymanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\new_entity.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

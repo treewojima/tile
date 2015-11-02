@@ -17,12 +17,13 @@
 
 #include "defines.hpp"
 #include "components/position.hpp"
+#include "entity.hpp"
 #include "events/dispatcher.hpp"
 
 Components::Position::Position(std::shared_ptr<Entity> parent,
                                float x_,
                                float y_) :
-    Components::Base(parent, "position"),
+    Components::Base(parent, parent->getDebugName() + "Position"),
     x(x_),
     y(y_)
 {

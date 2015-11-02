@@ -39,7 +39,7 @@ namespace Systems
 
         void onEvent(const Events::SpriteComponentCreated &event);
 
-        //std::string toString() const;
+        std::string toString() const;
 
     private:
         typedef ComponentList<Components::Graphics::Sprite> SpriteComponentList;

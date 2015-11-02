@@ -72,36 +72,6 @@ void EntityManager::destroyEntity(UUID uuid)
     _map.erase(uuid);
 }
 
-#if 0
-template <class T>
-std::shared_ptr<T> EntityManager::getComponent<T>(UUID uuid)
-{
-    try
-    {
-        // This is an absolutely HORRIBLE, UGLY, HIDEOUSLY NAIVE FUNCTION.
-        // FUCKING FIX THIS.
-
-        auto &pair = _map.at(uuid);
-        auto &entity = pair.first;
-        auto &components = pair.second;
-        auto &iter = std::find_if(components.begin(),
-                                  components.end(),
-                                  [](const std::shared_ptr<Components::Base> &value)
-                                  { return dynamic_cast<T *>(value.get()) != nullptr; });
-        if (iter != components.end())
-        {
-            return std::dynamic_pointer_cast<T>(*iter);
-        }
-    }
-    catch (std::out_of_range &e)
-    {
-        // Just fall through
-    }
-
-    return std::shared_ptr<T>(nullptr);
-}
-#endif
-
 /*void EntityManager::onEvent(const Events::EntityCreated &event)
 {
     EntityComponentsPair pair;
@@ -116,4 +86,11 @@ void EntityManager::onEvent(const Events::ComponentCreated &event)
 
     // TODO: Should this have error checking in case the entity doesn't exist?
     _map[component->getParent()->getUUID()].second.push_back(component);
+}
+
+std::string EntityManager::toString() const
+{
+	std::ostringstream ss;
+	ss << "EntityManager[entityCount = " << _map.size() << "]";
+	return ss.str();
 }

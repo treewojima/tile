@@ -28,7 +28,7 @@
 
 namespace Systems
 {
-    class Base : public Events::Subscriber, public Stringable
+    class Base : public Events::Subscriber
     {
     public:
         template <class T>

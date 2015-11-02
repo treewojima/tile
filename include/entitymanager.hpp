@@ -21,11 +21,13 @@
 #include "defines.hpp"
 
 #include <boost/uuid/random_generator.hpp>
-#include <map>
+#include <unordered_map>
 
 #include "components/base.hpp"
 #include "entity.hpp"
 #include "events/subscriber.hpp"
+#include "exception.hpp"
+#include "logger.hpp"
 #include "systems/base.hpp"
 
 class EntityManager : public Events::Subscriber
@@ -48,15 +50,19 @@ public:
     //void onEvent(const Events::EntityCreated &event);
     void onEvent(const Events::ComponentCreated &event);
 
+	std::string toString() const;
+
 private:
     bool _destroyed;
-    boost::uuids::random_generator _generator;
-
+    boost::uuids::random_generator _generator;	
+	
     // Subject to change based on performance considerations
     typedef Systems::Base::ComponentList<Components::Base> ComponentList;
     typedef std::pair<std::shared_ptr<Entity>, ComponentList>
             EntityComponentsPair;
-    typedef std::map<UUID, EntityComponentsPair> EntityMap;
+	typedef std::unordered_map<UUID,
+							   EntityComponentsPair,
+							   boost::hash<boost::uuids::uuid>> EntityMap;
 
     EntityMap _map;
 };
@@ -75,7 +81,14 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
                                  components.end(),
                                  [](const std::shared_ptr<Components::Base> &value)
                                  { return dynamic_cast<T *>(value.get()) != nullptr; });
-        if (iter != components.end())
+        
+		/*for (auto &component : components)
+		{
+			LOG_DEBUG << "component = " << component;
+		}
+		throw Exception("fuck you");*/
+		
+		if (iter != components.end())
         {
             return std::dynamic_pointer_cast<T>(*iter);
         }

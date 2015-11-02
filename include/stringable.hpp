@@ -20,7 +20,9 @@
 
 #include "defines.hpp"
 
+#include <memory>
 #include <string>
+#include <type_traits>
 
 // Interface that guarantees a toString() method
 class Stringable
@@ -30,11 +32,31 @@ public:
     virtual std::string toString() const = 0;
 };
 
-// Helper ostream operator
+// Helper ostream operators
 inline std::ostream &operator<<(std::ostream &stream, const Stringable &obj)
 {
     stream << obj.toString();
     return stream;
+}
+
+template <class T>
+inline std::ostream &operator<<(std::ostream &os, const std::shared_ptr<T> &ptr)
+{
+	static_assert(std::is_base_of<Stringable, T>::value,
+				  "Class T is not subclass of type Stringable");
+			
+	os << ptr->toString();
+	return os;
+}
+
+template <class T>
+inline std::ostream &operator<<(std::ostream &os, const std::unique_ptr<T> &ptr)
+{
+	static_assert(std::is_base_of<Stringable, T>::value,
+			      "Class T is not subclass of type Stringable");
+
+	os << ptr->toString();
+	return os;
 }
 
 #endif

@@ -23,6 +23,7 @@
 #ifdef _USE_NEW_COMPONENTS
 
 #include <memory>
+#include <sstream>
 #include <string>
 
 #include "events/base.hpp"
@@ -62,6 +63,14 @@ namespace Events
         SpecificComponentCreated(std::shared_ptr<T> component_) :
             Events::Base(),
             component(component_) {}
+
+		std::string toString() const
+		{
+			std::ostringstream ss;
+			ss << "Events::SpecificComponentCreated<" << typeid(T).name() << ">"
+			   << "[component = " << component << "]";
+			return ss.str();
+		}
     };
 
     typedef SpecificComponentCreated<Components::Base> ComponentCreated;

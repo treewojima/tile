@@ -20,6 +20,7 @@
 
 #include "defines.hpp"
 
+#include <functional>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -39,6 +40,9 @@
 #include "components/base.hpp"
 #include "events/base.hpp"
 #include "events/subscriber.hpp"
+#ifdef _DEBUG_NEW_EVENTS
+#   include "logger.hpp"
+#endif
 
 namespace Events
 {
@@ -83,6 +87,11 @@ void Events::Dispatcher::subscribe(T &subscriber)
     _map[typeid(E)].push_back(
                 std::make_pair(static_cast<Subscriber *>(&subscriber),
                                callback));
+
+#ifdef _DEBUG_NEW_EVENTS
+	LOG_DEBUG << "subscriber " << subscriber
+		      << " is listening for events of type " << typeid(E).name();
+#endif
 }
 
 template <class E, class T>
@@ -108,6 +117,11 @@ void Events::Dispatcher::unsubscribe(T &subscriber)
             }
         }
     }
+
+#ifdef _DEBUG_NEW_EVENTS
+	LOG_DEBUG << "subscriber " << subscriber
+			  << " is no longer listening for events of type " << typeid(E).name();
+#endif
 }
 
 template <class T>
@@ -130,6 +144,11 @@ void Events::Dispatcher::unsubscribe(T &subscriber)
             }
         }
     }
+
+#ifdef _DEBUG_NEW_EVENTS
+	LOG_DEBUG << "subscriber " << subscriber
+			  << " is no longer listening for events of any type";
+#endif
 }
 
 template <class E, class... Args>
@@ -146,6 +165,10 @@ void Events::Dispatcher::raise(Args&& ... args)
         //callback(static_cast<const Base &>(event));
         pair.second(static_cast<const Base &>(event));
     }
+
+#ifdef _DEBUG_NEW_EVENTS
+	LOG_DEBUG << "event raised: " << event;
+#endif
 }
 
 #endif

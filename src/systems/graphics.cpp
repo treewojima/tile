@@ -74,3 +74,10 @@ void Systems::Graphics::onEvent(const Events::SpriteComponentCreated &event)
 
     _spriteComponents.push_back(component);
 }
+
+std::string Systems::Graphics::toString() const
+{
+	std::ostringstream ss;
+	ss << "Systems::Graphics[spriteComponentCount = " << _spriteComponents.size() << "]";
+	return ss.str();
+}

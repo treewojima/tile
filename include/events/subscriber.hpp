@@ -19,10 +19,11 @@
 #define __EVENTS_SUBSCRIBER_HPP__
 
 #include "defines.hpp"
+#include "stringable.hpp"
 
 namespace Events
 {
-    class Subscriber
+    class Subscriber : public Stringable
     {
     protected:
         Subscriber() {}

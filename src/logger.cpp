@@ -13,6 +13,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "game.hpp"
+
 namespace bl = boost::log;
 namespace attr = bl::attributes;
 namespace expr = bl::expressions;

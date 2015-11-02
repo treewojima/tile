@@ -20,7 +20,9 @@
 
 #ifdef _USE_NEW_ENTITY
 
+#include <boost/uuid/uuid_io.hpp>
 #include <sstream>
+
 #include "entitymanager.hpp"
 #include "events/dispatcher.hpp"
 #include "game.hpp"
@@ -50,7 +52,7 @@ Entity::~Entity()
 std::string Entity::toString() const
 {
     std::ostringstream ss;
-    ss << "Entity[uuid = " << "lol" << ", debugName = \"" << _debugName << "\"]";
+    ss << "Entity[uuid = " << _uuid << ", debugName = \"" << _debugName << "\"]";
     return ss.str();
 }
 

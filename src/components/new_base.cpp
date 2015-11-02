@@ -20,11 +20,14 @@
 #ifdef _USE_NEW_COMPONENTS
 
 #include "components/base.hpp"
+
+#include <sstream>
+
+#include "entity.hpp"
 #include "exception.hpp"
 #ifdef _DEBUG_COMPONENTS
 #   include "logger.hpp"
 #endif
-#include <sstream>
 
 Components::Base::Base(std::shared_ptr<Entity> parent,
                        const std::string &debugName) :

@@ -24,7 +24,7 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 
-#include "game.hpp"
+namespace Game { struct Options; }
 
 namespace Logger
 {

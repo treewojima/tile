@@ -33,6 +33,7 @@
 //#   define _DEBUG_TEXTURES
 #   define _DEBUG_ENTITIES
 #   define _DEBUG_COMPONENTS
+#	define _DEBUG_NEW_EVENTS
 #endif
 
 #endif

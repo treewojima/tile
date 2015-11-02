@@ -21,6 +21,7 @@
 
 #include "colors.hpp"
 #include "entities/dog.hpp"
+#include "game.hpp"
 #include "logger.hpp"
 #include "systems/graphics.hpp"
 

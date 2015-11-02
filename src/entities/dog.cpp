@@ -20,9 +20,13 @@
 #ifdef _USE_NEW_ENTITY
 
 #include "entities/dog.hpp"
+
 #include <memory>
+
+#include "components/position.hpp"
 #include "colors.hpp"
 #include "game.hpp"
+#include "window.hpp"
 
 std::shared_ptr<Entity> createDog()
 {
@@ -33,9 +37,12 @@ std::shared_ptr<Entity> createDog()
     Game::getTexMgr().add(texture->getName(), texture);
 
     //Game::getGraphicsSys().createSpriteComponent(dog, texture->getName());
+	Components::Position::create(dog,
+								 Window::getWidth() / 2,
+							     Window::getHeight() / 2);
     Components::Graphics::Sprite::create(dog,
                                          texture->getName(),
-                                         "DogGraphicsComponent");
+                                         "Down");
 
     return dog;
 }
