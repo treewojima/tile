@@ -40,7 +40,9 @@
 #include "components/base.hpp"
 #include "events/base.hpp"
 #include "events/subscriber.hpp"
+
 #ifdef _DEBUG_NEW_EVENTS
+#   include <boost/core/demangle.hpp>
 #   include "logger.hpp"
 #endif
 
@@ -90,7 +92,8 @@ void Events::Dispatcher::subscribe(T &subscriber)
 
 #ifdef _DEBUG_NEW_EVENTS
 	LOG_DEBUG << "subscriber " << subscriber
-		      << " is listening for events of type " << typeid(E).name();
+              << " is listening for events of type "
+              << boost::core::demangle(typeid(E).name());
 #endif
 }
 
@@ -120,7 +123,8 @@ void Events::Dispatcher::unsubscribe(T &subscriber)
 
 #ifdef _DEBUG_NEW_EVENTS
 	LOG_DEBUG << "subscriber " << subscriber
-			  << " is no longer listening for events of type " << typeid(E).name();
+              << " is no longer listening for events of type "
+              << boost::core::demangle(typeid(E).name());
 #endif
 }
 

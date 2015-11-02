@@ -31,7 +31,7 @@ namespace Events
     public:
         virtual ~Base() {}
 
-        std::string toString() const { return "Base[]"; }
+        std::string toString() const { return "Events::Base[]"; }
     };
 }
 

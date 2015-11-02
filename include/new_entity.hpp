@@ -68,6 +68,13 @@ namespace Events
         EntityCreated(std::shared_ptr<Entity> entity_) :
             Events::Base(),
             entity(entity_) {}
+
+        std::string toString() const
+        {
+            std::ostringstream ss;
+            ss << "Events::EntityCreated[entity = " << entity << "]";
+            return ss.str();
+        }
     };
 }
 

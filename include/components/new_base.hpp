@@ -22,6 +22,7 @@
 
 #ifdef _USE_NEW_COMPONENTS
 
+#include <boost/core/demangle.hpp>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -67,7 +68,8 @@ namespace Events
 		std::string toString() const
 		{
 			std::ostringstream ss;
-			ss << "Events::SpecificComponentCreated<" << typeid(T).name() << ">"
+            ss << "Events::SpecificComponentCreated<"
+               << boost::core::demangle(typeid(T).name()) << ">"
 			   << "[component = " << component << "]";
 			return ss.str();
 		}

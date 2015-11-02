@@ -18,6 +18,7 @@
 #ifndef __VECTOR_HPP__
 #define __VECTOR_HPP__
 
+#include <boost/core/demangle.hpp>
 #include <sstream>
 #include <string>
 #include <typeinfo>
@@ -38,7 +39,8 @@ public:
     std::string toString() const
     {
         std::ostringstream ss;
-        ss << "Vector2<" << typeid(T).name() << ">(" << x << ", " << y << ")";
+        ss << "Vector2<" << boost::core::demangle(typeid(T).name())
+           << ">(" << x << ", " << y << ")";
         return ss.str();
     }
 
@@ -100,16 +102,6 @@ inline Vector2<T> operator-(Vector2<T> lhs, const Vector2<T> &rhs)
     lhs -= rhs;
     return lhs;
 }
-
-// Helper stream operator
-#if 0
-template <class T>
-inline std::ostream &operator<<(std::ostream &stream, const Vector2<T> &v)
-{
-	stream << v.toString();
-	return stream;
-}
-#endif
 
 // Common typedefs
 typedef Vector2<int> Vector2i;
