@@ -15,29 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
+#ifndef __EVENTS_SUBSCRIBER_HPP__
+#define __EVENTS_SUBSCRIBER_HPP__
 
 #include "defines.hpp"
 
-#ifndef _USE_NEW_ENTITY
-
-#include "entity.hpp"
-
-#include <vector>
-
-#include "game.hpp"
-
-class Tux : public Entity
+namespace Events
 {
-public:
-    Tux();
-    ~Tux();
+    class Subscriber
+    {
+    protected:
+        Subscriber() {}
 
-private:
-    std::vector<Game::Event::Handle> _eventHandles;
-};
-
-#endif
+    public:
+        virtual ~Subscriber() {}
+    };
+}
 
 #endif

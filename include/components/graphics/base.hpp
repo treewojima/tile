@@ -15,29 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
+#ifndef __COMPONENTS_GRAPHICS_BASE_HPP__
+#define __COMPONENTS_GRAPHICS_BASE_HPP__
 
 #include "defines.hpp"
 
-#ifndef _USE_NEW_ENTITY
+#ifdef _USE_NEW_COMPONENTS
 
-#include "entity.hpp"
+#include "components/base.hpp"
 
-#include <vector>
-
-#include "game.hpp"
-
-class Tux : public Entity
+namespace Components
 {
-public:
-    Tux();
-    ~Tux();
+    namespace Graphics
+    {
+        class Base : public Components::Base
+        {
+        protected:
+            using Components::Base::Base;
 
-private:
-    std::vector<Game::Event::Handle> _eventHandles;
-};
+        public:
+            std::string toString() const;
+        };
+    }
+}
 
 #endif
 
 #endif
+

@@ -29,6 +29,8 @@ namespace Logger
 	}
 }
 
+BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", Logger::SeverityType)
+
 BOOST_LOG_GLOBAL_LOGGER_INIT(gLog, src::severity_logger_mt<Logger::SeverityType>)
 {
 	src::severity_logger_mt<Logger::SeverityType> lg;
@@ -43,13 +45,13 @@ void Logger::init(const Game::Options &options)
 	bl::core::get()->add_global_attribute("TimeStamp", attr::local_clock());
 	
 	typedef bl::sinks::synchronous_sink<bl::sinks::text_ostream_backend> text_sink;
-	auto sink = boost::make_shared<text_sink>();
+    auto sink = boost::make_shared<text_sink>();
 
 	// File stream
 	sink->locked_backend()->add_stream(boost::make_shared<std::ofstream>(options.logFile));
 
 	// std::cout stream
-	sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::clog, boost::null_deleter()));
+    sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::clog, boost::null_deleter()));
 
 	// Set the log format
 	auto formatter = expr::stream
@@ -57,6 +59,10 @@ void Logger::init(const Game::Options &options)
 		<< "<" << expr::attr<Logger::SeverityType>("Severity") << "> "
 		<< expr::smessage;
 	sink->set_formatter(formatter);
+
+#ifndef _DEBUG
+    sink->set_filter(severity != Logger::Severity::Debug);
+#endif
 
 	bl::core::get()->add_sink(sink);
 }

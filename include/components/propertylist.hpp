@@ -20,6 +20,8 @@
 
 #include "defines.hpp"
 
+#ifndef _USE_NEW_COMPONENTS
+
 #include "components/base.hpp"
 #include "resourcemanager.hpp"
 #include "variant.hpp"
@@ -34,5 +36,7 @@ namespace Components
         std::string toString() const;
     };
 }
+
+#endif
 
 #endif

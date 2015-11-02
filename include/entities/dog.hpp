@@ -15,10 +15,18 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __DOG_HPP__
-#define __DOG_HPP__
+#ifndef __ENTITIES_DOG_HPP__
+#define __ENTITIES_DOG_HPP__
 
 #include "defines.hpp"
+
+#ifdef _USE_NEW_ENTITY
+
+#include "entity.hpp"
+
+std::shared_ptr<Entity> createDog();
+
+#else
 
 #include <memory>
 #include <vector>
@@ -57,3 +65,4 @@ private:
 
 #endif
 
+#endif

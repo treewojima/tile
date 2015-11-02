@@ -17,6 +17,8 @@
 
 #include "map.hpp"
 
+#if !defined(_USE_NEW_ENTITY) || !defined(_USE_NEW_COMPONENTS)
+
 #include <cassert>
 #include <iostream>
 #include <sstream>
@@ -195,3 +197,5 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
         cellID++;
     }
 }
+
+#endif

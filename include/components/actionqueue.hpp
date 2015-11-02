@@ -19,6 +19,9 @@
 #define __COMPONENTS_ACTIONQUEUE_HPP__
 
 #include "defines.hpp"
+
+#ifndef _USE_NEW_COMPONENTS
+
 #include "components/base.hpp"
 
 // TODO: look into refactoring some of this code as a generic "event queue"
@@ -35,5 +38,7 @@ namespace Components
 
 	typedef std::shared_ptr<ActionQueue> ActionQueuePtr;
 }
+
+#endif
 
 #endif

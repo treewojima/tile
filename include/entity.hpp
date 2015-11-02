@@ -20,15 +20,19 @@
 
 #include "defines.hpp"
 
+#ifdef _USE_NEW_ENTITY
+#   include "new_entity.hpp"
+#else
+
 #include <memory> 
 #include <ostream>
 
 #include "components/graphics.hpp"
 #include "components/position.hpp"
 #include "components/propertylist.hpp"
-#include "istringable.hpp"
+#include "stringable.hpp"
 
-class Entity : public IStringable
+class Entity : public Stringable
 {
 public:
     Entity(const std::string &name);
@@ -77,5 +81,7 @@ inline std::ostream &operator<<(std::ostream &os, const Entity::Type &type)
 
 	return os;
 }
+
+#endif
 
 #endif

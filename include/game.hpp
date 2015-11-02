@@ -25,7 +25,9 @@
 #include <string>
 
 #include "camera.hpp"
+#include "entitymanager.hpp"
 #include "statemanager.hpp"
+#include "systems/graphics.hpp"
 #include "texture.hpp"
 
 namespace Game
@@ -65,8 +67,12 @@ namespace Game
     void setRunning(bool b);
 
     Camera &getCamera();
+
+    EntityManager &getEntityMgr();
 	StateManager &getStateMgr();
     TextureManager &getTexMgr();
+
+    Systems::Graphics &getGraphicsSys();
 
     Event::Handle registerEvent(SDL_Scancode key,
                                 Event::Callback callback,

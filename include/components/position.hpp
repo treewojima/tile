@@ -20,23 +20,37 @@
 
 #include "defines.hpp"
 #include "components/base.hpp"
+
+#include "events/base.hpp"
 #include "vector.hpp"
 
 namespace Components
 {
     class Position : public Base
     {
-    public:
-        // NOTE: Should these be replaced by getters/setters?
-        float x, y;
+    private:
+        Position(std::shared_ptr<Entity> parent,
+                 float x_,
+                 float y_);
 
-        Position(const Vector2f pos = Vector2f::ZERO);
-        Position(float x_, float y_);
+    public:
+        float x, y;
 
         inline Vector2f toVector() const { return Vector2f(x, y); }
 
         std::string toString() const;
+
+        static std::shared_ptr<Position> create(std::shared_ptr<Entity> parent,
+                                                float x,
+                                                float y);
+        static std::shared_ptr<Position> create(std::shared_ptr<Entity> parent,
+                                                const Vector2f &v = Vector2f::ZERO);
     };
+}
+
+namespace Events
+{
+    typedef SpecificComponentCreated<Components::Position> PositionComponentCreated;
 }
 
 #endif

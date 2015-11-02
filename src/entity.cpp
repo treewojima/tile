@@ -16,6 +16,9 @@
  */
 
 #include "defines.hpp"
+
+#ifndef _USE_NEW_ENTITY
+
 #include "entity.hpp"
 
 #include <cassert>
@@ -54,3 +57,5 @@ std::string Entity::toString() const
        << (graphics.get() != nullptr ? graphics->toString() : "<null>") << "]";
     return ss.str();
 }
+
+#endif

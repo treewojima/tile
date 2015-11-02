@@ -15,36 +15,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPONENTS_BASE_HPP__
-#define __COMPONENTS_BASE_HPP__
+#ifndef __COMPONENTS_NEW_BASE_HPP__
+#define __COMPONENTS_NEW_BASE_HPP__
 
 #include "defines.hpp"
 
 #ifdef _USE_NEW_COMPONENTS
-#   include "components/new_base.hpp"
-#else
 
 #include <memory>
 #include <string>
+
+#include "events/base.hpp"
 #include "stringable.hpp"
+
+class Entity;
 
 namespace Components
 {
     class Base : public Stringable
     {
-    public:
-        //typedef std::shared_ptr<Base> Ptr;
+    protected:
+        Base(std::shared_ptr<Entity> parent, const std::string &debugName);
 
-        Base(const std::string &name);
+    public:
         virtual ~Base();
 
-        inline std::string getName() const { return _name; }
+        inline std::string getDebugName() const { return _debugName; }
+        inline std::shared_ptr<Entity> getParent() const { return _parent; }
 
         std::string toString() const;
 
     private:
-        std::string _name;
+        std::shared_ptr<Entity> _parent;
+        std::string _debugName;
     };
+}
+
+namespace Events
+{
+    template <class T>
+    class SpecificComponentCreated : public Events::Base
+    {
+    public:
+        std::shared_ptr<T> component;
+
+        SpecificComponentCreated(std::shared_ptr<T> component_) :
+            Events::Base(),
+            component(component_) {}
+    };
+
+    typedef SpecificComponentCreated<Components::Base> ComponentCreated;
 }
 
 #endif

@@ -16,6 +16,9 @@
  */
 
 #include "defines.hpp"
+
+#ifndef _USE_NEW_COMPONENTS
+
 #include "components/graphics.hpp"
 #include "graphics.hpp"
 
@@ -30,3 +33,5 @@ std::string Components::Graphics::toString() const
     ss << "Components::Graphics[name = \"" << getName() << "\" ]";
     return ss.str();
 }
+
+#endif

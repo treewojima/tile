@@ -15,29 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
+#ifndef __EVENTS_BASE_HPP__
+#define __EVENTS_BASE_HPP__
 
 #include "defines.hpp"
+#include "stringable.hpp"
 
-#ifndef _USE_NEW_ENTITY
-
-#include "entity.hpp"
-
-#include <vector>
-
-#include "game.hpp"
-
-class Tux : public Entity
+namespace Events
 {
-public:
-    Tux();
-    ~Tux();
+    class Base : public Stringable
+    {
+    protected:
+        Base() {}
 
-private:
-    std::vector<Game::Event::Handle> _eventHandles;
-};
+    public:
+        virtual ~Base() {}
 
-#endif
+        std::string toString() const { return "Base[]"; }
+    };
+}
 
 #endif

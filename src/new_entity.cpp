@@ -15,29 +15,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TUX_HPP__
-#define __TUX_HPP__
-
 #include "defines.hpp"
-
-#ifndef _USE_NEW_ENTITY
-
 #include "entity.hpp"
 
-#include <vector>
+#ifdef _USE_NEW_ENTITY
 
+#include <sstream>
+#include "entitymanager.hpp"
+#include "events/dispatcher.hpp"
 #include "game.hpp"
+#include "logger.hpp"
 
-class Tux : public Entity
+std::shared_ptr<Entity> Entity::create(const std::string &debugName)
 {
-public:
-    Tux();
-    ~Tux();
+    return Game::getEntityMgr().createEntity(debugName);
+}
 
-private:
-    std::vector<Game::Event::Handle> _eventHandles;
-};
-
+Entity::Entity(UUID uuid, const std::string &debugName) :
+    _uuid(uuid),
+    _debugName(debugName)
+{
+#ifdef _DEBUG_ENTITIES
+    LOG_DEBUG << "created entity " << toString();
 #endif
+}
+
+Entity::~Entity()
+{
+#ifdef _DEBUG_ENTITIES
+    LOG_DEBUG << "destroyed entity " << toString();
+#endif
+}
+
+std::string Entity::toString() const
+{
+    std::ostringstream ss;
+    ss << "Entity[uuid = " << "lol" << ", debugName = \"" << _debugName << "\"]";
+    return ss.str();
+}
 
 #endif

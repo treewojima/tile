@@ -20,6 +20,8 @@
 
 #include "defines.hpp"
 
+#if !defined(_USE_NEW_ENTITY) || !defined(_USE_NEW_COMPONENTS)
+
 #include <list>
 #include <memory>
 #include <string>
@@ -66,5 +68,7 @@ class MapException : public Exception
 public:
 	using Exception::Exception;
 };
+
+#endif
 
 #endif

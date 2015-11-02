@@ -23,9 +23,10 @@
 #include <boost/variant.hpp>
 #include <string>
 
-#include "entity.hpp" // for Entity::Type
+//#include "entity.hpp" // for Entity::Type
+enum class Type;
 
 // Keep this updated with various types as needed
-typedef boost::variant<std::string, bool, int, Entity::Type> Variant;
+typedef boost::variant<std::string, bool, int, Type> Variant;
 
 #endif

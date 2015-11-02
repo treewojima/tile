@@ -17,16 +17,12 @@
 
 #include "defines.hpp"
 #include "components/position.hpp"
+#include "events/dispatcher.hpp"
 
-Components::Position::Position(const Vector2f pos) :
-    Components::Base("position"),
-    x(pos.x),
-    y(pos.y)
-{
-}
-
-Components::Position::Position(float x_, float y_) :
-    Components::Base("position"),
+Components::Position::Position(std::shared_ptr<Entity> parent,
+                               float x_,
+                               float y_) :
+    Components::Base(parent, "position"),
     x(x_),
     y(y_)
 {
@@ -35,7 +31,26 @@ Components::Position::Position(float x_, float y_) :
 std::string Components::Position::toString() const
 {
     std::ostringstream ss;
-    ss << "Components::Position[name = \"" << getName() << "\", "
-       << "position = " << Vector2f(x, y) << "]";
+    ss << "Components::Position[debugName = \"" << getDebugName() << "\", "
+       << "parent = " << getParent() << "\", "
+       << "position = " << toVector() << "]";
     return ss.str();
+}
+
+std::shared_ptr<Components::Position>
+Components::Position::create(std::shared_ptr<Entity> parent,
+                             float x,
+                             float y)
+{
+    auto ptr = std::shared_ptr<Position>(new Position(parent, x, y));
+    Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
+    Events::Dispatcher::raise<Events::PositionComponentCreated>(ptr);
+    return ptr;
+}
+
+std::shared_ptr<Components::Position>
+Components::Position::create(std::shared_ptr<Entity> parent,
+                             const Vector2f &v)
+{
+    return create(parent, v.x, v.y);
 }

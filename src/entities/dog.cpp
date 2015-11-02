@@ -15,6 +15,33 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "defines.hpp"
+
+#ifdef _USE_NEW_ENTITY
+
+#include "entities/dog.hpp"
+#include <memory>
+#include "colors.hpp"
+#include "game.hpp"
+
+std::shared_ptr<Entity> createDog()
+{
+    auto dog = Entity::create("Dog");
+
+    SDL_Color colorKey = Colors::makeColor(255, 0, 255);
+    auto texture = std::make_shared<Texture>("Dog", "res/dog/dog_down_0.png", &colorKey);
+    Game::getTexMgr().add(texture->getName(), texture);
+
+    //Game::getGraphicsSys().createSpriteComponent(dog, texture->getName());
+    Components::Graphics::Sprite::create(dog,
+                                         texture->getName(),
+                                         "DogGraphicsComponent");
+
+    return dog;
+}
+
+#else
+
 #include "entities/dog.hpp"
 
 #include <sstream>
@@ -116,3 +143,5 @@ void Dog::registerEvents()
 		[this](const SDL_Event &e) { graphics = _directions[Direction::Right]; },
 		"DogRightEvent");
 }
+
+#endif

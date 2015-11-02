@@ -21,6 +21,10 @@
 #define _DEBUG
 #define _USE_MATH_DEFINES
 
+#define _USE_NEW_ENTITY
+#define _USE_NEW_COMPONENTS
+//#define _NO_PROGRAM_OPTIONS
+
 //#define _ENABLE_AUDIO
 
 #ifdef _DEBUG
@@ -28,7 +32,7 @@
 //#   define _DEBUG_EVENTS
 //#   define _DEBUG_TEXTURES
 #   define _DEBUG_ENTITIES
-//#   define _DEBUG_COMPONENTS
+#   define _DEBUG_COMPONENTS
 #endif
 
 #endif

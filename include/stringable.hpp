@@ -23,15 +23,15 @@
 #include <string>
 
 // Interface that guarantees a toString() method
-class IStringable
+class Stringable
 {
 public:
-    virtual ~IStringable() {}
+    virtual ~Stringable() {}
     virtual std::string toString() const = 0;
 };
 
 // Helper ostream operator
-inline std::ostream &operator<<(std::ostream &stream, const IStringable &obj)
+inline std::ostream &operator<<(std::ostream &stream, const Stringable &obj)
 {
     stream << obj.toString();
     return stream;

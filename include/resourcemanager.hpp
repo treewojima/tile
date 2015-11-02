@@ -34,38 +34,43 @@ template <class T>
 class KeyValuePair
 {
 public:
-	KeyValuePair(const std::string &k, T &v) : key(k), value(v) {}
-	KeyValuePair(const std::pair<std::string, T> &pair) : key(pair.first), value(pair.second) {}
+    typedef std::string Key;
+    typedef T Value;
 
-	std::string key;
-	T value;
+    KeyValuePair(const Key &k, Value &v) : key(k), value(v) {}
+    KeyValuePair(const std::pair<Key, Value> &pair) : key(pair.first), value(pair.second) {}
+
+    Key key;
+    Value value;
 };
 
 // Lightweight wrapper around a map with strings as keys
 template <class T>
 class ResourceManager
 {
-private:
-	typedef T ResourceType;
+public:
+    typedef T Resource;
+    typedef typename KeyValuePair<Resource>::Key Key;
 
+private:
     // unordered_map is faster than map for random access, but slower
     // for sequential access - which is optimal for what the ResourceManager
     // is used for
-    typedef std::unordered_map<std::string, ResourceType> ResourceMap;
+    typedef std::unordered_map<Key, Resource> ResourceMap;
 
 public:
 	ResourceManager() : _destroyed(false) {}
     virtual ~ResourceManager();
 	void destroy();
 
-    void add(const std::string &name, ResourceType resource);
-	bool has(const std::string &name) const;
-	ResourceType get(const std::string &name) const;
+    void add(const Key &name, Resource resource);
+    bool has(const Key &name) const;
+    Resource get(const Key &name) const;
     void clear();
 
-	ResourceType &operator[](const std::string &name);
+    Resource &operator[](const Key &name);
 
-	void forEach(std::function<void(KeyValuePair<ResourceType>)> f) const;
+    void forEach(std::function<void(KeyValuePair<Resource>)> f) const;
 
 private:
 	bool _destroyed;
@@ -90,7 +95,7 @@ void ResourceManager<T>::destroy()
 }
 
 template <class T>
-void ResourceManager<T>::add(const std::string &name, ResourceType resource)
+void ResourceManager<T>::add(const Key &name, Resource resource)
 {
 #if 0
     if (!ptr)
@@ -116,13 +121,13 @@ void ResourceManager<T>::add(const std::string &name, ResourceType resource)
 }
 
 template <class T>
-bool ResourceManager<T>::has(const std::string &name) const
+bool ResourceManager<T>::has(const Key &name) const
 {
 	return _map.count(name);
 }
 
 template <class T>
-typename ResourceManager<T>::ResourceType ResourceManager<T>::get(const std::string &name) const
+typename ResourceManager<T>::Resource ResourceManager<T>::get(const Key &name) const
 {
 	// NOTE: Should this use has() or the subscript operator instead?
 
@@ -147,17 +152,17 @@ void ResourceManager<T>::clear()
 }
 
 template <class T>
-typename ResourceManager<T>::ResourceType &ResourceManager<T>::operator[](const std::string &name)
+typename ResourceManager<T>::Resource &ResourceManager<T>::operator[](const Key &name)
 {
 	return _map[name];
 }
 
 template <class T>
-void ResourceManager<T>::forEach(std::function<void(KeyValuePair<ResourceType>)> f) const
+void ResourceManager<T>::forEach(std::function<void(KeyValuePair<Resource>)> f) const
 {
     for (auto iter = _map.begin() ; iter != _map.end(); iter++)
     {
-        f(KeyValuePair<ResourceType>(*iter));
+        f(KeyValuePair<Resource>(*iter));
     }
 }
 

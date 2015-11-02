@@ -16,6 +16,9 @@
 */
 
 #include "components/actionqueue.hpp"
+
+#ifndef _USE_NEW_COMPONENTS
+
 #include <sstream>
 
 std::string Components::ActionQueue::toString() const
@@ -24,3 +27,5 @@ std::string Components::ActionQueue::toString() const
 	ss << "Components::ActionQueue[name = \"" << getName() << "\"]";
 	return ss.str();
 }
+
+#endif

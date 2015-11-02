@@ -19,14 +19,30 @@
 #define __SYSTEMS_BASE_HPP__
 
 #include "defines.hpp"
-#include "istringable.hpp"
+
+#include <list>
+#include <memory>
+
+#include "events/subscriber.hpp"
+#include "stringable.hpp"
 
 namespace Systems
 {
-    class Base : public IStringable
+    class Base : public Events::Subscriber, public Stringable
     {
     public:
+        template <class T>
+        using ComponentList = std::list<std::shared_ptr<T>>;
+
+        Base();
+        ~Base();
+
+        virtual void destroy() = 0;
+
         std::string toString() const;
+
+    protected:
+        bool _destroyed;
     };
 }
 

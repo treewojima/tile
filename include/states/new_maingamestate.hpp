@@ -15,28 +15,36 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef __NEW_MAINGAMESTATE_HPP__
+#define __NEW_MAINGAMESTATE_HPP__
+
 #include "defines.hpp"
-#include "systems/base.hpp"
 
-#include "entitymanager.hpp"
-#include "exception.hpp"
-#include "logger.hpp"
+#include <list>
+#include <memory>
 
-Systems::Base::Base() :
-    _destroyed(false)
+#include "entity.hpp"
+//#include "map.hpp"
+#include "state.hpp"
+
+class MainGameState : public State
 {
-}
+public:
+    MainGameState() : State(Type::Main) {}
 
-Systems::Base::~Base()
-{
-    if (!_destroyed)
-    {
-        // NOTE: this is shitty error handling
-        LOG_DEBUG << "system ??? wasn't destroyed before destructor";
-    }
-}
+    void initialize();
+    void destroy();
 
-std::string Systems::Base::toString() const
-{
-    return "Systems::Base[]";
-}
+    void postLoop();
+
+    void update(float dt);
+    void draw();
+
+private:
+    //std::list<std::shared_ptr<Entity>> _entities;
+
+    void loadTextures();
+    void createEntities();
+};
+
+#endif

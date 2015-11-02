@@ -61,16 +61,22 @@ namespace
     std::map<Game::Event::Handle, std::shared_ptr<Game::Event>> _events;
 
     // Timer for tracking and calculating FPS
-    Timer _fpsTimer;
+    std::unique_ptr<Timer> _fpsTimer;
 
     // Camera view
     std::unique_ptr<Camera> _camera;
 
+    // Entity manager
+    std::unique_ptr<EntityManager> _entityMgr;
+
 	// State stack
-	StateManager _stateMgr;
+    std::unique_ptr<StateManager> _stateMgr;
 
     // Resource managers
-    TextureManager _texMgr;
+    std::unique_ptr<TextureManager> _texMgr;
+
+    // Component systems
+    std::unique_ptr<Systems::Graphics> _graphicsSys;
 
     // Subsystem initialization and shutdown functions
     void initSDL();
@@ -111,11 +117,22 @@ void Game::run(const Game::Options &options)
     initAudio();
 #endif
 
+    // Set up various managers and miscellaneous objects that haven't been
+    // initialized yet
+    _fpsTimer = std::make_unique<Timer>();
+    _stateMgr = std::make_unique<StateManager>();
+    _texMgr = std::make_unique<TextureManager>();
+    _graphicsSys = std::make_unique<Systems::Graphics>();
+
+    // TEST
+    _entityMgr = std::make_unique<EntityManager>();
+    _entityMgr->initialize();
+
     // Set up event handling details
     registerEvents();
 
 	// Create the initial main game state
-	_stateMgr.push(std::make_shared<MainGameState>());
+    _stateMgr->push(std::make_shared<MainGameState>());
 
     // Main loop variables
     Timer stepTimer;
@@ -125,12 +142,12 @@ void Game::run(const Game::Options &options)
 
     // Enter the main loop
     setRunning(true);
-    _fpsTimer.start();
+    _fpsTimer->start();
     stepTimer.start();
     while (isRunning())
     {
         // Update the FPS counter every second
-        currentTicks = _fpsTimer.getTicks();
+        currentTicks = _fpsTimer->getTicks();
         if (currentTicks - oldTicks >= 1000)
         {
             float avgFPS = countedFrames / (currentTicks / 1000.f);
@@ -144,7 +161,7 @@ void Game::run(const Game::Options &options)
         try
         {
 			// First, make sure we even have a state to begin with
-			auto state = _stateMgr.peek();
+            auto state = _stateMgr->peek();
 			if (!state)
 			{
 				throw EmptyStateStackException();
@@ -177,11 +194,13 @@ void Game::run(const Game::Options &options)
         // Update frame count for the next iteration
         countedFrames++;
     }
-    _fpsTimer.stop();
+    _fpsTimer->stop();
 
     // Clean up
-	_stateMgr.destroy();
-    _texMgr.clear();
+    _stateMgr->destroy();
+    _graphicsSys->destroy();
+    _entityMgr->destroy();
+    _texMgr->clear();
     Window::destroy();
     shutdownSDL();
 }
@@ -201,14 +220,24 @@ Camera &Game::getCamera()
     return *_camera;
 }
 
+EntityManager &Game::getEntityMgr()
+{
+    return *_entityMgr;
+}
+
 StateManager &Game::getStateMgr()
 {
-	return _stateMgr;
+    return *_stateMgr;
 }
 
 TextureManager &Game::getTexMgr()
 {
-    return _texMgr;
+    return *_texMgr;
+}
+
+Systems::Graphics &Game::getGraphicsSys()
+{
+    return *_graphicsSys;
 }
 
 Game::Event::Handle Game::registerEvent(SDL_Scancode key,
@@ -400,13 +429,13 @@ void handleEvents()
 
 void togglePause()
 {
-	if (_stateMgr.peek()->getType() == State::Type::Paused)
+    if (_stateMgr->peek()->getType() == State::Type::Paused)
 	{
-		_stateMgr.pop();
+        _stateMgr->pop();
 	}
 	else
 	{
-		_stateMgr.push(std::make_shared<PausedState>());
+        _stateMgr->push(std::make_shared<PausedState>());
 	}
 }
 
@@ -414,7 +443,7 @@ void listTextures()
 {
 	std::ostringstream ss;
     ss << "Texture dump:\n";
-    _texMgr.forEach([&ss](auto pair) { ss << pair.value << "\n"; });
+    _texMgr->forEach([&ss](auto pair) { ss << pair.value << "\n"; });
 	ss << "\n";
 	LOG_DEBUG << ss.str();
 }

@@ -19,6 +19,9 @@
 #define __COMPONENTS_ANIMATEDSPRITE_HPP__
 
 #include "defines.hpp"
+
+#ifndef _USE_NEW_COMPONENTS
+
 #include <list>
 #include "components/graphics.hpp"
 #include "components/position.hpp"
@@ -47,6 +50,8 @@ namespace Components
         Timer _timer;
     };
 }
+
+#endif
 
 #endif
 

@@ -22,10 +22,10 @@
 #include <string>
 #include <typeinfo>
 
-#include "istringable.hpp"
+#include "stringable.hpp"
 
 template <class T>
-class Vector2 : public IStringable
+class Vector2 : public Stringable
 {
 public:
     T x, y;

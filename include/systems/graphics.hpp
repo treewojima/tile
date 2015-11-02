@@ -15,20 +15,36 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __SYSTEMS_RENDER_HPP__
-#define __SYSTEMS_RENDER_HPP__
+#ifndef __SYSTEMS_GRAPHICS_HPP__
+#define __SYSTEMS_GRAPHICS_HPP__
 
 #include "defines.hpp"
 #include "systems/base.hpp"
 
+#include <map>
+
+#include "components/graphics/sprite.hpp"
+
 namespace Systems
 {
-    class Render : public Base
+    class Graphics : public Base
     {
     public:
-        std::string toString() const;
+        Graphics();
+        ~Graphics();
+
+        void destroy();
+
+        void draw();
+
+        void onEvent(const Events::SpriteComponentCreated &event);
+
+        //std::string toString() const;
+
+    private:
+        typedef ComponentList<Components::Graphics::Sprite> SpriteComponentList;
+        SpriteComponentList _spriteComponents;
     };
 }
 
 #endif
-

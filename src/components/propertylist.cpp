@@ -17,6 +17,8 @@
 
 #include "components/propertylist.hpp"
 
+#ifndef _USE_NEW_COMPONENTS
+
 #include <sstream>
 
 Components::PropertyList::PropertyList(const std::string &name) :
@@ -60,3 +62,5 @@ std::string Components::PropertyList::toString() const
     ss << "<end> }]";
     return ss.str();
 }
+
+#endif

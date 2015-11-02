@@ -18,6 +18,10 @@
 #ifndef __MAINGAMESTATE_HPP__
 #define __MAINGAMESTATE_HPP__
 
+#if 1
+#   include "states/new_maingamestate.hpp"
+#else
+
 #include "defines.hpp"
 
 #include <list>
@@ -47,5 +51,7 @@ private:
 	void loadTextures();
 	void createEntities();
 };
+
+#endif
 
 #endif

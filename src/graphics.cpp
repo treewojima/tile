@@ -23,6 +23,7 @@
 
 #include "colors.hpp"
 #include "exception.hpp"
+#include "game.hpp"
 
 SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
                                       bool optimize)
@@ -99,18 +100,20 @@ SDL_Surface *Graphics::createBlankSDLSurface(int width, int height, SDL_Color co
     return surface;
 }
 
-void Graphics::blitTexture(std::shared_ptr<Texture> texture,
+void Graphics::blitTexture(const TextureManager::Key &texture,
                            float x,
                            float y)
 {
-    const auto width = texture->getWidth();
-    const auto height = texture->getHeight();
+    const auto &texturePtr = Game::getTexMgr().get(texture);
+
+    const auto width = texturePtr->getWidth();
+    const auto height = texturePtr->getHeight();
     const float centeredWidth = width / 2.f;
     const float centeredHeight = height / 2.f;
 
     // NOTE: Should there be a glLoadIdentity() here as well?
 
-    glBindTexture(GL_TEXTURE_2D, texture->getRawTexture());
+    glBindTexture(GL_TEXTURE_2D, texturePtr->getRawTexture());
     glTranslatef(x - centeredWidth, y - centeredHeight, 0);
     glBegin(GL_QUADS);
         glTexCoord2i(1, 1);

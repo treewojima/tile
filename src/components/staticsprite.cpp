@@ -16,6 +16,9 @@
  */
 
 #include "defines.hpp"
+
+#ifndef _USE_NEW_COMPONENTS
+
 #include "components/staticsprite.hpp"
 #include "graphics.hpp"
 
@@ -53,3 +56,4 @@ void Components::StaticSprite::setTexture(std::shared_ptr<Texture> texture)
     _texture = texture;
 }
 
+#endif

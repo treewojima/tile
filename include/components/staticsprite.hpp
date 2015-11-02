@@ -19,6 +19,9 @@
 #define __COMPONENTS_STATICSPRITE_HPP__
 
 #include "defines.hpp"
+
+#ifndef _USE_NEW_COMPONENTS
+
 #include "components/graphics.hpp"
 #include "components/position.hpp"
 #include "texture.hpp"
@@ -47,5 +50,7 @@ namespace Components
         std::shared_ptr<Components::Position> _position;
     };
 }
+
+#endif
 
 #endif

@@ -15,6 +15,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if 0
 #include "states/maingamestate.hpp"
 
 #include <sstream>
@@ -127,3 +128,5 @@ void MainGameState::createEntities()
 
 	_entities.push_back(std::make_shared<Dog>());
 }
+
+#endif

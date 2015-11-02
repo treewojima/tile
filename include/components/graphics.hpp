@@ -19,6 +19,11 @@
 #define __COMPONENTS_GRAPHICS_HPP__
 
 #include "defines.hpp"
+
+#ifdef _USE_NEW_COMPONENTS
+#   include "components/graphics/base.hpp"
+#else
+
 #include "components/base.hpp"
 #include "components/position.hpp"
 #include "texture.hpp"
@@ -36,5 +41,7 @@ namespace Components
         std::string toString() const;
     };
 }
+
+#endif
 
 #endif
