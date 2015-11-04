@@ -55,6 +55,9 @@ void Logger::init(const Game::Options &options)
 	// std::cout stream
     sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::clog, boost::null_deleter()));
 
+	// Flush after each log entry
+	sink->locked_backend()->auto_flush();
+
 	// Set the log format
 	auto formatter = expr::stream
 		<< "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%m-%d-%Y %H:%M:%S") << "] "
