@@ -115,6 +115,7 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 
 	// Cast to the proper derived type
 	ptr = std::move(std::dynamic_pointer_cast<T>(basePtr));
+	//ptr = std::move(std::static_pointer_cast<T>(basePtr));
 	if (!ptr)
 	{
 		std::ostringstream ss;

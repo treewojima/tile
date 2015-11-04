@@ -27,7 +27,7 @@
 Components::Graphics::Sprite::Sprite(std::shared_ptr<Entity> parent,
                                      const TextureManager::Key &texture_,
                                      const std::string &debugName) :
-    Components::Graphics::Base(parent, parent->getDebugName() + "Sprite-" + debugName),
+    Components::Graphics::Base(parent, parent->getDebugName() + "Sprite" + debugName),
     texture(texture_)
 {
 }

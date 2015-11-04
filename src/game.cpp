@@ -66,6 +66,9 @@ namespace
     // Camera view
     std::unique_ptr<Camera> _camera;
 
+	// Game map
+	std::unique_ptr<Map> _map;
+
     // Entity manager
     std::unique_ptr<EntityManager> _entityMgr;
 
@@ -124,6 +127,8 @@ void Game::run(const Game::Options &options)
     // TEST
     _entityMgr = std::make_unique<EntityManager>();
     _entityMgr->initialize();
+
+	_map = std::make_unique<Map>("res/desert.tmx");
 
     // Set up event handling details
     registerEvents();
@@ -194,6 +199,7 @@ void Game::run(const Game::Options &options)
     _fpsTimer->stop();
 
     // Clean up
+	_map->destroy();
     _stateMgr->destroy();
     _graphicsSys->destroy();
     _entityMgr->destroy();

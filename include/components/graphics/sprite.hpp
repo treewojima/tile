@@ -43,7 +43,7 @@ namespace Components
 
             static std::shared_ptr<Sprite> create(std::shared_ptr<Entity> parent,
                                                   const TextureManager::Key &texture_,
-                                                  const std::string &debugName);
+                                                  const std::string &debugName = "");
         };
     }
 }

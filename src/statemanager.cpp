@@ -24,6 +24,8 @@ StateManager::~StateManager()
 
 void StateManager::destroy()
 {
+	if (_destroyed) return;
+
 	while (!_stateStack.empty())
 	{
 		pop();

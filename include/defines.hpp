@@ -31,9 +31,9 @@
 //#   define _TEST_TEXTURE_DIMENSIONS
 //#   define _DEBUG_EVENTS
 //#   define _DEBUG_TEXTURES
-#   define _DEBUG_ENTITIES
-#   define _DEBUG_COMPONENTS
-#	define _DEBUG_NEW_EVENTS
+//#   define _DEBUG_ENTITIES
+//#   define _DEBUG_COMPONENTS
+//#	define _DEBUG_NEW_EVENTS
 #endif
 
 #endif

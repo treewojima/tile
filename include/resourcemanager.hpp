@@ -86,6 +86,8 @@ ResourceManager<T>::~ResourceManager()
 template <class T>
 void ResourceManager<T>::destroy()
 {
+	if (_destroyed) return;
+
 	// NOTE: Should this just rely on clearing the map, or should it be ensured
 	//       that every ResourcePtr is dropped properly?
 

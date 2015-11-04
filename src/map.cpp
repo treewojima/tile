@@ -17,8 +17,6 @@
 
 #include "map.hpp"
 
-#if !defined(_USE_NEW_ENTITY) || !defined(_USE_NEW_COMPONENTS)
-
 #include <cassert>
 #include <iostream>
 #include <sstream>
@@ -36,8 +34,9 @@
 #include "graphics.hpp"
 #include "window.hpp"
 
-Map::Map(const std::string &name, const std::string &filename) :
-    _name(name)
+Map::Map(const std::string &filename) :
+    _destroyed(false),
+	_filename(filename)
 {
     _map = tmx::Map::parseFile(filename);
 
@@ -62,18 +61,23 @@ Map::Map(const std::string &name, const std::string &filename) :
 
 Map::~Map()
 {
-    _entities.clear();
-
-    //assert(_map != nullptr);
-    //delete _map;
+    if (!_destroyed) destroy();
 }
 
-void Map::draw() const
+void Map::destroy()
 {
-    for (auto entity : _entities)
-    {
-        entity->graphics->draw();
-    }
+	if (_destroyed) return;
+
+	_entities.clear();
+
+	_destroyed = true;
+}
+
+std::string Map::toString() const
+{
+	std::ostringstream ss;
+	ss << "Map[filename = \"" << _filename << "\"]";
+	return ss.str();
 }
 
 void Map::loadTilesetTextures()
@@ -178,24 +182,23 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
             std::ostringstream entityName;
             entityName << layerName << "-" << col << "-" << row
                        << "-" << textureName.str();
-            auto entity = std::make_shared<Entity>(entityName.str());
+            //auto entity = std::make_shared<Entity>(entityName.str());
+			auto entity = Entity::create(entityName.str());
 
             Vector2f pos(x + 50, Window::getHeight() - (y + 50));
-            entity->position =
-                    std::make_shared<Components::Position>(pos);
+            //entity->position =
+            //        std::make_shared<Components::Position>(pos);
+			Components::Position::create(entity, pos);
 
             auto texture = Game::getTexMgr().get(textureName.str());
-            entity->graphics =
-                    std::make_shared<Components::StaticSprite>(texture,
-                                                               entity->position);
-
+            //entity->graphics =
+            //        std::make_shared<Components::StaticSprite>(texture,
+            //                                                   entity->position);
+			Components::Graphics::Sprite::create(entity, textureName.str());
 			
-
             _parent->_entities.push_back(entity);
         }
 
         cellID++;
     }
 }
-
-#endif

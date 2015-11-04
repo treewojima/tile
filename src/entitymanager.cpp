@@ -42,6 +42,8 @@ void EntityManager::initialize()
 
 void EntityManager::destroy()
 {
+	if (_destroyed) return;
+
     // TODO: update this as necessary for additional cleanup procedures
 
     //for (auto &pair : _map)

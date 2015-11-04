@@ -38,6 +38,8 @@ Systems::Graphics::~Graphics()
 
 void Systems::Graphics::destroy()
 {
+	if (_destroyed) return;
+
     Events::Dispatcher::unsubscribe(*this);
     _spriteComponents.clear();
 
