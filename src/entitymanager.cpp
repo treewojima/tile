@@ -85,7 +85,8 @@ void EntityManager::onEvent(const Events::ComponentCreated &event)
     auto component = event.component;
 
     // TODO: Should this have error checking in case the entity doesn't exist?
-    _map[component->getParent()->getUUID()].second.push_back(component);
+    //_map[component->getParent()->getUUID()].second.push_back(component);
+	_map[component->getParent()->getUUID()].second[typeid(*component)] = component;
 }
 
 std::string EntityManager::toString() const

@@ -24,6 +24,7 @@
 
 #include <boost/functional/hash.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp> // for uuid ostream operator
 #include <memory>
 #include <sstream>
 

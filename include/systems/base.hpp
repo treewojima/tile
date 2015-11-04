@@ -22,6 +22,8 @@
 
 #include <list>
 #include <memory>
+#include <typeindex>
+#include <unordered_map>
 
 #include "events/subscriber.hpp"
 #include "stringable.hpp"
@@ -32,7 +34,10 @@ namespace Systems
     {
     public:
         template <class T>
-        using ComponentList = std::list<std::shared_ptr<T>>;
+        using ComponentMap = std::unordered_map<std::type_index, std::shared_ptr<T>>;
+
+		template <class T>
+		using ComponentList = std::list<std::shared_ptr<T>>;
 
         Base();
         ~Base();

@@ -57,8 +57,8 @@ private:
     boost::uuids::random_generator _generator;	
 	
     // Subject to change based on performance considerations
-    typedef Systems::Base::ComponentList<Components::Base> ComponentList;
-    typedef std::pair<std::shared_ptr<Entity>, ComponentList>
+    typedef Systems::Base::ComponentMap<Components::Base> ComponentMap; 
+	typedef std::pair<std::shared_ptr<Entity>, ComponentMap>
             EntityComponentsPair;
 	typedef std::unordered_map<UUID,
 							   EntityComponentsPair,
@@ -70,35 +70,61 @@ private:
 template <class T>
 std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 {
+	std::shared_ptr<T> ptr(nullptr);
+
+	EntityComponentsPair *pair;
+
+	// First, see if we have an entity entry that matches uuid
     try
     {
-        // This is an absolutely HORRIBLE, UGLY, HIDEOUSLY NAIVE FUNCTION.
-        // FUCKING FIX THIS.
+		pair = &_map.at(uuid);
+	}
+	catch (std::out_of_range &e)
+	{
+		std::ostringstream ss;
+		ss << "no such entity for UUID " << uuid;
+		throw Exception(ss.str());
+	}
 
-        auto &pair = _map.at(uuid);
-        auto &components = pair.second;
-        auto iter = std::find_if(components.begin(),
-                                 components.end(),
-                                 [](const std::shared_ptr<Components::Base> &value)
-                                 { return dynamic_cast<T *>(value.get()) != nullptr; });
-        
-		/*for (auto &component : components)
-		{
-			LOG_DEBUG << "component = " << component;
-		}
-		throw Exception("fuck you");*/
-		
-		if (iter != components.end())
-        {
-            return std::dynamic_pointer_cast<T>(*iter);
-        }
-    }
-    catch (std::out_of_range &e)
-    {
-        // Just fall through
+	// Try to find an entry for type T
+	auto &componentsMap = pair->second;
+	std::shared_ptr<Components::Base> basePtr;
+	try
+	{
+		// should this use move semantics?
+		basePtr = componentsMap.at(typeid(T));
+	}
+	catch (std::out_of_range &e)
+	{
+		std::ostringstream ss;
+		ss << "no entry for component of type "
+		   << boost::core::demangle(typeid(T).name())
+		   << " in entity " << pair->first;
+		throw Exception(ss.str());
+	}
+
+	// Make sure the pointer isn't null
+	if (!basePtr)
+	{
+		std::ostringstream ss;
+		ss << "entry for component of type "
+		   << boost::core::demangle(typeid(T).name())
+		   << " in entity " << pair->first << "is null";
+		throw Exception(ss.str());
+	}
+
+	// Cast to the proper derived type
+	ptr = std::move(std::dynamic_pointer_cast<T>(basePtr));
+	if (!ptr)
+	{
+		std::ostringstream ss;
+		ss << "could not cast component from Components::Base to "
+		   << boost::core::demangle(typeid(T).name()) << " in entity "
+		   << pair->first;
+		throw Exception(ss.str());
     }
 
-    return std::shared_ptr<T>(nullptr);
+    return ptr;
 }
 
 #endif

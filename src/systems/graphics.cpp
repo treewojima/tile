@@ -48,20 +48,22 @@ void Systems::Graphics::draw()
 {
     Window::clear(255, 255, 255);
 
-    // NOTE: This is very naive and slow. Make sure to implement some sort of caching
+    // NOTE: This is pretty naive and slow. Make sure to implement some sort of caching
     //       system to optimize this!
 
-    for (std::shared_ptr<Components::Graphics::Sprite> &component : _spriteComponents)
+    for (auto &sprite : _spriteComponents)
     {
-        const auto &parent = component->getParent();
+        const auto &parent = sprite->getParent();
         const auto &pos = Game::getEntityMgr().getComponent<Components::Position>(parent->getUUID());
         if (pos)
         {
-            ::Graphics::blitTexture(component->texture, pos->x, pos->y);
+            ::Graphics::blitTexture(sprite->texture, pos->x, pos->y);
         }
         else
         {
-            LOG_ERROR << "FUCK";
+			std::ostringstream ss;
+			ss << "no matching position component for " << sprite;
+			throw Exception(ss.str());
         }
     }
 

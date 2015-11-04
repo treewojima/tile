@@ -91,9 +91,6 @@ namespace
     void handleEvents();
 
 	void togglePause();
-
-	// Debugging functions
-	void listTextures();
 }
 
 void Game::run(const Game::Options &options)
@@ -404,7 +401,7 @@ void registerEvents()
 
 	Game::registerEvent(
 			SDL_SCANCODE_SPACE,
-			[](const SDL_Event &e) { listTextures(); },
+			[](const SDL_Event &e) { togglePause(); },
 			"SpaceEvent");
 }
 
@@ -437,15 +434,6 @@ void togglePause()
 	{
         _stateMgr->push(std::make_shared<PausedState>());
 	}
-}
-
-void listTextures()
-{
-	std::ostringstream ss;
-    ss << "Texture dump:\n";
-    _texMgr->forEach([&ss](auto pair) { ss << pair.value << "\n"; });
-	ss << "\n";
-	LOG_DEBUG << ss.str();
 }
 
 }

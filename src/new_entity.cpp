@@ -20,7 +20,6 @@
 
 #ifdef _USE_NEW_ENTITY
 
-#include <boost/uuid/uuid_io.hpp>
 #include <sstream>
 
 #include "entitymanager.hpp"
