@@ -61,6 +61,12 @@
     <Filter Include="Header Files\events">
       <UniqueIdentifier>{6cd5e047-b866-43de-b980-369f7f880d75}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\components\old">
+      <UniqueIdentifier>{f0ec06af-3a1e-420d-bc1c-2704e028ec05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\components\old">
+      <UniqueIdentifier>{2b86dd5e-fa72-4be5-803b-ef27f66885fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.hpp">
@@ -117,19 +123,7 @@
     <ClInclude Include="include\window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\components\animatedsprite.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\base.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\graphics.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
     <ClInclude Include="include\components\position.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\staticsprite.hpp">
       <Filter>Header Files\components</Filter>
     </ClInclude>
     <ClInclude Include="include\entities\tux.hpp">
@@ -189,14 +183,8 @@
     <ClInclude Include="include\entities\dog.hpp">
       <Filter>Header Files\entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\components\propertylist.hpp">
-      <Filter>Header Files\components</Filter>
-    </ClInclude>
     <ClInclude Include="include\variant.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\actionqueue.hpp">
-      <Filter>Header Files\components</Filter>
     </ClInclude>
     <ClInclude Include="include\actions\base.hpp">
       <Filter>Header Files\actions</Filter>
@@ -209,9 +197,6 @@
     </ClInclude>
     <ClInclude Include="include\components\graphics\sprite.hpp">
       <Filter>Header Files\components\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\components\new_base.hpp">
-      <Filter>Header Files\components</Filter>
     </ClInclude>
     <ClInclude Include="include\states\new_maingamestate.hpp">
       <Filter>Header Files\states</Filter>
@@ -239,6 +224,27 @@
     </ClInclude>
     <ClInclude Include="include\events\subscriber.hpp">
       <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\base.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\.old\actionqueue.hpp">
+      <Filter>Header Files\components\old</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\.old\animatedsprite.hpp">
+      <Filter>Header Files\components\old</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\.old\base.hpp">
+      <Filter>Header Files\components\old</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\.old\graphics.hpp">
+      <Filter>Header Files\components\old</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\.old\propertylist.hpp">
+      <Filter>Header Files\components\old</Filter>
+    </ClInclude>
+    <ClInclude Include="include\components\.old\staticsprite.hpp">
+      <Filter>Header Files\components\old</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -287,19 +293,7 @@
     <ClCompile Include="src\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\animatedsprite.cpp">
-      <Filter>Source Files\components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\base.cpp">
-      <Filter>Source Files\components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\graphics.cpp">
-      <Filter>Source Files\components</Filter>
-    </ClCompile>
     <ClCompile Include="src\components\position.cpp">
-      <Filter>Source Files\components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\staticsprite.cpp">
       <Filter>Source Files\components</Filter>
     </ClCompile>
     <ClCompile Include="src\entities\tux.cpp">
@@ -338,26 +332,17 @@
     <ClCompile Include="src\entities\dog.cpp">
       <Filter>Source Files\entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\propertylist.cpp">
-      <Filter>Source Files\components</Filter>
-    </ClCompile>
     <ClCompile Include="src\actions\base.cpp">
       <Filter>Source Files\actions</Filter>
     </ClCompile>
     <ClCompile Include="src\actions\movement.cpp">
       <Filter>Source Files\actions</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\actionqueue.cpp">
-      <Filter>Source Files\components</Filter>
-    </ClCompile>
     <ClCompile Include="src\components\graphics\base.cpp">
       <Filter>Source Files\components\graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\components\graphics\sprite.cpp">
       <Filter>Source Files\components\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\components\new_base.cpp">
-      <Filter>Source Files\components</Filter>
     </ClCompile>
     <ClCompile Include="src\states\new_maingamestate.cpp">
       <Filter>Source Files\states</Filter>
@@ -376,6 +361,27 @@
     </ClCompile>
     <ClCompile Include="src\new_entity.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\base.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\.old\actionqueue.cpp">
+      <Filter>Source Files\components\old</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\.old\animatedsprite.cpp">
+      <Filter>Source Files\components\old</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\.old\base.cpp">
+      <Filter>Source Files\components\old</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\.old\graphics.cpp">
+      <Filter>Source Files\components\old</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\.old\propertylist.cpp">
+      <Filter>Source Files\components\old</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\.old\staticsprite.cpp">
+      <Filter>Source Files\components\old</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

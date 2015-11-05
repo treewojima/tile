@@ -16,32 +16,40 @@
  */
 
 #include "defines.hpp"
-
-#ifndef _USE_NEW_COMPONENTS
-
 #include "components/base.hpp"
+
+#include <sstream>
+
+#include "entity.hpp"
+#include "exception.hpp"
 #ifdef _DEBUG_COMPONENTS
 #   include "logger.hpp"
 #endif
-#include <sstream>
 
-Components::Base::Base(const std::string &name) :
-    _name(name)
+Components::Base::Base(std::shared_ptr<Entity> parent,
+                       const std::string &debugName) :
+    _parent(parent),
+    _debugName(debugName)
 {
+    if (!parent)
+    {
+        std::ostringstream ss;
+        ss << "parent of \"" << debugName << "\" cannot be null";
+        throw Exception(ss.str());
+    }
 }
 
 Components::Base::~Base()
 {
 #ifdef _DEBUG_COMPONENTS
-    LOG_DEBUG << "destroyed component " << getName();
+    LOG_DEBUG << "destroyed component \"" << getDebugName() << "\"";
 #endif
 }
 
 std::string Components::Base::toString() const
 {
     std::ostringstream ss;
-    ss << "Components::Base[name = \"" << getName() << "\"]";
+    ss << "Components::Base[parent = " << getParent() << ", "
+       << "debugName = \"" << getDebugName() << "\"]";
     return ss.str();
 }
-
-#endif

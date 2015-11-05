@@ -13,8 +13,7 @@ LFLAGS     := -m64 -mwindows -mconsole -lmingw32 -lSDL2main -lSDL2 -lSDL2_image 
               -lSDL2_mixer -lglew32.dll -lopengl32 -lglu32 -ltinyxml2 -lz.dll \
               $(BOOST_LIBS)
 PROJDIRS   := src include
-SOURCES    := $(shell find $(PROJDIRS) -type f -name "*.cpp")
-#HEADERS    := $(shell find $(PROJDIRS) -type f -name "*.hpp")
+SOURCES    := $(shell find $(PROJDIRS) -type d -name ".old" -prune -o -type f -name "*.cpp" -print)
 OBJECTS    := $(patsubst %.cpp, %.o, $(SOURCES))
 DEPFILES   := $(patsubst %.cpp, %.dep, $(SOURCES))
 TARGET     := tile.exe
