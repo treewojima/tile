@@ -19,6 +19,9 @@
 #define __LEVEL_HPP__
 
 #include "defines.hpp"
+
+#if !defined(_USE_NEW_ENTITY) || !defined(_USE_NEW_COMPONENTS)
+
 #include <list>
 #include <memory>
 #include <string>
@@ -37,5 +40,7 @@ public:
 private:
     std::list<std::shared_ptr<Entity>> _entities;
 };
+
+#endif
 
 #endif

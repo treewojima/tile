@@ -28,9 +28,9 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include "istringable.hpp"
+#include "stringable.hpp"
 
-class Exception : public std::runtime_error, public IStringable
+class Exception : public std::runtime_error, public Stringable
 {
 public:
 	using std::runtime_error::runtime_error;

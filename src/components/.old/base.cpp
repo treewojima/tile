@@ -15,48 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "components/propertylist.hpp"
+#include "defines.hpp"
 
+#ifndef _USE_NEW_COMPONENTS
+
+#include "components/base.hpp"
+#ifdef _DEBUG_COMPONENTS
+#   include "logger.hpp"
+#endif
 #include <sstream>
 
-Components::PropertyList::PropertyList(const std::string &name) :
-    Base(name),
-	ResourceManager<Variant>()
+Components::Base::Base(const std::string &name) :
+    _name(name)
 {
 }
 
-std::string Components::PropertyList::toString() const
+Components::Base::~Base()
+{
+#ifdef _DEBUG_COMPONENTS
+    LOG_DEBUG << "destroyed component " << getName();
+#endif
+}
+
+std::string Components::Base::toString() const
 {
     std::ostringstream ss;
-    ss << "Components::PropertyList[name = \"" << getName()
-       << "\", properties = { ";
-
-    forEach([&ss](auto pair)
-    {
-        const auto &key = pair.key;
-        const auto &value = pair.value;
-
-		ss << "\"" << key << "\" : ";
-		
-		switch (value.which())
-		{
-		// std::string
-		case 0:
-			ss << "\"" << value << "\"";
-			break;
-
-		// bool
-		case 1:
-			ss << (boost::get<bool>(value) ? "true" : "false");
-			break;
-
-		default:
-			ss << value;
-		}
-
-        ss << ", ";
-    });
-
-    ss << "<end> }]";
+    ss << "Components::Base[name = \"" << getName() << "\"]";
     return ss.str();
 }
+
+#endif

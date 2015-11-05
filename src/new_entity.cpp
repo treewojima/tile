@@ -16,17 +16,43 @@
  */
 
 #include "defines.hpp"
-#include "components/graphics.hpp"
-#include "graphics.hpp"
+#include "entity.hpp"
 
-Components::Graphics::Graphics(const std::string &name) :
-    Components::Base(name)
+#ifdef _USE_NEW_ENTITY
+
+#include <sstream>
+
+#include "entitymanager.hpp"
+#include "events/dispatcher.hpp"
+#include "game.hpp"
+#include "logger.hpp"
+
+std::shared_ptr<Entity> Entity::create(const std::string &debugName)
 {
+    return Game::getEntityMgr().createEntity(debugName);
 }
 
-std::string Components::Graphics::toString() const
+Entity::Entity(UUID uuid, const std::string &debugName) :
+    _uuid(uuid),
+    _debugName(debugName)
+{
+#ifdef _DEBUG_ENTITIES
+    LOG_DEBUG << "created entity " << toString();
+#endif
+}
+
+Entity::~Entity()
+{
+#ifdef _DEBUG_ENTITIES
+    LOG_DEBUG << "destroyed entity " << toString();
+#endif
+}
+
+std::string Entity::toString() const
 {
     std::ostringstream ss;
-    ss << "Components::Graphics[name = \"" << getName() << "\" ]";
+    ss << "Entity[uuid = " << _uuid << ", debugName = \"" << _debugName << "\"]";
     return ss.str();
 }
+
+#endif

@@ -19,6 +19,9 @@
 #define __TUX_HPP__
 
 #include "defines.hpp"
+
+#ifndef _USE_NEW_ENTITY
+
 #include "entity.hpp"
 
 #include <vector>
@@ -34,5 +37,7 @@ public:
 private:
     std::vector<Game::Event::Handle> _eventHandles;
 };
+
+#endif
 
 #endif

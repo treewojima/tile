@@ -20,14 +20,19 @@
 
 #include "defines.hpp"
 
-#include <memory>
+#ifdef _USE_NEW_ENTITY
+#   include "new_entity.hpp"
+#else
+
+#include <memory> 
+#include <ostream>
 
 #include "components/graphics.hpp"
 #include "components/position.hpp"
 #include "components/propertylist.hpp"
-#include "istringable.hpp"
+#include "stringable.hpp"
 
-class Entity : public IStringable
+class Entity : public Stringable
 {
 public:
     Entity(const std::string &name);
@@ -51,6 +56,32 @@ protected:
 private:
     std::string _name;
     bool _markedForDeath;
+
+public:
+	enum class Type
+	{
+		Terrain,
+		Actor
+	};
 };
+
+// Helper stream operator for Entity::Type
+inline std::ostream &operator<<(std::ostream &os, const Entity::Type &type)
+{
+	switch (type)
+	{
+	case Entity::Type::Terrain:
+		os << "Terrain";
+		break;
+
+	case Entity::Type::Actor:
+		os << "Actor";
+		break;
+	}
+
+	return os;
+}
+
+#endif
 
 #endif

@@ -15,26 +15,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPONENTS_GRAPHICS_HPP__
-#define __COMPONENTS_GRAPHICS_HPP__
+#ifndef __COMPONENTS_ANIMATEDSPRITE_HPP__
+#define __COMPONENTS_ANIMATEDSPRITE_HPP__
 
 #include "defines.hpp"
-#include "components/base.hpp"
+
+#ifndef _USE_NEW_COMPONENTS
+
+#include <list>
+#include "components/graphics.hpp"
 #include "components/position.hpp"
 #include "texture.hpp"
+#include "timer.hpp"
 #include "vector.hpp"
 
 namespace Components
 {
-    class Graphics : public Base
+    class AnimatedSprite : public Graphics
     {
     public:
-        Graphics(const std::string &name = "graphics");
+        typedef std::list<std::shared_ptr<Texture>> TextureList;
 
-        virtual void draw() = 0;
+        AnimatedSprite(TextureList textures,
+                       std::shared_ptr<Components::Position> positionComponent);
+
+        void draw();
 
         std::string toString() const;
+
+    private:
+        TextureList _textures;
+        TextureList::iterator _currentTextureIter;
+        std::shared_ptr<Components::Position> _position;
+        Timer _timer;
     };
 }
 
 #endif
+
+#endif
+

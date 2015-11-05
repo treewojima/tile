@@ -23,22 +23,22 @@
 #include <list>
 #include <memory>
 #include <string>
-//#include <tmxparser/TmxMap.h>
 #include <tmx/Map.h>
 
 #include "entity.hpp"
 #include "exception.hpp"
+#include "stringable.hpp"
 #include "texture.hpp"
 
-class Map
+class Map : public Stringable
 {
 public:
-    Map(const std::string &name, const std::string &filename);
+    Map(const std::string &filename);
     ~Map();
 
-    void draw() const;
+	void destroy();
 
-    inline std::string getName() const { return _name; }
+    std::string toString() const;
 
 private:
     class LayerVisitor : public tmx::LayerVisitor
@@ -52,11 +52,10 @@ private:
         Map *_parent;
     };
 
-    std::string _name;
-    //Tmx::Map *_map;
+	bool _destroyed;
+	std::string _filename;
     std::unique_ptr<tmx::Map> _map;
     std::list<std::shared_ptr<Entity>> _entities;
-    std::shared_ptr<Texture> _renderedMapTexture;
 
     void loadTilesetTextures();
 };

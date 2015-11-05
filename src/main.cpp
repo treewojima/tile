@@ -18,7 +18,9 @@
 #include "defines.hpp"
 
 #include <boost/filesystem/path.hpp>
-#include <boost/program_options.hpp>
+#ifndef _NO_PROGRAM_OPTIONS
+#   include <boost/program_options.hpp>
+#endif
 
 #include "game.hpp"
 #include "logger.hpp"
@@ -55,7 +57,8 @@ namespace {
 
 Game::Options parseArgs(int argc, char *argv[])
 {
-	namespace fs = boost::filesystem;
+#ifndef _NO_PROGRAM_OPTIONS
+    namespace fs = boost::filesystem;
 	namespace po = boost::program_options;
 
 	Game::Options options;
@@ -94,6 +97,16 @@ Game::Options parseArgs(int argc, char *argv[])
 	}
 
 	return options;
+#else
+#warning "building w/o program options"
+    Game::Options options;
+    options.logFile = "logs/tile.txt";
+    options.programName = "tile";
+    options.vsync = true;
+    options.windowHeight = DEFAULT_WINDOW_HEIGHT;
+    options.windowWidth = DEFAULT_WINDOW_WIDTH;
+    return options;
+#endif
 }
 
 }

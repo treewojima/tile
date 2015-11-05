@@ -22,10 +22,10 @@
 
 #include <iostream>
 
-#include "istringable.hpp"
+#include "stringable.hpp"
 #include "vector.hpp"
 
-class Camera : public IStringable
+class Camera : public Stringable
 {
 public:
     Camera(const Vector2f &worldMin, const Vector2f &worldMax,

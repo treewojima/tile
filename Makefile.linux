@@ -30,5 +30,6 @@ clean:
 -include $(DEPFILES)
 
 %.o: %.cpp
-	$(CC) -o $@ $(CFLAGS) -MMD -MP -MF$*.dep $<
+	@echo CC $<
+	@$(CC) -o $@ $(CFLAGS) -MMD -MP -MF$*.dep $<
 

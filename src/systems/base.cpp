@@ -15,26 +15,28 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ISTRINGABLE_HPP__
-#define __ISTRINGABLE_HPP__
-
 #include "defines.hpp"
+#include "systems/base.hpp"
 
-#include <string>
+#include "entitymanager.hpp"
+#include "exception.hpp"
+#include "logger.hpp"
 
-// Interface that guarantees a toString() method
-class IStringable
+Systems::Base::Base() :
+    _destroyed(false)
 {
-public:
-    virtual ~IStringable() {}
-    virtual std::string toString() const = 0;
-};
-
-// Helper ostream operator
-inline std::ostream &operator<<(std::ostream &stream, const IStringable &obj)
-{
-    stream << obj.toString();
-    return stream;
 }
 
-#endif
+Systems::Base::~Base()
+{
+    if (!_destroyed)
+    {
+        // NOTE: this is shitty error handling
+        LOG_DEBUG << "system ??? wasn't destroyed before destructor";
+    }
+}
+
+std::string Systems::Base::toString() const
+{
+    return "Systems::Base[]";
+}

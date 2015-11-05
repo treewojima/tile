@@ -18,6 +18,8 @@
 #include "defines.hpp"
 #include "level.hpp"
 
+#if !defined(_USE_NEW_ENTITY) || !defined(_USE_NEW_COMPONENTS)
+
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -58,3 +60,5 @@ void Level::cullDeadEntities()
         return e->isMarkedForDeath();
     });
 }
+
+#endif

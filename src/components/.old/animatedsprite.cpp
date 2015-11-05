@@ -1,4 +1,7 @@
 #include "defines.hpp"
+
+#ifndef _USE_NEW_COMPONENTS
+
 #include "components/animatedsprite.hpp"
 
 #include "colors.hpp"
@@ -44,3 +47,5 @@ std::string Components::AnimatedSprite::toString() const
        << "]";
     return ss.str();
 }
+
+#endif

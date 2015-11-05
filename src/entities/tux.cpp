@@ -16,6 +16,9 @@
  */
 
 #include "defines.hpp"
+
+#ifndef _USE_NEW_ENTITY
+
 #include "entities/tux.hpp"
 
 Tux::Tux() :
@@ -54,3 +57,5 @@ Tux::~Tux()
         Game::unregisterEvent(handle);
     }
 }
+
+#endif

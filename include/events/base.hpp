@@ -15,36 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPONENTS_STATICSPRITE_HPP__
-#define __COMPONENTS_STATICSPRITE_HPP__
+#ifndef __EVENTS_BASE_HPP__
+#define __EVENTS_BASE_HPP__
 
 #include "defines.hpp"
-#include "components/graphics.hpp"
-#include "components/position.hpp"
-#include "texture.hpp"
-#include "vector.hpp"
+#include "stringable.hpp"
 
-namespace Components
+namespace Events
 {
-    class StaticSprite : public Graphics
+    class Base : public Stringable
     {
-    public:
-        StaticSprite(std::shared_ptr<Texture> texture,
-                     std::shared_ptr<Components::Position> positionComponent);
-
-        void draw();
-
-        inline std::shared_ptr<Texture> getTexture() const
-            { return _texture; }
-
-        std::string toString() const;
-
     protected:
-        void setTexture(std::shared_ptr<Texture> texture);
+        Base() {}
 
-    private:
-        std::shared_ptr<Texture> _texture;
-        std::shared_ptr<Components::Position> _position;
+    public:
+        virtual ~Base() {}
+
+        std::string toString() const { return "Events::Base[]"; }
     };
 }
 

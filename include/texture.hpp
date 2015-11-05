@@ -25,10 +25,10 @@
 #include <SDL2/SDL.h>
 #include <string>
 
-#include "istringable.hpp"
 #include "resourcemanager.hpp"
+#include "stringable.hpp"
 
-class Texture : public IStringable
+class Texture : public Stringable
 {
 public:
     Texture(const std::string &name,
