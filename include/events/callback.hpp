@@ -15,41 +15,26 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __SYSTEMS_BASE_HPP__
-#define __SYSTEMS_BASE_HPP__
+#ifndef __EVENTS_CALLBACK_HPP__
+#define __EVENTS_CALLBACK_HPP__
 
 #include "defines.hpp"
 
-#include <list>
-#include <memory>
-#include <typeindex>
-#include <unordered_map>
+#include <functional>
 
-#include "events/subscriber.hpp"
-#include "stringable.hpp"
+#include "events/base.hpp"
 
-namespace Systems
+namespace Events
 {
-    class Base : public Events::Subscriber
-    {
-    public:
-        template <class T>
-        using ComponentMap = std::unordered_map<std::type_index, std::shared_ptr<T>>;
+	class Callback : public Base
+	{
+	public:
+		//typedef std::function<bool()>
 
-		template <class T>
-		using ComponentList = std::list<std::shared_ptr<T>>;
+		Callback();
 
-        Base();
-        ~Base();
-
-		virtual void update(float dt) {}
-        virtual void destroy() = 0;
-
-        std::string toString() const;
-
-    protected:
-        bool _destroyed;
-    };
+		std::string toString() const;
+	};
 }
 
 #endif

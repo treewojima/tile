@@ -32,11 +32,6 @@
 #include <sstream>
 
 #include "colors.hpp"
-#include "components/animatedsprite.hpp"
-#include "components/position.hpp"
-#include "components/propertylist.hpp"
-#include "components/staticsprite.hpp"
-#include "entities/tux.hpp"
 #include "exception.hpp"
 #include "graphics.hpp"
 #include "helper_events.hpp"

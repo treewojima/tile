@@ -19,8 +19,9 @@
 #define __COMPONENTS_POSITION_HPP__
 
 #include "defines.hpp"
-#include "components/base.hpp"
 
+#include "components/base.hpp"
+#include "components/mapposition.hpp"
 #include "events/base.hpp"
 #include "vector.hpp"
 
@@ -45,7 +46,9 @@ namespace Components
                                                 float y);
         static std::shared_ptr<Position> create(std::shared_ptr<Entity> parent,
                                                 const Vector2f &v = Vector2f::ZERO);
-    };
+		static std::shared_ptr<Position> create(std::shared_ptr<Entity> parent,
+												const MapPosition &position);
+	};
 }
 
 namespace Events

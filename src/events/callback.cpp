@@ -15,41 +15,19 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __SYSTEMS_BASE_HPP__
-#define __SYSTEMS_BASE_HPP__
-
 #include "defines.hpp"
+#include "events/callback.hpp"
 
-#include <list>
-#include <memory>
-#include <typeindex>
-#include <unordered_map>
+#include <sstream>
 
-#include "events/subscriber.hpp"
-#include "stringable.hpp"
-
-namespace Systems
+Events::Callback::Callback()
 {
-    class Base : public Events::Subscriber
-    {
-    public:
-        template <class T>
-        using ComponentMap = std::unordered_map<std::type_index, std::shared_ptr<T>>;
 
-		template <class T>
-		using ComponentList = std::list<std::shared_ptr<T>>;
-
-        Base();
-        ~Base();
-
-		virtual void update(float dt) {}
-        virtual void destroy() = 0;
-
-        std::string toString() const;
-
-    protected:
-        bool _destroyed;
-    };
 }
 
-#endif
+std::string Events::Callback::toString() const
+{
+	std::ostringstream ss;
+
+	return ss.str();
+}

@@ -40,6 +40,8 @@ public:
 
     std::string toString() const;
 
+	static const int TILE_WIDTH, TILE_HEIGHT;
+
 private:
     class LayerVisitor : public tmx::LayerVisitor
     {

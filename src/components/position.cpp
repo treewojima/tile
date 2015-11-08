@@ -19,11 +19,13 @@
 #include "components/position.hpp"
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
+#include "map.hpp"
+#include "window.hpp"
 
 Components::Position::Position(std::shared_ptr<Entity> parent,
                                float x_,
                                float y_) :
-    Components::Base(parent, parent->getDebugName() + "Position"),
+    Base(parent, parent->getDebugName() + "Position"),
     x(x_),
     y(y_)
 {
@@ -54,4 +56,13 @@ Components::Position::create(std::shared_ptr<Entity> parent,
                              const Vector2f &v)
 {
     return create(parent, v.x, v.y);
+}
+
+std::shared_ptr<Components::Position>
+Components::Position::create(std::shared_ptr<Entity> parent,
+							 const Components::MapPosition &mapPosition)
+{
+	float x = mapPosition.x * Map::TILE_WIDTH - (Map::TILE_WIDTH / 2);
+	float y = mapPosition.y * Map::TILE_HEIGHT - (Map::TILE_HEIGHT / 2);
+	return create(parent, x, y);
 }

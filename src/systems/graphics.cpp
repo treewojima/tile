@@ -46,7 +46,7 @@ void Systems::Graphics::destroy()
     _destroyed = true;
 }
 
-void Systems::Graphics::draw()
+void Systems::Graphics::update(float dt)
 {
     Window::clear(255, 255, 255);
 

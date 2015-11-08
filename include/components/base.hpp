@@ -16,7 +16,7 @@
  */
 
 #ifndef __COMPONENTS_BASE_HPP__
-#define __COMPONENTS_NEW_BASE_HPP__
+#define __COMPONENTS_BASE_HPP__
 
 #include "defines.hpp"
 

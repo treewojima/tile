@@ -246,6 +246,15 @@
     <ClInclude Include="include\components\.old\staticsprite.hpp">
       <Filter>Header Files\components\old</Filter>
     </ClInclude>
+    <ClInclude Include="include\components\mapposition.hpp">
+      <Filter>Header Files\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\callback.hpp">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\systems\input.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp">
@@ -382,6 +391,12 @@
     </ClCompile>
     <ClCompile Include="src\components\.old\staticsprite.cpp">
       <Filter>Source Files\components\old</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\mapposition.cpp">
+      <Filter>Source Files\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\events\callback.cpp">
+      <Filter>Source Files\events</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

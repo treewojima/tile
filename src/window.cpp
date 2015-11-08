@@ -35,8 +35,13 @@ namespace
 
 void Window::create(int width, int height, bool vsync)
 {
-    assert(width > 0);
-    assert(height > 0);
+	if (width < 1 || height < 1)
+	{
+		std::ostringstream ss;
+		ss << "width and height must be greater than zero (received values "
+		   << width << "x" << height << ")";
+		throw Exception(ss.str());
+	}
 
 	// Double buffering
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);

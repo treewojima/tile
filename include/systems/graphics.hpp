@@ -35,7 +35,7 @@ namespace Systems
 
         void destroy();
 
-        void draw();
+        void update(float dt);
 
         void onEvent(const Events::SpriteComponentCreated &event);
 

@@ -21,18 +21,19 @@
 #include <iostream>
 #include <sstream>
 #include <tmx/Cell.h>
-//#include <tmx/LayerVisitor.h>
 #include <tmx/TileLayer.h>
 
 #include "colors.hpp"
+#include "components/mapposition.hpp"
 #include "components/position.hpp"
-#include "components/staticsprite.hpp"
-//#include "entities/tiletest.hpp"
 #include "entity.hpp"
 #include "exception.hpp"
 #include "game.hpp"
 #include "graphics.hpp"
 #include "window.hpp"
+
+const int Map::TILE_WIDTH = 32;
+const int Map::TILE_HEIGHT = Map::TILE_WIDTH;
 
 Map::Map(const std::string &filename) :
     _destroyed(false),
@@ -91,13 +92,30 @@ void Map::loadTilesetTextures()
         auto tilesetSurface = Graphics::loadSDLSurface(image->getSource().string());
 
         const int tileWidth = tileset->getTileWidth();
-        const int tileHeight = tileset->getTileHeight();
+		if (tileWidth != TILE_WIDTH)
+		{
+			std::ostringstream ss;
+			ss << "Map " << _filename << " does not have a tile width of "
+			   << TILE_WIDTH << " (" << tileWidth << " instead)";
+			throw Exception(ss.str());
+		}
+
+		const int tileHeight = tileset->getTileHeight();
+		if (tileHeight != TILE_HEIGHT)
+		{
+			std::ostringstream ss;
+			ss << "Map " << _filename << " does not have a tile height of "
+				<< TILE_HEIGHT << " (" << tileHeight << " instead)";
+			throw Exception(ss.str());
+		}
+
         const int tilesetWidth = tilesetSurface->w;
         const int tilesetHeight = tilesetSurface->h;
         const int numCols = tilesetWidth / tileWidth;
         const int numRows = tilesetHeight / tileHeight;
         const int margin = tileset->getMargin();
 
+#if 0
         std::cout << "tileWidth     = "   << tileWidth
                   << "\ntileHeight    = " << tileHeight
                   << "\ntilesetWidth  = " << tilesetWidth
@@ -106,6 +124,7 @@ void Map::loadTilesetTextures()
                   << "\nnumCols       = " << numCols
                   << "\nnumRows       = " << numRows
                   << "\nfirstGid      = " << tileset->getFirstGID() << std::endl;
+#endif
 
         auto gid = tileset->getFirstGID();
         SDL_Rect srcRect;
@@ -173,6 +192,7 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
 
             // Calculate the tile's position on the screen/within the map
             auto col = cellID % map.getWidth();
+			assert(col < map.getWidth());
             auto row = cellID / map.getWidth();
             assert(row < map.getHeight());
             float x = col * map.getTileWidth();
@@ -185,10 +205,13 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
             //auto entity = std::make_shared<Entity>(entityName.str());
 			auto entity = Entity::create(entityName.str());
 
-            Vector2f pos(x + 50, Window::getHeight() - (y + 50));
+			Vector2i v(1 + col, map.getHeight() - row);
+			auto pos = Components::MapPosition::create(entity, v);
+
+            //Vector2f pos(x + 50, Window::getHeight() - (y + 50));
             //entity->position =
             //        std::make_shared<Components::Position>(pos);
-			Components::Position::create(entity, pos);
+			auto pos2 = Components::Position::create(entity, *pos);
 
             auto texture = Game::getTexMgr().get(textureName.str());
             //entity->graphics =
@@ -197,6 +220,9 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
 			Components::Graphics::Sprite::create(entity, textureName.str());
 			
             _parent->_entities.push_back(entity);
+
+			LOG_DEBUG << "created entity: (" << pos->x << "," << pos->y << ") -> "
+				      << "(" << pos2->x << "," << pos2->y << ")";
         }
 
         cellID++;
