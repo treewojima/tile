@@ -15,8 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __NEW_MAINGAMESTATE_HPP__
-#define __NEW_MAINGAMESTATE_HPP__
+#ifndef __STATES_MAINGAME_HPP__
+#define __STATES_MAINGAME_HPP__
 
 #include "defines.hpp"
 
@@ -25,26 +25,27 @@
 
 #include "entity.hpp"
 //#include "map.hpp"
-#include "state.hpp"
+#include "states/base.hpp"
 
-class MainGameState : public State
+namespace States
 {
-public:
-    MainGameState() : State(Type::Main) {}
+    class MainGame : public Base
+    {
+    public:
+        MainGame() : Base(Type::Main) {}
 
-    void initialize();
-    void destroy();
+        void initialize();
+        void destroy();
 
-    void postLoop();
+        void postLoop();
 
-    void update(float dt);
-    void draw();
+        void update(float dt);
+        void draw(float dt);
 
-private:
-    //std::list<std::shared_ptr<Entity>> _entities;
-
-    void loadTextures();
-    void createEntities();
-};
+    private:
+        void loadTextures();
+        void createEntities();
+    };
+}
 
 #endif

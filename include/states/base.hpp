@@ -15,22 +15,46 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __PAUSEDSTATE_HPP__
-#define __PAUSEDSTATE_HPP__
+#ifndef __STATES_BASE_HPP__
+#define __STATES_BASE_HPP__
 
 #include "defines.hpp"
-#include "state.hpp"
 
-class PausedState : public State
+namespace States
 {
-public:
-	PausedState() : State(Type::Paused) {}
+    // I don't like this...
+    enum class Type
+    {
+        Main,
+        Paused
+    };
 
-	void initialize();
-	void destroy();
+    class Base
+    {
+    public:
 
-	void draw();
-};
+
+    protected:
+        Base(Type type) : _type(type) {}
+
+    public:
+        virtual ~Base() {}
+
+        virtual void initialize() {}
+        virtual void destroy() {}
+
+        virtual void preLoop() {}
+        virtual void postLoop() {}
+
+        virtual void update(float dt) {}
+        virtual void draw(float dt) {}
+
+        bool isActive() const;
+        Type getType() const { return _type; }
+
+    private:
+        Type _type;
+    };
+}
 
 #endif
-

@@ -11,3 +11,4 @@ test64
 *.exe.map
 *.*sdf
 *.autosave
+oprofile_data

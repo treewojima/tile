@@ -20,69 +20,176 @@
 
 #include "defines.hpp"
 
+#include <boost/core/demangle.hpp>
 #include <functional>
 #include <iostream>
 #include <list>
 #include <memory>
+#include <sstream>
 #include <typeindex>
 #include <typeinfo>
+#include <unordered_map>
 #include <utility>
 
-#ifdef _DEBUG_DISPATCHER_MAP
-#   warning "using debug unordered_map"
-#   include <debug/unordered_map>
-#   define DispatcherMap __gnu_debug::unordered_map
-#else
-#   include <unordered_map>
-#   define DispatcherMap std::unordered_map
-#endif
-
-#include "components/base.hpp"
+//#include "components/base.hpp"
 #include "events/base.hpp"
 #include "events/subscriber.hpp"
-
 #ifdef _DEBUG_NEW_EVENTS
-#   include <boost/core/demangle.hpp>
 #   include "logger.hpp"
 #endif
 
 namespace Events
 {
+    // TODO: This class is ripe for refactoring
     class Dispatcher
     {
     private:
         Dispatcher() {}
 
     public:
-        template <class E, class T>
-        static void subscribe(T &subscriber);
+        template <class E, class T, typename std::enable_if<std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
+        static void subscribe(T &subscriber)
+        {
+            static_assert(std::is_base_of<Base, E>::value,
+                          "Can only subscribe to types derived from class Event");
+            static_assert(std::is_base_of<Subscriber, T>::value,
+                          "Only subclasses of class Subscriber can subscribe to asynchronous events");
 
-        template <class E, class T>
-        static void unsubscribe(T &subscriber);
+            subscribeSync<E>(subscriber);
+        }
 
-        template <class T>
-        static void unsubscribe(T &subscriber);
+        template <class E, class T, typename std::enable_if<std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
+        static void subscribe(T &subscriber)
+        {
+            static_assert(std::is_base_of<Base, E>::value,
+                          "Can only subscribe to types derived from class Event");
+
+            subscribeAsync<E>(subscriber);
+        }
+
+        template <class E, class T, typename std::enable_if<std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
+        static void unsubscribe(T &subscriber)
+        {
+            static_assert(std::is_base_of<Base, E>::value,
+                          "Can only unsubscribe from types derived from class Event");
+
+            unsubscribeSync<E>(subscriber);
+        }
+
+        template <class E, class T, typename std::enable_if<std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
+        static void unsubscribe(T &subscriber)
+        {
+            static_assert(std::is_base_of<Base, E>::value,
+                          "Can only unsubscribe from types derived from class Event");
+
+            unsubscribeAsync<E>(subscriber);
+        }
+
+        template <class T, typename std::enable_if<std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
+        static void unsubscribe(T &subscriber)
+        {
+            unsubscribeSync(subscriber);
+        }
+
+        template <class T, typename std::enable_if<std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
+        static void unsubscribe(T &subscriber)
+        {
+            unsubscribeAsync(subscriber);
+        }
 
         template <class E, class... Args>
         static void raise(Args&& ... args);
 
+        //template <class E, class... Args>
+        //static void raiseAsync(Args&& ... args);
+
     private:
-        typedef std::pair<Subscriber *, std::function<void(const Base &)>> SubscriberCallbackPair;
-        typedef std::list<SubscriberCallbackPair> SubscriberList;
-        typedef DispatcherMap<std::type_index, SubscriberList> TypeSubscriberMap;
+        template <class E, class T>
+        static void subscribeSync(T &subscriber);
+
+        template <class E, class T>
+        static void subscribeAsync(T &subscriber);
+
+        template <class E, class T>
+        static void unsubscribeSync(T &subscriber);
+
+        template <class E, class T>
+        static void unsubscribeAsync(T &subscriber);
+
+        template <class T>
+        static void unsubscribeSync(T &subscriber);
+
+        template <class T>
+        static void unsubscribeAsync(T &subscriber);
+
+        typedef std::function<void(const Base &)> SubscriberCallback;
+        typedef std::pair<Subscriber *, SubscriberCallback> SubscriberPair;
+        typedef std::list<SubscriberPair> SubscriberList;
+        typedef std::unordered_map<std::type_index, SubscriberList> TypeSubscriberMap;
+
+        typedef std::function<void(std::shared_ptr<Base>)> AsyncSubscriberCallback;
+        typedef std::pair<AsyncSubscriber *, AsyncSubscriberCallback> AsyncSubscriberPair;
+        typedef std::list<AsyncSubscriberPair> AsyncSubscriberList;
+        typedef std::unordered_map<std::type_index, AsyncSubscriberList> TypeAsyncSubscriberMap;
 
         static TypeSubscriberMap _map;
+        static TypeAsyncSubscriberMap _asyncMap;
     };
 }
 
-template <class E, class T>
-void Events::Dispatcher::subscribe(T &subscriber)
+template <class E, class... Args>
+void Events::Dispatcher::raise(Args&& ... args)
 {
     static_assert(std::is_base_of<Base, E>::value,
-                  "Can only subscribe to types derived from class Event");
-    static_assert(std::is_base_of<Subscriber, T>::value,
-                  "Only classes derived from Subscriber can be subscribers");
+                  "Can only raise types derived from class Event");
 
+    auto event = std::make_shared<E>(std::forward<Args>(args)...);
+    auto baseEvent = std::static_pointer_cast<Base>(event);
+
+#ifdef _DEBUG_NEW_EVENTS
+    LOG_DEBUG << "event raised: " << event;
+#endif
+
+    // First, queue it for asynchronous subscribers
+    auto asyncList = _asyncMap[typeid(E)];
+    for (auto &pair : asyncList)
+    {
+        pair.second(baseEvent);
+    }
+
+    // Next, fire off regular subscribers
+    auto list = _map[typeid(E)];
+    for (auto &pair : list)
+    {
+        pair.second(*baseEvent);
+    }
+}
+
+#if 0
+template <class E, class... Args>
+void Events::Dispatcher::raiseAsync(Args&& ... args)
+{
+    static_assert(std::is_base_of<Base, E>::value,
+                  "Can only raise types derived from class Event");
+
+    auto event = std::make_shared<E>(std::forward<Args>(args)...);
+    auto baseEvent = std::static_pointer_cast<Base>(event);
+
+    auto list = _asyncMap[typeid(E)];
+    for (auto &pair : list)
+    {
+        pair.second(baseEvent);
+    }
+
+#ifdef _DEBUG_NEW_EVENTS
+    LOG_DEBUG << "asynchronous event raised: " << event;
+#endif
+}
+#endif
+
+template <class E, class T>
+void Events::Dispatcher::subscribeSync(T &subscriber)
+{
     auto callback = [&subscriber](const Events::Base &event)
         { subscriber.onEvent(static_cast<const E &>(event)); };
 
@@ -91,21 +198,32 @@ void Events::Dispatcher::subscribe(T &subscriber)
                                callback));
 
 #ifdef _DEBUG_NEW_EVENTS
-	LOG_DEBUG << "subscriber " << subscriber
+    LOG_DEBUG << "subscriber " << subscriber
               << " is listening for events of type "
               << boost::core::demangle(typeid(E).name());
 #endif
 }
 
 template <class E, class T>
-void Events::Dispatcher::unsubscribe(T &subscriber)
+void Events::Dispatcher::subscribeAsync(T &subscriber)
 {
-    // Are these checks necessary?
-    static_assert(std::is_base_of<Base, E>::value,
-                  "Can only unsubscribe from types derived from class Event");
-    static_assert(std::is_base_of<Subscriber, T>::value,
-                  "Only classes derived from Subscriber can be subscribers");
+    auto callback = [&subscriber](std::shared_ptr<Events::Base> event)
+        { subscriber.queueEvent(std::static_pointer_cast<E>(event)); };
 
+    _asyncMap[typeid(E)].push_back(
+                std::make_pair(static_cast<AsyncSubscriber *>(&subscriber),
+                               callback));
+
+#ifdef _DEBUG_NEW_EVENTS
+    LOG_DEBUG << "asynchronous subscriber " << subscriber
+              << " is listening for events of type "
+              << boost::core::demangle(typeid(E).name());
+#endif
+}
+
+template <class E, class T>
+void Events::Dispatcher::unsubscribeSync(T &subscriber)
+{
     auto s = static_cast<Subscriber *>(&subscriber);
     auto i = _map.find(typeid(E));
     if (i != _map.end())
@@ -122,18 +240,40 @@ void Events::Dispatcher::unsubscribe(T &subscriber)
     }
 
 #ifdef _DEBUG_NEW_EVENTS
-	LOG_DEBUG << "subscriber " << subscriber
+    LOG_DEBUG << "subscriber " << subscriber
+              << " is no longer listening for events of type "
+              << boost::core::demangle(typeid(E).name());
+#endif
+}
+
+template <class E, class T>
+void Events::Dispatcher::unsubscribeAsync(T &subscriber)
+{
+    auto s = static_cast<AsyncSubscriber *>(&subscriber);
+    auto i = _asyncMap.find(typeid(E));
+    if (i != _asyncMap.end())
+    {
+        auto &list = i->second;
+        for (auto j = list.begin(); j != list.end(); j++)
+        {
+            if (j->first == s)
+            {
+                list.erase(j);
+                break;
+            }
+        }
+    }
+
+#ifdef _DEBUG_NEW_EVENTS
+    LOG_DEBUG << "asynchronous subscriber " << subscriber
               << " is no longer listening for events of type "
               << boost::core::demangle(typeid(E).name());
 #endif
 }
 
 template <class T>
-void Events::Dispatcher::unsubscribe(T &subscriber)
+void Events::Dispatcher::unsubscribeSync(T &subscriber)
 {
-    static_assert(std::is_base_of<Subscriber, T>::value,
-                  "Only classes derived from Subscriber can be subscribers");
-
     auto s = static_cast<Subscriber *>(&subscriber);
 
     for (auto &i : _map)
@@ -150,28 +290,32 @@ void Events::Dispatcher::unsubscribe(T &subscriber)
     }
 
 #ifdef _DEBUG_NEW_EVENTS
-	LOG_DEBUG << "subscriber " << subscriber
-			  << " is no longer listening for events of any type";
+    LOG_DEBUG << "subscriber " << subscriber
+              << " is no longer listening for events of any type";
 #endif
 }
 
-template <class E, class... Args>
-void Events::Dispatcher::raise(Args&& ... args)
+template <class T>
+void Events::Dispatcher::unsubscribeAsync(T &subscriber)
 {
-    static_assert(std::is_base_of<Base, E>::value,
-                  "Can only raise types derived from class Event");
+    auto s = static_cast<AsyncSubscriber *>(&subscriber);
 
-    E event(std::forward<Args>(args)...);
-
-    auto list = _map[typeid(E)];
-    for (auto &pair : list)
+    for (auto &i : _asyncMap)
     {
-        //callback(static_cast<const Base &>(event));
-        pair.second(static_cast<const Base &>(event));
+        auto &list = i.second;
+        for (auto j = list.begin(); j != list.end(); j++)
+        {
+            if (j->first == s)
+            {
+                list.erase(j);
+                break;
+            }
+        }
     }
 
 #ifdef _DEBUG_NEW_EVENTS
-	LOG_DEBUG << "event raised: " << event;
+    LOG_DEBUG << "asynchronous subscriber " << subscriber
+              << " is no longer listening for events of any type";
 #endif
 }
 

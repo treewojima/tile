@@ -23,13 +23,20 @@
 
 namespace Events
 {
+    // Must guarantee the following function:
+    // (virtual) void onEvent(const <subclass of Event> &event)
     class Subscriber : public Stringable
     {
     protected:
         Subscriber() {}
+    };
 
-    public:
-        virtual ~Subscriber() {}
+    // Must guarantee the following function:
+    // (virtual) void queueEvent(std::shared_ptr<subclass of Event> event)
+    class AsyncSubscriber : public Stringable
+    {
+    protected:
+        AsyncSubscriber() {}
     };
 }
 

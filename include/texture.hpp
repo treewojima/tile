@@ -28,6 +28,11 @@
 #include "resourcemanager.hpp"
 #include "stringable.hpp"
 
+#ifdef _DEBUG
+//#   define _TEST_TEXTURE_DIMENSIONS
+//#   define _DEBUG_TEXTURES
+#endif
+
 class Texture : public Stringable
 {
 public:

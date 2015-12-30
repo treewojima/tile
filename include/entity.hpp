@@ -20,68 +20,74 @@
 
 #include "defines.hpp"
 
-#ifdef _USE_NEW_ENTITY
-#   include "new_entity.hpp"
-#else
+#include <memory>
+#include <sstream>
 
-#include <memory> 
-#include <ostream>
-
-#include "components/graphics.hpp"
-#include "components/position.hpp"
-#include "components/propertylist.hpp"
+#include "events/base.hpp"
 #include "stringable.hpp"
 
-class Entity : public Stringable
+#ifdef _USE_NEW_UUID
+#   include "uuid.hpp"
+#else
+#   include <boost/functional/hash.hpp>
+#   include <boost/uuid/uuid.hpp>
+#   include <boost/uuid/uuid_io.hpp> // for uuid ostream operator
+#endif
+
+#ifdef _DEBUG
+//#   define _DEBUG_ENTITIES
+#endif
+
+// Conceptually, an Entity should be nothing more than an identifier (an
+// int, a string, etc). BUT, for convenience, make it a class with absolutely
+// no additional functionality other than wrapper methods to EntityManager
+class Entity final : public Stringable
 {
+    friend class EntityManager;
+
 public:
-    Entity(const std::string &name);
-    virtual ~Entity();
+#ifdef _USE_NEW_UUID
+    typedef uuid::uuid UUID;
+#else
+    typedef boost::uuids::uuid UUID;
+#endif
 
-    std::shared_ptr<Components::Position> position;
-    std::shared_ptr<Components::Graphics> graphics;
-    std::shared_ptr<Components::PropertyList> properties;
+    static std::shared_ptr<Entity> create(const std::string &debugName);
 
-    virtual void update(float dt) {}
+private:
+    Entity(UUID uuid, const std::string &debugName);
 
-    inline std::string getName() const { return _name; }
-    inline bool isMarkedForDeath() const { return _markedForDeath; }
+public:
+    ~Entity();
+
+    inline UUID getUUID() const { return _uuid; }
+    inline std::string getDebugName() const { return _debugName; }
 
     std::string toString() const;
 
-protected:
-    // This is the most badass function name ever
-    inline void markForDeath() { _markedForDeath = true; }
-
 private:
-    std::string _name;
-    bool _markedForDeath;
-
-public:
-	enum class Type
-	{
-		Terrain,
-		Actor
-	};
+    UUID _uuid;
+    std::string _debugName;
 };
 
-// Helper stream operator for Entity::Type
-inline std::ostream &operator<<(std::ostream &os, const Entity::Type &type)
+namespace Events
 {
-	switch (type)
-	{
-	case Entity::Type::Terrain:
-		os << "Terrain";
-		break;
+    class EntityCreated : public Events::Base
+    {
+    public:
+        std::shared_ptr<Entity> entity;
 
-	case Entity::Type::Actor:
-		os << "Actor";
-		break;
-	}
+        EntityCreated(std::shared_ptr<Entity> entity_) :
+            Events::Base(),
+            entity(entity_) {}
 
-	return os;
+        std::string toString() const
+        {
+            std::ostringstream ss;
+            ss << "Events::EntityCreated[entity = " << entity << "]";
+            return ss.str();
+        }
+    };
 }
-
-#endif
 
 #endif

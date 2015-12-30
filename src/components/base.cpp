@@ -21,7 +21,7 @@
 #include <sstream>
 
 #include "entity.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #ifdef _DEBUG_COMPONENTS
 #   include "logger.hpp"
 #endif
@@ -35,7 +35,7 @@ Components::Base::Base(std::shared_ptr<Entity> parent,
     {
         std::ostringstream ss;
         ss << "parent of \"" << debugName << "\" cannot be null";
-        throw Exception(ss.str());
+        throw Exceptions::Base(ss.str());
     }
 }
 

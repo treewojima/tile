@@ -21,6 +21,11 @@
 #include "defines.hpp"
 #include "stringable.hpp"
 
+#ifdef _DEBUG
+//#   define _DEBUG_EVENTS
+//#	  define _DEBUG_NEW_EVENTS
+#endif
+
 namespace Events
 {
     class Base : public Stringable

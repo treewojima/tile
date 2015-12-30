@@ -15,32 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LEVEL_HPP__
-#define __LEVEL_HPP__
+#ifndef __EXCEPTION_HPP__
+#define __EXCEPTION_HPP__
 
 #include "defines.hpp"
-
-#if !defined(_USE_NEW_ENTITY) || !defined(_USE_NEW_COMPONENTS)
-
-#include <list>
-#include <memory>
+#include <GL/glew.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#ifdef _ENABLE_AUDIO
+#   include <SDL2/SDL_mixer.h>
+#endif
+#include <sstream>
+#include <stdexcept>
 #include <string>
-#include "entity.hpp"
+#include "stringable.hpp"
 
-class Level
+namespace Exceptions
+{
+    class Base : public std::runtime_error, public Stringable
+    {
+    public:
+        using std::runtime_error::runtime_error;
+
+        std::string toString() const { return what(); }
+    };
+}
+
+#ifdef _ENABLE_AUDIO
+#error move this class to another file
+class SDLMixerException : public SDLException
 {
 public:
-    Level(const std::string &filename);
-    ~Level();
-
-    void update(float dt);
-    void draw();
-    void cullDeadEntities();
-
-private:
-    std::list<std::shared_ptr<Entity>> _entities;
+    SDLMixerException(const std::string &msg) : SDLException(msg) {}
+    SDLMixerException() : SDLException(Mix_GetError()) {}
 };
-
 #endif
 
 #endif

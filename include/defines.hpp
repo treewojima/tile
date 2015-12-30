@@ -24,16 +24,8 @@
 #define _USE_NEW_ENTITY
 #define _USE_NEW_COMPONENTS
 //#define _NO_PROGRAM_OPTIONS
+#define _USE_NEW_UUID
 
 //#define _ENABLE_AUDIO
-
-#ifdef _DEBUG
-//#   define _TEST_TEXTURE_DIMENSIONS
-//#   define _DEBUG_EVENTS
-//#   define _DEBUG_TEXTURES
-//#   define _DEBUG_ENTITIES
-//#   define _DEBUG_COMPONENTS
-//#	define _DEBUG_NEW_EVENTS
-#endif
 
 #endif

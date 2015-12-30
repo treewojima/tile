@@ -19,7 +19,6 @@
 #include "systems/base.hpp"
 
 #include "entitymanager.hpp"
-#include "exception.hpp"
 #include "logger.hpp"
 
 Systems::Base::Base() :

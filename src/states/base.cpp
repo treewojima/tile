@@ -15,43 +15,12 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __STATE_HPP__
-#define __STATE_HPP__
-
 #include "defines.hpp"
+#include "states/base.hpp"
 
-class State
+#include "game.hpp"
+
+bool States::Base::isActive() const
 {
-public:
-	// I don't like this...
-	enum class Type
-	{
-		Main,
-		Paused
-	};
-
-protected:
-	State(Type type) : _type(type) {}
-
-public:
-	virtual ~State() {}
-
-	virtual void initialize() {}
-	virtual void destroy() {}
-
-	virtual void preLoop() {}
-	virtual void postLoop() {}
-
-	virtual void update(float dt) {}
-	virtual void draw() {}
-
-	bool isActive() const;
-	Type getType() const { return _type; }
-
-private:
-	Type _type;
-};
-
-
-
-#endif
+	return (this == Game::getStateMgr().peek().get());
+}

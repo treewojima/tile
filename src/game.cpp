@@ -32,14 +32,13 @@
 #include <sstream>
 
 #include "colors.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "graphics.hpp"
 #include "helper_events.hpp"
-#include "level.hpp"
 #include "logger.hpp"
 #include "map.hpp"
-#include "states/maingamestate.hpp"
-#include "states/pausedstate.hpp"
+#include "states/maingame.hpp"
+#include "states/paused.hpp"
 #include "texture.hpp"
 #include "timer.hpp"
 #include "window.hpp"
@@ -129,7 +128,7 @@ void Game::run(const Game::Options &options)
     registerEvents();
 
 	// Create the initial main game state
-    _stateMgr->push(std::make_shared<MainGameState>());
+    _stateMgr->push(std::make_shared<States::MainGame>());
 
     // Main loop variables
     Timer stepTimer;
@@ -161,7 +160,7 @@ void Game::run(const Game::Options &options)
             auto state = _stateMgr->peek();
 			if (!state)
 			{
-				throw EmptyStateStackException();
+                throw Exceptions::EmptyStateStack();
 			}
 
 			// Pre-processing
@@ -174,10 +173,11 @@ void Game::run(const Game::Options &options)
             // since the last step
             dt = stepTimer.getTicks() / 1000.f;
 			state->update(dt);
-            stepTimer.start();
 
             // Update the screen
-			state->draw();
+            state->draw(dt);
+
+            stepTimer.start();
 
             // Post-processing
 			state->postLoop();
@@ -185,6 +185,11 @@ void Game::run(const Game::Options &options)
         catch (std::exception &e)
         {
             LOG_ERROR << "EXCEPTION: " << e.what();
+            setRunning(false);
+        }
+        catch (...)
+        {
+            LOG_ERROR << "UNKNOWN/UNHANDLED EXCEPTION";
             setRunning(false);
         }
 
@@ -289,7 +294,7 @@ void initSDL()
 #endif
 	if (SDL_Init(flags))
 	{
-		throw SDLException();
+        throw Exceptions::SDLException();
 	}
 
     SDL_version version;
@@ -302,7 +307,7 @@ void initSDL()
     if (!(IMG_Init(flags) & flags))
     {
         SDL_Quit();
-        throw SDLImageException();
+        throw Exceptions::SDLImageException();
     }
 }
 
@@ -313,7 +318,7 @@ void initGL()
     {
         Window::destroy();
         shutdownSDL();
-        throw GLEWException(errorCode);
+        throw Exceptions::GLEWException(errorCode);
     }
 
     LOG_INFO << "using GLEW " << glewGetString(GLEW_VERSION);
@@ -344,7 +349,7 @@ void initGL()
     {
         Window::destroy();
         shutdownSDL();
-        throw GLException(errorCode);
+        throw Exceptions::GLException(errorCode);
     }
 }
 
@@ -389,7 +394,7 @@ void registerEvents()
     // Register a custom keyboard event designed to fire every "tick"
     Game::Event::CUSTOM_KEYPRESS_EVENT = SDL_RegisterEvents(1);
     if (Game::Event::CUSTOM_KEYPRESS_EVENT == (Uint32)-1)
-        throw SDLException();
+        throw Exceptions::SDLException();
 
     // Window/program quit event
     Game::registerEvent(std::make_shared<Game::QuitEvent>());
@@ -427,13 +432,13 @@ void handleEvents()
 
 void togglePause()
 {
-    if (_stateMgr->peek()->getType() == State::Type::Paused)
+    if (_stateMgr->peek()->getType() == States::Type::Paused)
 	{
         _stateMgr->pop();
 	}
 	else
 	{
-        _stateMgr->push(std::make_shared<PausedState>());
+        _stateMgr->push(std::make_shared<States::Paused>());
 	}
 }
 

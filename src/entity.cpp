@@ -16,46 +16,39 @@
  */
 
 #include "defines.hpp"
-
-#ifndef _USE_NEW_ENTITY
-
 #include "entity.hpp"
 
-#include <cassert>
-#include <cmath>
-#include <GL/glew.h>
-#include <SDL2/SDL.h>
 #include <sstream>
 
+#include "entitymanager.hpp"
+#include "events/dispatcher.hpp"
+#include "game.hpp"
 #include "logger.hpp"
 
-Entity::Entity(const std::string &name) :
-    position(nullptr),
-    graphics(nullptr),
-    properties(std::make_shared<Components::PropertyList>()),
-    _name(name),
-    _markedForDeath(false)
+std::shared_ptr<Entity> Entity::create(const std::string &debugName)
+{
+    return Game::getEntityMgr().createEntity(debugName);
+}
+
+Entity::Entity(UUID uuid, const std::string &debugName) :
+    _uuid(uuid),
+    _debugName(debugName)
 {
 #ifdef _DEBUG_ENTITIES
-    LOG_DEBUG << "created entity " << getName();
+    LOG_DEBUG << "created entity " << toString();
 #endif
 }
 
 Entity::~Entity()
 {
 #ifdef _DEBUG_ENTITIES
-    LOG_DEBUG << "destroyed entity " << getName();
+    LOG_DEBUG << "destroyed entity " << toString();
 #endif
 }
 
 std::string Entity::toString() const
 {
     std::ostringstream ss;
-    ss << "Entity[name = \"" << getName() << "\", position = "
-       << (position.get() != nullptr ? position->toString() : "<null>")
-       << ", graphics = "
-       << (graphics.get() != nullptr ? graphics->toString() : "<null>") << "]";
+    ss << "Entity[uuid = " << _uuid << ", debugName = \"" << _debugName << "\"]";
     return ss.str();
 }
-
-#endif

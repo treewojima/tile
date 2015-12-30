@@ -19,17 +19,18 @@
 #define __SYSTEMS_INPUT_HPP__
 
 #include "defines.hpp"
+#include "events/subscriber.hpp"
 #include "systems/base.hpp"
 
 namespace Systems
 {
-	class Input : public Base
+    class Input : public Base
 	{
 	public:
 		Input();
 		~Input();
 
-
+        void update(float dt);
 	};
 }
 

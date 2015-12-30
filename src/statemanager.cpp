@@ -45,8 +45,8 @@ void StateManager::push(StatePtr state)
 StateManager::StatePtr StateManager::pop()
 {
 	auto state = peek();
-	if (state == nullptr)
-		throw EmptyStateStackException();
+    if (!state)
+        throw Exceptions::EmptyStateStack();
 
 	_stateStack.pop();
 	state->destroy();

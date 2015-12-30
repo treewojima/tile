@@ -24,10 +24,11 @@
 #include <map>
 
 #include "components/graphics/sprite.hpp"
+#include "events/subscriber.hpp"
 
 namespace Systems
 {
-    class Graphics : public Base
+    class Graphics : public Base, public Events::Subscriber
     {
     public:
         Graphics();

@@ -58,7 +58,12 @@ void EntityManager::destroy()
 
 std::shared_ptr<Entity> EntityManager::createEntity(const std::string &debugName)
 {
-    auto entity = std::shared_ptr<Entity>(new Entity(_generator(), debugName));
+#ifdef _USE_NEW_UUID
+    UUID uuid = uuid::generate();
+#else
+    UUID uuid = _generator();
+#endif
+    auto entity = std::shared_ptr<Entity>(new Entity(uuid, debugName));
 
     EntityComponentsPair pair;
     pair.first = entity;

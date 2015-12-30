@@ -25,12 +25,11 @@
 #include <typeindex>
 #include <unordered_map>
 
-#include "events/subscriber.hpp"
 #include "stringable.hpp"
 
 namespace Systems
 {
-    class Base : public Events::Subscriber
+    class Base : public Stringable
     {
     public:
         template <class T>

@@ -15,39 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WINDOW_HPP__
-#define __WINDOW_HPP__
+#ifndef __UUID_HPP__
+#define __UUID_HPP__
 
 #include "defines.hpp"
+#include <cstdint>
 
-#include <memory>
-
-#include "exceptions.hpp"
-#include "texture.hpp"
-#include "vector.hpp"
-
-namespace Window
+namespace uuid
 {
-    void create(int width, int height, bool vsync);
-    void destroy();
+    typedef uint64_t uuid;
 
-    void clear(float r = 0, float g = 0, float b = 0, float a = 0);
-    void flip();
-
-    void setTitle(const std::string &title);
-
-    Vector2i getDimensions();
-    inline int getWidth() { return getDimensions().x; }
-    inline int getHeight() { return getDimensions().y; }
-}
-
-namespace Exceptions
-{
-    class WindowException : public Base
-    {
-    public:
-        using Base::Base;
-    };
+    void initialize();
+    uuid generate();
 }
 
 #endif
+

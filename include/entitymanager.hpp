@@ -20,15 +20,18 @@
 
 #include "defines.hpp"
 
-#include <boost/uuid/random_generator.hpp>
+#ifndef _USE_NEW_UUID
+#   include <boost/uuid/random_generator.hpp>
+#endif
 #include <unordered_map>
 
 #include "components/base.hpp"
 #include "entity.hpp"
 #include "events/subscriber.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "logger.hpp"
 #include "systems/base.hpp"
+
 
 class EntityManager : public Events::Subscriber
 {
@@ -54,15 +57,21 @@ public:
 
 private:
     bool _destroyed;
-    boost::uuids::random_generator _generator;	
-	
+#ifndef _USE_NEW_UUID
+    boost::uuids::random_generator _generator;
+#endif
+
     // Subject to change based on performance considerations
     typedef Systems::Base::ComponentMap<Components::Base> ComponentMap; 
-	typedef std::pair<std::shared_ptr<Entity>, ComponentMap>
-            EntityComponentsPair;
+    typedef std::pair<std::shared_ptr<Entity>, ComponentMap> EntityComponentsPair;
+
+#ifdef _USE_NEW_UUID
+    typedef std::unordered_map<UUID, EntityComponentsPair> EntityMap;
+#else
 	typedef std::unordered_map<UUID,
 							   EntityComponentsPair,
 							   boost::hash<boost::uuids::uuid>> EntityMap;
+#endif
 
     EntityMap _map;
 };
@@ -83,7 +92,7 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 	{
 		std::ostringstream ss;
 		ss << "no such entity for UUID " << uuid;
-		throw Exception(ss.str());
+        throw Exceptions::Base(ss.str());
 	}
 
 	// Try to find an entry for type T
@@ -100,7 +109,7 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 		ss << "no entry for component of type "
 		   << boost::core::demangle(typeid(T).name())
 		   << " in entity " << pair->first;
-		throw Exception(ss.str());
+        throw Exceptions::Base(ss.str());
 	}
 
 	// Make sure the pointer isn't null
@@ -110,7 +119,7 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 		ss << "entry for component of type "
 		   << boost::core::demangle(typeid(T).name())
 		   << " in entity " << pair->first << "is null";
-		throw Exception(ss.str());
+        throw Exceptions::Base(ss.str());
 	}
 
 	// Cast to the proper derived type
@@ -122,7 +131,7 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 		ss << "could not cast component from Components::Base to "
 		   << boost::core::demangle(typeid(T).name()) << " in entity "
 		   << pair->first;
-		throw Exception(ss.str());
+        throw Exceptions::Base(ss.str());
     }
 
     return ptr;

@@ -15,7 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "states/maingamestate.hpp"
+#include "defines.hpp"
+#include "states/maingame.hpp"
 
 #include <sstream>
 
@@ -25,9 +26,9 @@
 #include "logger.hpp"
 #include "systems/graphics.hpp"
 
-void MainGameState::initialize()
+void States::MainGame::initialize()
 {
-    LOG_DEBUG << "initialized MainGameState";
+    LOG_DEBUG << "initialized States::MainGame";
 
     loadTextures();
     createEntities();
@@ -35,51 +36,25 @@ void MainGameState::initialize()
     //_map = std::make_unique<Map>("desert", "res/desert.tmx");
 }
 
-void MainGameState::destroy()
+void States::MainGame::destroy()
 {
-    //if (_map.get() != nullptr) _map.reset();
-    //_entities.clear();
-
     LOG_DEBUG << "destroyed MainGameState";
 }
 
-void MainGameState::postLoop()
+void States::MainGame::postLoop()
 {
-    // Cull dead entities
-    /*_entities.remove_if([](std::shared_ptr<Entity> e)
-    {
-        return e->isMarkedForDeath();
-    });*/
 }
 
-void MainGameState::update(float dt)
+void States::MainGame::update(float dt)
 {
-    /*for (auto entity : _entities)
-    {
-        entity->update(dt);
-    }*/
 }
 
-void MainGameState::draw()
+void States::MainGame::draw(float dt)
 {
-    /*Window::clear(255, 255, 255);
-
-    _map->draw();
-
-    for (auto entity : _entities)
-    {
-        if (entity->graphics.get() != nullptr)
-        {
-            entity->graphics->draw();
-        }
-    }
-
-    Window::flip();*/
-
-    Game::getGraphicsSys().draw();
+    Game::getGraphicsSys().update(dt);
 }
 
-void MainGameState::loadTextures()
+void States::MainGame::loadTextures()
 {
     const SDL_Color colorKey = Colors::makeColor(255, 0, 255);
     std::shared_ptr<Texture> texture;
@@ -99,7 +74,7 @@ void MainGameState::loadTextures()
     }
 }
 
-void MainGameState::createEntities()
+void States::MainGame::createEntities()
 {
 #if 0
     //_entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));

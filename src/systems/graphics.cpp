@@ -65,7 +65,7 @@ void Systems::Graphics::update(float dt)
         {
 			std::ostringstream ss;
 			ss << "no matching position component for " << sprite;
-			throw Exception(ss.str());
+            throw Exceptions::Base(ss.str());
         }
     }
 

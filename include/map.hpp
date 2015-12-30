@@ -26,7 +26,7 @@
 #include <tmx/Map.h>
 
 #include "entity.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "stringable.hpp"
 #include "texture.hpp"
 
@@ -62,10 +62,13 @@ private:
     void loadTilesetTextures();
 };
 
-class MapException : public Exception
+namespace Exceptions
 {
-public:
-	using Exception::Exception;
-};
+    class MapException : public Base
+    {
+    public:
+        using Base::Base;
+    };
+}
 
 #endif

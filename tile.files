@@ -1,5 +1,5 @@
 include/defines.hpp
-include/exception.hpp
+include/exceptions.hpp
 include/game.hpp
 include/texture.hpp
 include/timer.hpp
@@ -17,8 +17,6 @@ include/colors.hpp
 src/colors.cpp
 include/helper_events.hpp
 src/helper_events.cpp
-include/level.hpp
-src/level.cpp
 include/entities/ball.hpp
 include/entities/block.hpp
 include/entities/cursor.hpp
@@ -83,8 +81,7 @@ include/components/position.hpp
 include/components/staticsprite.hpp
 include/entities/dog.hpp
 include/entities/tux.hpp
-include/states/maingamestate.hpp
-include/states/pausedstate.hpp
+include/states/paused.hpp
 include/tmx/Adaptor.h
 include/tmx/Cell.h
 include/tmx/Component.h
@@ -112,7 +109,6 @@ include/level.hpp
 include/logger.hpp
 include/map.hpp
 include/resourcemanager.hpp
-include/state.hpp
 include/statemanager.hpp
 include/texture.hpp
 include/timer.hpp
@@ -125,8 +121,7 @@ src/components/position.cpp
 src/components/staticsprite.cpp
 src/entities/dog.cpp
 src/entities/tux.cpp
-src/states/maingamestate.cpp
-src/states/pausedstate.cpp
+src/states/paused.cpp
 src/tmx/Component.cpp
 src/tmx/Layers.cpp
 src/tmx/LayerVisitor.cpp
@@ -328,7 +323,6 @@ src/texture.cpp
 src/timer.cpp
 src/vector.cpp
 src/window.cpp
-include/new_entity.hpp
 include/entitymanager.hpp
 include/actions/base.hpp
 include/actions/movement.hpp
@@ -444,8 +438,8 @@ src/components/new_base.cpp
 src/entitymanager.cpp
 src/systems/graphics.cpp
 src/systems/base.cpp
-include/states/new_maingamestate.hpp
-src/states/new_maingamestate.cpp
+include/states/maingame.hpp
+src/states/maingame.cpp
 include/events/base.hpp
 include/events/dispatcher.hpp
 include/events/subscriber.hpp
@@ -494,4 +488,12 @@ src/texture.cpp
 src/timer.cpp
 src/vector.cpp
 src/window.cpp
-src/new_entity.cpp
+include/events/callback.hpp
+src/events/callback.cpp
+include/states/base.hpp
+src/states/base.cpp
+include/systems/input.hpp
+include/components/inputhandler.hpp
+src/components/inputhandler.cpp
+include/uuid.hpp
+src/uuid.cpp

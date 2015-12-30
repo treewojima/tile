@@ -22,7 +22,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "colors.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "game.hpp"
 
 SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
@@ -33,7 +33,7 @@ SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
     {
         std::ostringstream ss;
         ss << "unable to load \"" << filename << "\": " << IMG_GetError();
-        throw SDLImageException(ss.str());
+        throw Exceptions::SDLImageException(ss.str());
     }
 
     if (optimize)
@@ -70,7 +70,7 @@ SDL_Surface *Graphics::optimizeSDLSurface(SDL_Surface *surface, bool freeSurface
                                                  Colors::BMASK,
                                                  Colors::AMASK);
     if (!optimizedSurface)
-        throw SDLException();
+        throw Exceptions::SDLException();
 
     SDL_BlitSurface(surface, nullptr, optimizedSurface, nullptr);
 
@@ -91,7 +91,7 @@ SDL_Surface *Graphics::createBlankSDLSurface(int width, int height, SDL_Color co
                                         Colors::BMASK,
                                         Colors::AMASK);
     if (surface == nullptr)
-        throw SDLException();
+        throw Exceptions::SDLException();
 
     SDL_FillRect(surface,
                  nullptr,

@@ -10,8 +10,7 @@ CFLAGS     := -c -pipe -ggdb3 -std=c++14 $(WARNINGS) \
 LFLAGS     := -lSDL2 -lSDL2_image -lSDL2_mixer -lpthread -lGLEW -lGL -lGLU \
               -ltinyxml2 -lz $(BOOST_LIBS)
 PROJDIRS   := src include
-SOURCES    := $(shell find $(PROJDIRS) -type f -name "*.cpp")
-#HEADERS    := $(shell find $(PROJDIRS) -type f -name "*.hpp")
+SOURCES    := $(shell find $(PROJDIRS) -type d -name ".old" -prune -o -type f -name "*.cpp" -print)
 OBJECTS    := $(patsubst %.cpp, %.o, $(SOURCES))
 DEPFILES   := $(patsubst %.cpp, %.dep, $(SOURCES))
 TARGET     := tile

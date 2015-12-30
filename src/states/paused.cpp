@@ -15,22 +15,23 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "states/pausedstate.hpp"
+#include "defines.hpp"
+#include "states/paused.hpp"
 
 #include "logger.hpp"
 #include "window.hpp"
 
-void PausedState::initialize()
+void States::Paused::initialize()
 {
 	LOG_DEBUG << "initialized PausedState";
 }
 
-void PausedState::destroy()
+void States::Paused::destroy()
 {
 	LOG_DEBUG << "destroyed PausedState";
 }
 
-void PausedState::draw()
+void States::Paused::draw(float dt)
 {
 	Window::clear(0, 0, 255);
 	Window::flip();

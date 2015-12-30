@@ -27,7 +27,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "exception.hpp"
+#include "exceptions.hpp"
 //#include "logger.hpp"
 
 template <class T>
@@ -118,7 +118,7 @@ void ResourceManager<T>::add(const Key &name, Resource resource)
         std::ostringstream ss;
         ss << "could not insert new resource \"" << name
                   << "\" into ResourceManager: duplicate key";
-        throw Exception(ss.str());
+        throw Exceptions::Base(ss.str());
     }
 }
 

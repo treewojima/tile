@@ -15,39 +15,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WINDOW_HPP__
-#define __WINDOW_HPP__
+#include "uuid.hpp"
 
-#include "defines.hpp"
+#include <cstdlib>
+#include <ctime>
 
-#include <memory>
-
-#include "exceptions.hpp"
-#include "texture.hpp"
-#include "vector.hpp"
-
-namespace Window
+namespace
 {
-    void create(int width, int height, bool vsync);
-    void destroy();
-
-    void clear(float r = 0, float g = 0, float b = 0, float a = 0);
-    void flip();
-
-    void setTitle(const std::string &title);
-
-    Vector2i getDimensions();
-    inline int getWidth() { return getDimensions().x; }
-    inline int getHeight() { return getDimensions().y; }
+    bool _initialized = false;
+    uuid::uuid _state[2];
 }
 
-namespace Exceptions
+void uuid::initialize()
 {
-    class WindowException : public Base
-    {
-    public:
-        using Base::Base;
-    };
+    using namespace std;
+
+    srand(time(nullptr));
+    _state[0] = rand();
+    _state[1] = rand();
+
+    _initialized = true;
 }
 
-#endif
+uuid::uuid uuid::generate()
+{
+    if (!_initialized) initialize();
+
+    // This uses the xorshift128+ random number method, it's basically a
+    // random number generator
+    uuid x = _state[0];
+    uuid const y = _state[1];
+    _state[0] = y;
+    x ^= x << 23;
+    _state[1] = x ^ y ^ (x >> 17) ^ (y >> 26);
+    return _state[1] + y;
+}

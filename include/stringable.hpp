@@ -15,8 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ISTRINGABLE_HPP__
-#define __ISTRINGABLE_HPP__
+#ifndef __STRINGABLE_HPP__
+#define __STRINGABLE_HPP__
 
 #include "defines.hpp"
 

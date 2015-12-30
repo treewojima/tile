@@ -23,8 +23,8 @@
 #include <memory>
 #include <stack>
 
-#include "exception.hpp"
-#include "state.hpp"
+#include "exceptions.hpp"
+#include "states/base.hpp"
 
 class StateManager
 {
@@ -33,7 +33,7 @@ public:
 	~StateManager();
 	void destroy();
 
-	typedef std::shared_ptr<State> StatePtr;
+    typedef std::shared_ptr<States::Base> StatePtr;
 
 	void push(StatePtr state);
 	StatePtr pop();
@@ -46,10 +46,13 @@ private:
 	StateStack _stateStack;
 };
 
-class EmptyStateStackException : public Exception
+namespace Exceptions
 {
-public:
-	EmptyStateStackException() : Exception("State stack is empty") {}
-};
+    class EmptyStateStack : public Base
+    {
+    public:
+        EmptyStateStack() : Base("State stack is empty") {}
+    };
+}
 
 #endif

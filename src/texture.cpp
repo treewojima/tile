@@ -25,7 +25,7 @@
 #include <sstream>
 
 #include "colors.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "game.hpp"
 #include "graphics.hpp"
 #include "logger.hpp"
@@ -66,7 +66,7 @@ Texture::Texture(const std::string &name,
     _height(0)
 {
     if (!surface)
-        throw SDLException("null surface passed to Texture constructor");
+        throw Exceptions::SDLException("null surface passed to Texture constructor");
 
     copySurfaceToGL(surface, colorKey, optimize);
     if (freeSurface)
@@ -126,7 +126,7 @@ void Texture::copySurfaceToGL(SDL_Surface *surface,
         std::ostringstream ss;
         ss << "intermediate SDL_Surface for texture \"" << getName()
            << "\" is not truecolor (24 or 32 bpp)";
-        throw SDLException(ss.str());
+        throw Exceptions::SDLException(ss.str());
     }
 
     // Loop through the surface pixel data and override the alpha value for any pixels

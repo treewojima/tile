@@ -21,7 +21,6 @@
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 
-#include "exception.hpp"
 #include "game.hpp"
 #include "graphics.hpp"
 #include "logger.hpp"
@@ -40,7 +39,7 @@ void Window::create(int width, int height, bool vsync)
 		std::ostringstream ss;
 		ss << "width and height must be greater than zero (received values "
 		   << width << "x" << height << ")";
-		throw Exception(ss.str());
+        throw Exceptions::WindowException(ss.str());
 	}
 
 	// Double buffering
@@ -54,7 +53,7 @@ void Window::create(int width, int height, bool vsync)
                                height,
                                SDL_WINDOW_OPENGL);
     if (_window == nullptr)
-        throw SDLException();
+        throw Exceptions::SDLException();
 
     LOG_INFO << "created window (width = " << width
              << ", height = " << height << ")";
@@ -64,7 +63,7 @@ void Window::create(int width, int height, bool vsync)
     if (!_glContext)
     {
         SDL_DestroyWindow(_window);
-        throw SDLException();
+        throw Exceptions::SDLException();
     }
 
 	if (vsync)
@@ -76,7 +75,7 @@ void Window::create(int width, int height, bool vsync)
 			if (SDL_GL_SetSwapInterval(1) < 0)
 			{
 				// Couldn't enable vsync
-				throw SDLException();
+                throw Exceptions::SDLException();
 			}
 
 			LOG_INFO << "vsync enabled";
@@ -89,7 +88,7 @@ void Window::create(int width, int height, bool vsync)
 	else
 	{
 		if (SDL_GL_SetSwapInterval(0) < 0)
-			throw SDLException();
+            throw Exceptions::SDLException();
 		LOG_INFO << "vsync disabled";
 	}
 }

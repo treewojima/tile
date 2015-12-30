@@ -27,7 +27,7 @@
 #include "components/mapposition.hpp"
 #include "components/position.hpp"
 #include "entity.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "game.hpp"
 #include "graphics.hpp"
 #include "window.hpp"
@@ -97,7 +97,7 @@ void Map::loadTilesetTextures()
 			std::ostringstream ss;
 			ss << "Map " << _filename << " does not have a tile width of "
 			   << TILE_WIDTH << " (" << tileWidth << " instead)";
-			throw Exception(ss.str());
+            throw Exceptions::MapException(ss.str());
 		}
 
 		const int tileHeight = tileset->getTileHeight();
@@ -106,7 +106,7 @@ void Map::loadTilesetTextures()
 			std::ostringstream ss;
 			ss << "Map " << _filename << " does not have a tile height of "
 				<< TILE_HEIGHT << " (" << tileHeight << " instead)";
-			throw Exception(ss.str());
+            throw Exceptions::Base(ss.str());
 		}
 
         const int tilesetWidth = tilesetSurface->w;
@@ -179,7 +179,7 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
     unsigned cellID = 0;
     for (auto &cell : layer)
     {
-		bool passable = (layer.getProperty("passable", "true") == "true" ? true : false);
+        //bool passable = (layer.getProperty("passable", "true") == "true" ? true : false);
 
         auto gid = cell.getGID();
         if (gid)
@@ -195,8 +195,8 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
 			assert(col < map.getWidth());
             auto row = cellID / map.getWidth();
             assert(row < map.getHeight());
-            float x = col * map.getTileWidth();
-            float y = row * map.getTileHeight();
+            //float x = col * map.getTileWidth();
+            //float y = row * map.getTileHeight();
 
             // Create the ***TEST*** entity
             std::ostringstream entityName;

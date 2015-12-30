@@ -28,6 +28,10 @@
 #include "events/base.hpp"
 #include "stringable.hpp"
 
+#ifdef _DEBUG
+//#   define _DEBUG_COMPONENTS
+#endif
+
 class Entity;
 
 namespace Components

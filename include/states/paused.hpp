@@ -15,11 +15,25 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "state.hpp"
+#ifndef __PAUSEDSTATE_HPP__
+#define __PAUSEDSTATE_HPP__
 
-#include "game.hpp"
+#include "defines.hpp"
+#include "states/base.hpp"
 
-bool State::isActive() const
+namespace States
 {
-	return (this == Game::getStateMgr().peek().get());
+    class Paused : public Base
+    {
+    public:
+        Paused() : Base(Type::Paused) {}
+
+        void initialize();
+        void destroy();
+
+        void draw(float dt);
+    };
 }
+
+#endif
+
