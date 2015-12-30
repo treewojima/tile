@@ -63,6 +63,8 @@ public:
     inline UUID getUUID() const { return _uuid; }
     inline std::string getDebugName() const { return _debugName; }
 
+    bool dirty;
+
     std::string toString() const;
 
 private:

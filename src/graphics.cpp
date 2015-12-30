@@ -25,6 +25,46 @@
 #include "exceptions.hpp"
 #include "game.hpp"
 
+void Graphics::Batch::draw()
+{
+    for (auto &pair : _map)
+    {
+        auto &key = pair.first;
+        auto &list = pair.second;
+
+        for (auto &pos : list)
+        {
+            blitTexture(key, pos);
+        }
+    }
+}
+
+void Graphics::Batch::queueBlit(TextureManager::Key &texture,
+                                const Vector2f &pos)
+{
+    if (!_map.count(texture))
+    {
+        _map[texture] = { pos };
+    }
+    else
+    {
+        _map[texture].push_back(pos);
+    }
+}
+
+void Graphics::Batch::queueBlit(TextureManager::Key &texture,
+                                const Vector2f &&pos)
+{
+    if (!_map.count(texture))
+    {
+        _map[texture] = { std::move(pos) };
+    }
+    else
+    {
+        _map[texture].push_back(std::move(pos));
+    }
+}
+
 SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
                                       bool optimize)
 {

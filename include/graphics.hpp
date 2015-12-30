@@ -20,10 +20,12 @@
 
 #include "defines.hpp"
 
+#include <list>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include "colors.hpp"
 #include "exceptions.hpp"
@@ -33,6 +35,33 @@
 // Miscellaneous graphics routines
 namespace Graphics
 {
+    // Container class for drawing texture/sprite batches
+    // TODO: reorganize this later
+    class Batch
+    {
+    public:
+        void draw();
+
+        void queueBlit(TextureManager::Key &texture, const Vector2f &pos);
+        void queueBlit(TextureManager::Key &texture, const Vector2f &&pos);
+
+        inline void queueBlit(TextureManager::Key &texture, float x, float y)
+        {
+            queueBlit(texture, std::move(Vector2f(x, y)));
+        }
+
+        inline void queueBlit(TextureManager::Key &texture, const Vector2i &pos)
+        {
+            queueBlit(texture, std::move(Vector2f(pos.x, pos.y)));
+        }
+
+    private:
+        typedef std::list<Vector2f> PositionList;
+        typedef std::unordered_map<TextureManager::Key, PositionList> BatchMap;
+
+        BatchMap _map;
+    };
+
     // NOTE: The default arguments for "optimize" and "freeSurface" were
     //       originally true, but have been changed to false because
     //       SDL_FreeSurface kept erroring out. Investigate this later!
