@@ -18,6 +18,11 @@
 #include "defines.hpp"
 #include "colors.hpp"
 
+#include <sstream>
+
+#include "exceptions.hpp"
+#include "logger.hpp"
+
 #define MAKE_COLOR(r, g, b, a) \
     SDL_Color { (r), (g), (b), (a) }
 
@@ -46,7 +51,37 @@ SDL_Color Colors::makeColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     return MAKE_COLOR(r, g, b, a);
 }
 
+SDL_Color Colors::makeColor(uint32_t c)
+{
+    return makeColor(c >> 24,
+                     c >> 16,
+                     c >> 8,
+                     c);
+}
 
+SDL_Color Colors::parseRGBHexString(std::string s)
+{
+    // Passed in as a 24-bit color w/o alpha
+    if (s.size() == 6)
+    {
+        s += "FF";
+    }
+
+    if (s.size() != 8)
+    {
+        std::ostringstream ss;
+        ss << "Unable to parse hex color string \"" << s << "\"";
+        throw Exceptions::Base(s);
+    }
+
+    uint32_t c;
+    std::stringstream stream;
+
+    stream << std::hex << s;
+    stream >> c;
+
+    return makeColor(c);
+}
 
 uint32_t Colors::convertToUint32(const SDL_Color &color,
                                  const SDL_PixelFormat *format)

@@ -40,6 +40,9 @@ std::shared_ptr<Entity> createDog()
 	Components::Position::create(dog,
 								 Window::getWidth() / 2,
 							     Window::getHeight() / 2);
+    Components::MapPosition::create(dog,
+                                    Window::getWidth() / 64,
+                                    Window::getHeight() / 64);
     Components::Graphics::Sprite::create(dog,
                                          texture->getName(),
                                          "Down");

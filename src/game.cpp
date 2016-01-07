@@ -32,6 +32,7 @@
 #include <sstream>
 
 #include "colors.hpp"
+#include "events/dispatcher.hpp"
 #include "exceptions.hpp"
 #include "graphics.hpp"
 #include "helper_events.hpp"
@@ -88,6 +89,16 @@ namespace
     void handleEvents();
 
 	void togglePause();
+
+    // TEST
+    class MouseDownSubscriber : public Events::Subscriber
+    {
+    public:
+        void onEvent(const Events::MouseDown &event);
+
+        std::string toString() const { return "MouseDownSubscriber"; }
+    };
+    MouseDownSubscriber _subscriber;
 }
 
 void Game::run(const Game::Options &options)
@@ -409,6 +420,9 @@ void registerEvents()
 			SDL_SCANCODE_SPACE,
 			[](const SDL_Event &e) { togglePause(); },
 			"SpaceEvent");
+
+    // New-style mouse event (TEST)
+    Events::Dispatcher::subscribe<Events::MouseDown>(_subscriber);
 }
 
 void handleEvents()
@@ -423,9 +437,28 @@ void handleEvents()
     event = {0};
     while (SDL_PollEvent(&event))
     {
-        for (auto &pair : _events)
+        if (event.type == SDL_MOUSEBUTTONDOWN)
         {
-            if (pair.second->test(event)) pair.second->fire(event);
+            Events::MouseDown::Button button;
+            Vector2i position;
+
+            if (event.button.button == SDL_BUTTON_RIGHT)
+                button = Events::MouseDown::Button::Right;
+            else if (event.button.button == SDL_BUTTON_LEFT)
+                button = Events::MouseDown::Button::Left;
+            else continue;
+
+            position.x = event.button.x;
+            position.y = event.button.y;
+
+            Events::Dispatcher::raise<Events::MouseDown>(button, position);
+        }
+        else
+        {
+            for (auto &pair : _events)
+            {
+                if (pair.second->test(event)) pair.second->fire(event);
+            }
         }
     }
 }
@@ -440,6 +473,28 @@ void togglePause()
 	{
         _stateMgr->push(std::make_shared<States::Paused>());
 	}
+}
+
+void MouseDownSubscriber::onEvent(const Events::MouseDown &event)
+{
+    auto col = event.position.x / 32;
+    auto row = (Window::getHeight() - event.position.y) / 32;
+
+    LOG_DEBUG << "MouseDown event: "
+              << (event.button == Events::MouseDown::Button::Left ? "left" : "right")
+              << "@(" << col << ", " << row << ")";
+
+    std::ostringstream ss;
+    ss << "Entities at location: ";
+
+    auto list = _map->getComponentsAt(col, row);
+    for (auto &e : list)
+    {
+        ss << e->getParent()->getDebugName() << ", ";
+    }
+    ss << "<end>";
+
+    LOG_DEBUG << ss.str();
 }
 
 }

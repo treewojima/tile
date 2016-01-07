@@ -165,28 +165,6 @@ void Events::Dispatcher::raise(Args&& ... args)
     }
 }
 
-#if 0
-template <class E, class... Args>
-void Events::Dispatcher::raiseAsync(Args&& ... args)
-{
-    static_assert(std::is_base_of<Base, E>::value,
-                  "Can only raise types derived from class Event");
-
-    auto event = std::make_shared<E>(std::forward<Args>(args)...);
-    auto baseEvent = std::static_pointer_cast<Base>(event);
-
-    auto list = _asyncMap[typeid(E)];
-    for (auto &pair : list)
-    {
-        pair.second(baseEvent);
-    }
-
-#ifdef _DEBUG_NEW_EVENTS
-    LOG_DEBUG << "asynchronous event raised: " << event;
-#endif
-}
-#endif
-
 template <class E, class T>
 void Events::Dispatcher::subscribeSync(T &subscriber)
 {

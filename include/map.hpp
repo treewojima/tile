@@ -24,19 +24,29 @@
 #include <memory>
 #include <string>
 #include <tmx/Map.h>
+#include <vector>
 
-#include "entity.hpp"
+#include "components/mapposition.hpp"
+#include "events/subscriber.hpp"
 #include "exceptions.hpp"
 #include "stringable.hpp"
-#include "texture.hpp"
 
-class Map : public Stringable
+#ifdef _DEBUG
+#   define _DEBUG_MAP
+#endif
+
+class Map : public Events::Subscriber
 {
 public:
     Map(const std::string &filename);
     ~Map();
 
 	void destroy();
+
+    typedef std::list<std::shared_ptr<Components::MapPosition>> ComponentList;
+    ComponentList getComponentsAt(int col, int row);
+
+    void onEvent(const Events::MapPositionComponentCreated &event);
 
     std::string toString() const;
 
@@ -57,7 +67,13 @@ private:
 	bool _destroyed;
 	std::string _filename;
     std::unique_ptr<tmx::Map> _map;
-    std::list<std::shared_ptr<Entity>> _entities;
+
+    //std::list<std::shared_ptr<Entity>> _entities;
+    //std::list<std::shared_ptr<Components::MapPosition>> _components;
+
+    typedef std::vector<ComponentList> GridRow;
+    typedef std::vector<GridRow> PositionGrid;
+    PositionGrid _componentGrid;
 
     void loadTilesetTextures();
 };

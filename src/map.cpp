@@ -24,9 +24,9 @@
 #include <tmx/TileLayer.h>
 
 #include "colors.hpp"
-#include "components/mapposition.hpp"
 #include "components/position.hpp"
 #include "entity.hpp"
+#include "events/dispatcher.hpp"
 #include "exceptions.hpp"
 #include "game.hpp"
 #include "graphics.hpp"
@@ -39,25 +39,23 @@ Map::Map(const std::string &filename) :
     _destroyed(false),
 	_filename(filename)
 {
+    Events::Dispatcher::subscribe<Events::MapPositionComponentCreated>(*this);
+
     _map = tmx::Map::parseFile(filename);
+
+    // Resize the internal grid
+    _componentGrid.resize(Window::getWidth());
+    _componentGrid.shrink_to_fit();
+    for (auto &row : _componentGrid)
+    {
+        row.resize(Window::getHeight());
+        row.shrink_to_fit();
+    }
 
     loadTilesetTextures();
 
     LayerVisitor visitor(this);
     _map->visitLayers(visitor);
-
-#if 0
-    _map = new Tmx::Map();
-    _map->ParseFile(filename);
-    if (_map->HasError())
-    {
-        std::ostringstream ss;
-        ss << "Error " << static_cast<unsigned>(_map->GetErrorCode())
-           << " while loading Map \"" << _name << "\": " << _map->GetErrorText();
-        delete _map;
-        throw MapException(ss.str());
-    }
-#endif
 }
 
 Map::~Map()
@@ -69,9 +67,38 @@ void Map::destroy()
 {
 	if (_destroyed) return;
 
-	_entities.clear();
+    Events::Dispatcher::unsubscribe(*this);
+
+    //_entities.clear();
+    //_components.clear();
+    _componentGrid.clear();
+
+    // NOTE: should components be unregistered here?
 
 	_destroyed = true;
+}
+
+Map::ComponentList Map::getComponentsAt(int col, int row)
+{
+    try
+    {
+        return _componentGrid.at(col).at(row);
+    }
+    catch (std::out_of_range &e)
+    {
+        LOG_WARNING << __FUNCTION__ << ": coordinates out of bounds: ("
+                    << col << ", " << row << ")";
+        return ComponentList();
+    }
+}
+
+void Map::onEvent(const Events::MapPositionComponentCreated &event)
+{
+    //_parent->_entities.push_back(entity);
+    //_parent->_components.push_back(mapPos);
+
+    auto c = event.component;
+    _componentGrid[c->x][c->y].push_back(c);
 }
 
 std::string Map::toString() const
@@ -84,7 +111,9 @@ std::string Map::toString() const
 void Map::loadTilesetTextures()
 {
     // NOTE: This is very, very hacky and ignores the settings in the map file
-    const SDL_Color colorKey = Colors::makeColor(0xFF, 0, 0xFF);
+    //const SDL_Color colorKey = Colors::makeColor(0xFF, 0, 0xFF);
+    auto rgbStr = _map->getBackgroundColor().substr(1);
+    const SDL_Color colorKey = Colors::parseRGBHexString(rgbStr);
 
     for (auto tileset : _map->getTileSets())
     {
@@ -195,34 +224,29 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
 			assert(col < map.getWidth());
             auto row = cellID / map.getWidth();
             assert(row < map.getHeight());
-            //float x = col * map.getTileWidth();
-            //float y = row * map.getTileHeight();
 
-            // Create the ***TEST*** entity
+            // Create the entity
             std::ostringstream entityName;
             entityName << layerName << "-" << col << "-" << row
                        << "-" << textureName.str();
-            //auto entity = std::make_shared<Entity>(entityName.str());
 			auto entity = Entity::create(entityName.str());
 
-			Vector2i v(1 + col, map.getHeight() - row);
-			auto pos = Components::MapPosition::create(entity, v);
+            auto mapPos = Components::MapPosition::create(entity,
+                                                          col + 1,
+                                                          map.getHeight() - row);
 
-            //Vector2f pos(x + 50, Window::getHeight() - (y + 50));
-            //entity->position =
-            //        std::make_shared<Components::Position>(pos);
-			auto pos2 = Components::Position::create(entity, *pos);
+            auto absPos = Components::Position::create(entity, *mapPos);
 
             auto texture = Game::getTexMgr().get(textureName.str());
             //entity->graphics =
             //        std::make_shared<Components::StaticSprite>(texture,
             //                                                   entity->position);
 			Components::Graphics::Sprite::create(entity, textureName.str());
-			
-            _parent->_entities.push_back(entity);
 
-			LOG_DEBUG << "created entity: (" << pos->x << "," << pos->y << ") -> "
-				      << "(" << pos2->x << "," << pos2->y << ")";
+#if defined(_DEBUG_MAP) && defined(_DEBUG_ENTITIES)
+            LOG_DEBUG << "created entity: (" << mapPos->x << "," << mapPos->y << ") -> "
+                      << "(" << absPos->x << "," << absPos->y << ")";
+#endif
         }
 
         cellID++;

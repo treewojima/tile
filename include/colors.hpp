@@ -21,6 +21,7 @@
 #include "defines.hpp"
 #include <cstdint>
 #include <SDL2/SDL.h>
+#include <string>
 
 namespace Colors
 {
@@ -38,7 +39,10 @@ namespace Colors
     extern const uint32_t AMASK;
 
     SDL_Color makeColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
-    //SDL_Color makeColor(uint32_t color);
+    SDL_Color makeColor(uint32_t c);
+
+    SDL_Color parseRGBHexString(std::string s);
+
     uint32_t convertToUint32(const SDL_Color &color,
                              const SDL_PixelFormat *format);
 }

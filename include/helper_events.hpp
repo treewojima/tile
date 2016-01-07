@@ -19,8 +19,11 @@
 #define __HELPER_EVENTS_HPP__
 
 #include "defines.hpp"
+#include "events/base.hpp"
 #include "game.hpp"
 
+// Old-style events
+// TODO: port these to the new system
 namespace Game
 {
     // Helper key handler event for registerEvent()
@@ -50,6 +53,19 @@ namespace Game
 
         bool test(const SDL_Event &e);
         void fire(const SDL_Event &e);
+    };
+}
+
+// New-style events
+namespace Events
+{
+    class MouseDown : public Base
+    {
+    public:
+        enum class Button { Right, Left } button;
+        Vector2i position;
+
+        MouseDown(Button b, Vector2i pos) : Base(), button(b), position(pos) {}
     };
 }
 
