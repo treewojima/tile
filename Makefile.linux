@@ -12,7 +12,7 @@ LFLAGS     := -lSDL2 -lSDL2_image -lSDL2_mixer -lpthread -lGLEW -lGL -lGLU \
 PROJDIRS   := src include
 SOURCES    := $(shell find $(PROJDIRS) -type d -name ".old" -prune -o -type f -name "*.cpp" -print)
 OBJECTS    := $(patsubst %.cpp, %.o, $(SOURCES))
-DEPFILES   := $(patsubst %.cpp, %.dep, $(SOURCES))
+DEPFILES   := $(patsubst %.cpp, %.d, $(SOURCES))
 TARGET     := tile
 
 .PHONY: all clean
@@ -30,5 +30,5 @@ clean:
 
 %.o: %.cpp
 	@echo CC $<
-	@$(CC) -o $@ $(CFLAGS) -MMD -MP -MF$*.dep $<
+	@$(CC) -o $@ $(CFLAGS) -MMD -MP $<
 
