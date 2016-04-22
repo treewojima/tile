@@ -13,8 +13,8 @@ src/window.cpp
 Makefile
 include/camera.hpp
 src/camera.cpp
-include/colors.hpp
-src/colors.cpp
+include/color.hpp
+src/color.cpp
 include/helper_events.hpp
 include/entities/ball.hpp
 include/entities/block.hpp

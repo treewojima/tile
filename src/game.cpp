@@ -31,7 +31,7 @@
 #endif
 #include <sstream>
 
-#include "colors.hpp"
+#include "color.hpp"
 #include "events/dispatcher.hpp"
 #include "exceptions.hpp"
 #include "graphics.hpp"

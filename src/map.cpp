@@ -23,7 +23,7 @@
 #include <tmx/Cell.h>
 #include <tmx/TileLayer.h>
 
-#include "colors.hpp"
+#include "color.hpp"
 #include "components/position.hpp"
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
@@ -123,9 +123,9 @@ std::string Map::toString() const
 void Map::loadTilesetTextures()
 {
     // NOTE: This is very, very hacky and ignores the settings in the map file
-    //const SDL_Color colorKey = Colors::makeColor(0xFF, 0, 0xFF);
+    //const SDL_Color colorKey = Color::makeColor(0xFF, 0, 0xFF);
     auto rgbStr = _map->getBackgroundColor().substr(1);
-    const SDL_Color colorKey = Colors::parseRGBHexString(rgbStr);
+    const SDL_Color colorKey = Color::parseRGBHexString(rgbStr);
 
     for (auto tileset : _map->getTileSets())
     {

@@ -25,7 +25,7 @@
 
 #include "components/eventsubscriber.hpp"
 #include "components/position.hpp"
-#include "colors.hpp"
+#include "color.hpp"
 #include "events/dispatcher.hpp"
 #include "game.hpp"
 #include "helper_events.hpp"
@@ -78,7 +78,7 @@ std::shared_ptr<Entity> createDog()
 {
     auto dog = Entity::create("Dog");
 
-    SDL_Color colorKey = Colors::makeColor(255, 0, 255);
+    SDL_Color colorKey = Color::makeColor(255, 0, 255);
     auto texture = std::make_shared<Texture>("Dog", "res/dog/dog_down_0.png", &colorKey);
     Game::getTexMgr().add(texture->getName(), texture);
 
@@ -167,7 +167,7 @@ void Dog::loadTextures()
 {
 	if (_texturesLoaded) return;
 
-	const SDL_Color colorKey = Colors::makeColor(255, 0, 255);
+	const SDL_Color colorKey = Color::makeColor(255, 0, 255);
 	std::shared_ptr<Texture> texture;
 
 	for (int dir = 0; dir < Direction::NUM_DIRECTIONS; dir++)

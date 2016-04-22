@@ -20,7 +20,7 @@
 
 #include <sstream>
 
-#include "colors.hpp"
+#include "color.hpp"
 #include "entities/dog.hpp"
 #include "game.hpp"
 #include "logger.hpp"
@@ -56,7 +56,7 @@ void States::MainGame::draw(float dt)
 
 void States::MainGame::loadTextures()
 {
-    const SDL_Color colorKey = Colors::makeColor(255, 0, 255);
+    const SDL_Color colorKey = Color::makeColor(255, 0, 255);
     std::shared_ptr<Texture> texture;
 
     //texture = std::make_shared<Texture>("tux", "res/tux.png", &colorKey);

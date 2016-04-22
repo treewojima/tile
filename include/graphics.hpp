@@ -27,7 +27,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "colors.hpp"
+#include "color.hpp"
 #include "exceptions.hpp"
 #include "texture.hpp"
 #include "vector.hpp"
@@ -76,9 +76,9 @@ namespace Graphics
                                     bool freeSurface = false);
     SDL_Surface *createBlankSDLSurface(int width,
                                        int height,
-                                       SDL_Color color = Colors::WHITE);
+                                       SDL_Color color = Color::WHITE);
     inline SDL_Surface *createBlankSDLSurface(Vector2i dimensions,
-                                              SDL_Color color = Colors::WHITE)
+                                              SDL_Color color = Color::WHITE)
     {
         return createBlankSDLSurface(dimensions.x, dimensions.y, color);
     }

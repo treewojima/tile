@@ -21,7 +21,7 @@
 #include <cassert>
 #include <SDL2/SDL_image.h>
 
-#include "colors.hpp"
+#include "color.hpp"
 #include "exceptions.hpp"
 #include "game.hpp"
 
@@ -92,7 +92,7 @@ SDL_Surface *Graphics::loadSDLSurface(const std::string &filename,
     auto surface = loadSDLSurface(filename, optimize);
     SDL_SetColorKey(surface,
                     SDL_TRUE,
-                    Colors::convertToUint32(colorKey, surface->format));
+                    Color::convertToUint32(colorKey, surface->format));
     return surface;
 }
 #endif
@@ -105,10 +105,10 @@ SDL_Surface *Graphics::optimizeSDLSurface(SDL_Surface *surface, bool freeSurface
                                                  surface->w,
                                                  surface->h,
                                                  32,
-                                                 Colors::RMASK,
-                                                 Colors::GMASK,
-                                                 Colors::BMASK,
-                                                 Colors::AMASK);
+                                                 Color::RMASK,
+                                                 Color::GMASK,
+                                                 Color::BMASK,
+                                                 Color::AMASK);
     if (!optimizedSurface)
         throw Exceptions::SDLException();
 
@@ -126,10 +126,10 @@ SDL_Surface *Graphics::createBlankSDLSurface(int width, int height, SDL_Color co
                                         width,
                                         height,
                                         32,
-                                        Colors::RMASK,
-                                        Colors::GMASK,
-                                        Colors::BMASK,
-                                        Colors::AMASK);
+                                        Color::RMASK,
+                                        Color::GMASK,
+                                        Color::BMASK,
+                                        Color::AMASK);
     if (surface == nullptr)
         throw Exceptions::SDLException();
 

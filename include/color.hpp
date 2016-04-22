@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COLORS_HPP__
-#define __COLORS_HPP__
+#ifndef __COLOR_HPP__
+#define __COLOR_HPP__
 
 #include "defines.hpp"
 #include <cstdint>
 #include <SDL2/SDL.h>
 #include <string>
 
-namespace Colors
+namespace Color
 {
     extern const SDL_Color BLACK;
     extern const SDL_Color WHITE;

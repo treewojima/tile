@@ -24,7 +24,7 @@
 #include <SDL2/SDL_image.h>
 #include <sstream>
 
-#include "colors.hpp"
+#include "color.hpp"
 #include "exceptions.hpp"
 #include "game.hpp"
 #include "graphics.hpp"
