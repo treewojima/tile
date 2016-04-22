@@ -44,11 +44,11 @@ Map::Map(const std::string &filename) :
     _map = tmx::Map::parseFile(filename);
 
     // Resize the internal grid
-    _componentGrid.resize(Window::getWidth());
+    _componentGrid.resize(_map->getWidth());
     _componentGrid.shrink_to_fit();
     for (auto &row : _componentGrid)
     {
-        row.resize(Window::getHeight());
+        row.resize(_map->getHeight());
         row.shrink_to_fit();
     }
 
@@ -86,9 +86,10 @@ Map::ComponentList Map::getComponentsAt(int col, int row)
     }
     catch (std::out_of_range &e)
     {
-        LOG_WARNING << __FUNCTION__ << ": coordinates out of bounds: ("
-                    << col << ", " << row << ")";
-        return ComponentList();
+        std::ostringstream ss;
+        ss << __PRETTY_FUNCTION__ << ": map coordinates out of bounds: ("
+           << col << ", " << row << ")";
+        throw std::out_of_range(ss.str());
     }
 }
 
@@ -98,7 +99,18 @@ void Map::onEvent(const Events::MapPositionComponentCreated &event)
     //_parent->_components.push_back(mapPos);
 
     auto c = event.component;
-    _componentGrid[c->x][c->y].push_back(c);
+    int col = c->x, row = c->y;
+    try
+    {
+        _componentGrid.at(col).at(row).push_back(c);
+    }
+    catch (std::out_of_range &e)
+    {
+        std::ostringstream ss;
+        ss << __PRETTY_FUNCTION__ << ": map coordinates out of bounds: ("
+           << col << ", " << row << ")";
+        throw std::out_of_range(ss.str());
+    }
 }
 
 std::string Map::toString() const
@@ -232,8 +244,8 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
 			auto entity = Entity::create(entityName.str());
 
             auto mapPos = Components::MapPosition::create(entity,
-                                                          col + 1,
-                                                          map.getHeight() - row);
+                                                          col,
+                                                          map.getHeight() - row - 1);
 
             auto absPos = Components::Position::create(entity, *mapPos);
 
@@ -242,7 +254,7 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
             //        std::make_shared<Components::StaticSprite>(texture,
             //                                                   entity->position);
 			Components::Graphics::Sprite::create(entity, textureName.str());
-
+//#define _DEBUG_ENTITIES
 #if defined(_DEBUG_MAP) && defined(_DEBUG_ENTITIES)
             LOG_DEBUG << "created entity: (" << mapPos->x << "," << mapPos->y << ") -> "
                       << "(" << absPos->x << "," << absPos->y << ")";

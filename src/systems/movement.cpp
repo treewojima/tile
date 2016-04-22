@@ -15,23 +15,40 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __SYSTEMS_INPUT_HPP__
-#define __SYSTEMS_INPUT_HPP__
-
 #include "defines.hpp"
-#include "events/subscriber.hpp"
-#include "systems/base.hpp"
+#include "systems/movement.hpp"
 
-namespace Systems
+Systems::Movement::Movement() :
+    Base(),
+    _timer()
 {
-    class Input : public Base
-	{
-	public:
-		Input();
-		~Input();
-
-        void update(float dt);
-	};
+    //Events::Dispatcher::subscribe<Events::SpriteComponentCreated>(*this);
 }
 
+Systems::Movement::~Movement()
+{
+    destroy();
+}
+
+void Systems::Movement::destroy()
+{
+    if (isDestroyed()) return;
+
+    //Events::Dispatcher::unsubscribe(*this);
+
+    Base::destroy();
+}
+
+#if 0
+void Systems::Graphics::onEvent(const Events::SpriteComponentCreated &event)
+{
+    auto component = event.component;
+
+    _spriteComponents.push_back(component);
+}
 #endif
+
+std::string Systems::Movement::toString() const
+{
+    return "Systems::Movement[]";
+}

@@ -65,11 +65,13 @@ private:
 
 typedef ResourceManager<std::shared_ptr<Texture>> TextureManager;
 
+#if 0
 // Helper stream operator
 inline std::ostream &operator<<(std::ostream &stream, const Texture &t)
 {
 	stream << t.toString();
 	return stream;
 }
+#endif
 
 #endif

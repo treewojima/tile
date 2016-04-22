@@ -33,17 +33,17 @@ Systems::Graphics::Graphics() : Base()
 
 Systems::Graphics::~Graphics()
 {
-    if (!_destroyed) destroy();
+    destroy();
 }
 
 void Systems::Graphics::destroy()
 {
-	if (_destroyed) return;
+    if (isDestroyed()) return;
 
     Events::Dispatcher::unsubscribe(*this);
     _spriteComponents.clear();
 
-    _destroyed = true;
+    Base::destroy();
 }
 
 void Systems::Graphics::update(float dt)

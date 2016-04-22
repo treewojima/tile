@@ -26,7 +26,7 @@ namespace Actions
 	class Movement : public Base
 	{
 	public:
-		using Base::Base;
+        Movement();
 
 		std::string toString() const;
 	};

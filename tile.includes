@@ -1,9 +1,1 @@
 include/
-src
-include/events
-src/events
-include/states
-src/states
-include/systems
-include/components
-src/components

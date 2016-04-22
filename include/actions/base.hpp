@@ -18,11 +18,11 @@
 #ifndef __ACTIONS_BASE_HPP__
 #define __ACTIONS_BASE_HPP__
 
-#include <string>
+#include "stringable.hpp"
 
 namespace Actions
 {
-	class Base
+    class Base : public Stringable
 	{
 	protected:
 		Base(const std::string debugStr = "action") : _debugStr(debugStr) {}
@@ -30,18 +30,11 @@ namespace Actions
 	public:
 		virtual ~Base() {}
 
-		virtual std::string toString() const;
+        std::string toString() const;
 
 	private:
-		std::string _debugStr;
+        std::string _debugStr;
 	};
-}
-
-// Helper stream operator
-inline std::ostream &operator<<(std::ostream &stream, const Actions::Base &a)
-{
-	stream << a.toString();
-	return stream;
 }
 
 #endif

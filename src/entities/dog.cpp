@@ -23,10 +23,56 @@
 
 #include <memory>
 
+#include "components/eventsubscriber.hpp"
 #include "components/position.hpp"
 #include "colors.hpp"
+#include "events/dispatcher.hpp"
 #include "game.hpp"
+#include "helper_events.hpp"
 #include "window.hpp"
+
+namespace
+{
+    class DogKeyPressSubscriber : public Events::Subscriber
+    {
+    public:
+        DogKeyPressSubscriber(std::shared_ptr<Components::Position> pos) :
+            _pos(pos) {}
+
+        void onEvent(const Events::KeyDown &e)
+        {
+            if (e.keys[SDL_SCANCODE_LEFT])
+            {
+                _pos->x -= MAGNITUDE;
+            }
+
+            if (e.keys[SDL_SCANCODE_RIGHT])
+            {
+                _pos->x += MAGNITUDE;
+            }
+
+            if (e.keys[SDL_SCANCODE_DOWN])
+            {
+                _pos->y -= MAGNITUDE;
+            }
+
+            if (e.keys[SDL_SCANCODE_UP])
+            {
+                _pos->y += MAGNITUDE;
+            }
+        }
+
+        std::string toString() const
+        {
+            return "KeyPressSubscriber";
+        }
+
+    private:
+        static const int MAGNITUDE = 1;
+
+        std::shared_ptr<Components::Position> _pos;
+    };
+}
 
 std::shared_ptr<Entity> createDog()
 {
@@ -37,15 +83,23 @@ std::shared_ptr<Entity> createDog()
     Game::getTexMgr().add(texture->getName(), texture);
 
     //Game::getGraphicsSys().createSpriteComponent(dog, texture->getName());
-	Components::Position::create(dog,
+    auto mapPos = Components::MapPosition::create(dog, 2, 2);
+    auto pos = Components::Position::create(dog, *mapPos);
+
+    /*Components::Position::create(dog,
 								 Window::getWidth() / 2,
 							     Window::getHeight() / 2);
     Components::MapPosition::create(dog,
                                     Window::getWidth() / 64,
-                                    Window::getHeight() / 64);
+                                    Window::getHeight() / 64);*/
+
     Components::Graphics::Sprite::create(dog,
                                          texture->getName(),
                                          "Down");
+
+    auto subscriber = std::make_shared<DogKeyPressSubscriber>(pos);
+    Components::EventSubscriber::create(dog, subscriber);
+    Events::Dispatcher::subscribe<Events::KeyDown>(*subscriber);
 
     return dog;
 }

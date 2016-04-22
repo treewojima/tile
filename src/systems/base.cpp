@@ -35,6 +35,11 @@ Systems::Base::~Base()
     }
 }
 
+void Systems::Base::destroy()
+{
+    _destroyed = true;
+}
+
 std::string Systems::Base::toString() const
 {
     return "Systems::Base[]";

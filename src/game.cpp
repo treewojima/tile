@@ -44,8 +44,6 @@
 #include "timer.hpp"
 #include "window.hpp"
 
-Uint32 Game::Event::CUSTOM_KEYPRESS_EVENT;
-
 // Locals
 namespace
 {
@@ -53,7 +51,7 @@ namespace
     bool _running = false;
 
     // Map of event handles to event instances
-    std::map<Game::Event::Handle, std::shared_ptr<Game::Event>> _events;
+    //std::map<Game::Event::Handle, std::shared_ptr<Game::Event>> _events;
 
     // Timer for tracking and calculating FPS
     std::unique_ptr<Timer> _fpsTimer;
@@ -75,6 +73,7 @@ namespace
 
     // Component systems
     std::unique_ptr<Systems::Graphics> _graphicsSys;
+    std::unique_ptr<Systems::Movement> _movementSys;
 
     // Subsystem initialization and shutdown functions
     void initSDL();
@@ -90,15 +89,16 @@ namespace
 
 	void togglePause();
 
-    // TEST
-    class MouseDownSubscriber : public Events::Subscriber
+    // Catch-all game event handler
+    class Subscriber : public Events::Subscriber
     {
     public:
         void onEvent(const Events::MouseDown &event);
+        void onEvent(const Events::Quit &event);
 
-        std::string toString() const { return "MouseDownSubscriber"; }
+        std::string toString() const { return "Game::Subscriber"; }
     };
-    MouseDownSubscriber _subscriber;
+    Subscriber _subscriber;
 }
 
 void Game::run(const Game::Options &options)
@@ -229,6 +229,24 @@ void Game::setRunning(bool b)
     _running = b;
 }
 
+void Game::exit(const std::exception *e)
+{
+    std::ostringstream ss;
+    ss << "EXCEPTION: ";
+
+    if (e)
+    {
+        ss << e->what();
+    }
+    else
+    {
+        ss << "exit() called";
+    }
+
+    LOG_ERROR << ss.str();
+    std::exit(1);
+}
+
 Camera &Game::getCamera()
 {
     return *_camera;
@@ -254,6 +272,12 @@ Systems::Graphics &Game::getGraphicsSys()
     return *_graphicsSys;
 }
 
+Systems::Movement &Game::getMovementSys()
+{
+    return *_movementSys;
+}
+
+#ifndef NEW_STYLE_EVENTS
 Game::Event::Handle Game::registerEvent(SDL_Scancode key,
                                         Game::Event::Callback callback,
                                         const std::string &debugString)
@@ -293,6 +317,7 @@ Game::Event::~Event()
 		LOG_DEBUG << "destroyed event \"" << debugString << "\"";
 #endif
 }
+#endif
 
 // Local functions
 namespace {
@@ -320,6 +345,10 @@ void initSDL()
         SDL_Quit();
         throw Exceptions::SDLImageException();
     }
+
+    // The internal SDL keystate pointer never changes, so go ahead and
+    // assign it now
+    Events::KeyDown::keys = SDL_GetKeyboardState(nullptr);
 }
 
 void initGL()
@@ -393,72 +422,52 @@ void shutdownSDL()
 
 void registerEvents()
 {
-    // Set up an event filter to drop normal keyboard events from the queue
-    SDL_SetEventFilter(
-            [](void *unused, SDL_Event *e) -> int
-            {
-                return !(e->type == SDL_KEYDOWN ||
-                         e->type == SDL_KEYUP);
-            },
-            nullptr);
-
-    // Register a custom keyboard event designed to fire every "tick"
-    Game::Event::CUSTOM_KEYPRESS_EVENT = SDL_RegisterEvents(1);
-    if (Game::Event::CUSTOM_KEYPRESS_EVENT == (Uint32)-1)
-        throw Exceptions::SDLException();
-
     // Window/program quit event
-    Game::registerEvent(std::make_shared<Game::QuitEvent>());
+    Events::Dispatcher::subscribe<Events::Quit>(_subscriber);
 
-    // Escape key handler
-    Game::registerEvent(
-            SDL_SCANCODE_ESCAPE,
-            [](const SDL_Event &e) { Game::setRunning(false); },
-            "EscapeEvent");
-
-	Game::registerEvent(
-			SDL_SCANCODE_SPACE,
-			[](const SDL_Event &e) { togglePause(); },
-			"SpaceEvent");
-
-    // New-style mouse event (TEST)
+    // Mousedown test
     Events::Dispatcher::subscribe<Events::MouseDown>(_subscriber);
 }
 
 void handleEvents()
 {
-    // Inject an event to check our keyboard state
-    SDL_Event event = {0};
-    event.type = Game::Event::CUSTOM_KEYPRESS_EVENT;
-    event.user.data1 = const_cast<Uint8 *>(SDL_GetKeyboardState(nullptr));
-    SDL_PushEvent(&event);
+    // Call input event handlers every tick
+    Events::Dispatcher::raise<Events::KeyDown>();
 
     // Run the normal event loop
-    event = {0};
+    SDL_Event event = {0};
     while (SDL_PollEvent(&event))
     {
-        if (event.type == SDL_MOUSEBUTTONDOWN)
+        switch (event.type)
         {
-            Events::MouseDown::Button button;
-            Vector2i position;
+        // Catch special keys and fall through to quit
+        case SDL_KEYDOWN:
+            if (event.key.keysym.sym != SDLK_ESCAPE) break;
+        case SDL_QUIT:
+            Events::Dispatcher::raise<Events::Quit>();
+            break;
 
-            if (event.button.button == SDL_BUTTON_RIGHT)
-                button = Events::MouseDown::Button::Right;
-            else if (event.button.button == SDL_BUTTON_LEFT)
-                button = Events::MouseDown::Button::Left;
-            else continue;
-
-            position.x = event.button.x;
-            position.y = event.button.y;
-
-            Events::Dispatcher::raise<Events::MouseDown>(button, position);
-        }
-        else
-        {
-            for (auto &pair : _events)
+        // Capture all mouse down events for now
+        case SDL_MOUSEBUTTONDOWN:
             {
-                if (pair.second->test(event)) pair.second->fire(event);
+                Events::MouseDown::Button button;
+                Vector2i position;
+
+                if (event.button.button == SDL_BUTTON_RIGHT)
+                    button = Events::MouseDown::Button::Right;
+                else if (event.button.button == SDL_BUTTON_LEFT)
+                    button = Events::MouseDown::Button::Left;
+                else continue;
+
+                position.x = event.button.x;
+                position.y = event.button.y;
+
+                Events::Dispatcher::raise<Events::MouseDown>(button, position);
             }
+            break;
+
+        default:
+            break;
         }
     }
 }
@@ -475,7 +484,13 @@ void togglePause()
 	}
 }
 
-void MouseDownSubscriber::onEvent(const Events::MouseDown &event)
+void Subscriber::onEvent(const Events::Quit &event)
+{
+    Game::setRunning(false);
+    LOG_INFO << "received quit signal";
+}
+
+void Subscriber::onEvent(const Events::MouseDown &event)
 {
     auto col = event.position.x / 32;
     auto row = (Window::getHeight() - event.position.y) / 32;
@@ -487,13 +502,20 @@ void MouseDownSubscriber::onEvent(const Events::MouseDown &event)
     std::ostringstream ss;
     ss << "Entities at location: ";
 
-    auto list = _map->getComponentsAt(col, row);
-    for (auto &e : list)
+    try
     {
-        ss << e->getParent()->getDebugName() << ", ";
+        auto list = _map->getComponentsAt(col, row);
+        for (auto &e : list)
+        {
+            ss << e->getParent()->getDebugName() << ", ";
+        }
     }
-    ss << "<end>";
+    catch (std::out_of_range)
+    {
+        // Swallow exception
+    }
 
+    ss << "<end>";
     LOG_DEBUG << ss.str();
 }
 

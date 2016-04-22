@@ -28,7 +28,10 @@
 #include "entitymanager.hpp"
 #include "statemanager.hpp"
 #include "systems/graphics.hpp"
+#include "systems/movement.hpp"
 #include "texture.hpp"
+
+#define NEW_STYLE_EVENTS
 
 namespace Game
 {
@@ -40,6 +43,7 @@ namespace Game
 		std::string logFile;
     };
 
+#ifndef NEW_STYLE_EVENTS
     class Event
     {        
     public:
@@ -60,11 +64,14 @@ namespace Game
         // at compile time, so... don't fuck with this after it's set!
         static Uint32 CUSTOM_KEYPRESS_EVENT;
     };
+#endif
 
     void run(const Options &options);
 
     bool isRunning();
     void setRunning(bool b);
+
+    void exit(const std::exception *e = nullptr);
 
     Camera &getCamera();
 
@@ -73,12 +80,15 @@ namespace Game
     TextureManager &getTexMgr();
 
     Systems::Graphics &getGraphicsSys();
+    Systems::Movement &getMovementSys();
 
+#ifndef NEW_STYLE_EVENTS
     Event::Handle registerEvent(SDL_Scancode key,
                                 Event::Callback callback,
                                 const std::string &debugString = std::string());
     Event::Handle registerEvent(std::shared_ptr<Event> event);
     void unregisterEvent(Event::Handle handle);
+#endif
 }
 
 #endif

@@ -98,7 +98,7 @@ void Window::destroy()
     SDL_GL_DeleteContext(_glContext);
     SDL_DestroyWindow(_window);
 
-    LOG_INFO << "destroyed window";
+    LOG_DEBUG << "destroyed window";
 }
 
 void Window::clear(float r, float g, float b, float a)

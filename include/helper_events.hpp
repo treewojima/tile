@@ -20,52 +20,30 @@
 
 #include "defines.hpp"
 #include "events/base.hpp"
-#include "game.hpp"
+#include "vector.hpp"
 
-// Old-style events
-// TODO: port these to the new system
-namespace Game
-{
-    // Helper key handler event for registerEvent()
-    class KeyEvent : public Event
-    {
-    public:
-        KeyEvent(SDL_Scancode key,
-                 Event::Callback callback,
-                 const std::string debugString_) :
-            Event(debugString_),
-            _key(key),
-            _callback(callback) {}
-
-        bool test(const SDL_Event &e);
-        void fire(const SDL_Event &e);
-
-    private:
-        SDL_Scancode _key;
-        Game::Event::Callback _callback;
-    };
-
-    // Program quit handling event, for signals such as ^C
-    class QuitEvent : public Event
-    {
-    public:
-        QuitEvent() : Event("QuitEvent") {}
-
-        bool test(const SDL_Event &e);
-        void fire(const SDL_Event &e);
-    };
-}
-
-// New-style events
 namespace Events
 {
+    // SDL quit event, or any keypress tied to it
+    class Quit : public Base {};
+
+    // Mouse down
     class MouseDown : public Base
     {
     public:
         enum class Button { Right, Left } button;
         Vector2i position;
 
-        MouseDown(Button b, Vector2i pos) : Base(), button(b), position(pos) {}
+        MouseDown(Button b, Vector2i pos) : button(b), position(pos) {}
+    };
+
+    // Key down
+    class KeyDown : public Base
+    {
+    public:
+        static const uint8_t *keys;
+
+        KeyDown() {}
     };
 }
 

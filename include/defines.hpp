@@ -18,7 +18,7 @@
 #ifndef __DEFINES_HPP__
 #define __DEFINES_HPP__
 
-#define _DEBUG
+//#define _DEBUG // moved to Makefile
 #define _USE_MATH_DEFINES
 
 #define _USE_NEW_ENTITY

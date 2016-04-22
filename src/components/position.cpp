@@ -62,7 +62,7 @@ std::shared_ptr<Components::Position>
 Components::Position::create(std::shared_ptr<Entity> parent,
 							 const Components::MapPosition &mapPosition)
 {
-	float x = mapPosition.x * Map::TILE_WIDTH - (Map::TILE_WIDTH / 2);
-	float y = mapPosition.y * Map::TILE_HEIGHT - (Map::TILE_HEIGHT / 2);
+    float x = (mapPosition.x + 1) * Map::TILE_WIDTH - (Map::TILE_WIDTH / 2);
+    float y = (mapPosition.y + 1) * Map::TILE_HEIGHT - (Map::TILE_HEIGHT / 2);
 	return create(parent, x, y);
 }

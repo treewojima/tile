@@ -4,7 +4,7 @@ BOOST_VER  :=
 BOOST_LIBS := -lboost_filesystem$(BOOST_VER) -lboost_log$(BOOST_VER) \
               -lboost_program_options$(BOOST_VER) -lboost_system$(BOOST_VER) \
               -lboost_thread$(BOOST_VER)
-CFLAGS     := -c -pipe -ggdb3 -std=c++14 $(WARNINGS) \
+CFLAGS     := -c -pipe -ggdb3 -std=c++14 $(WARNINGS) -D_DEBUG \
               -D_REENTRANT -DBOOST_ALL_DYN_LINK -Iinclude \
               -fdiagnostics-color=always
 LFLAGS     := -lSDL2 -lSDL2_image -lSDL2_mixer -lpthread -lGLEW -lGL -lGLU \

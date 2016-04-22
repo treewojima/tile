@@ -47,51 +47,67 @@ namespace Events
         Dispatcher() {}
 
     public:
-        template <class E, class T, typename std::enable_if<std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
+        template <class E,
+                  class T,
+                  typename std::enable_if<
+                      std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
         static void subscribe(T &subscriber)
         {
             static_assert(std::is_base_of<Base, E>::value,
-                          "Can only subscribe to types derived from class Event");
+                          "Can only subscribe to types derived from class Events::Base");
             static_assert(std::is_base_of<Subscriber, T>::value,
                           "Only subclasses of class Subscriber can subscribe to asynchronous events");
 
             subscribeSync<E>(subscriber);
         }
 
-        template <class E, class T, typename std::enable_if<std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
+        template <class E,
+                  class T,
+                  typename std::enable_if<
+                      std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
         static void subscribe(T &subscriber)
         {
             static_assert(std::is_base_of<Base, E>::value,
-                          "Can only subscribe to types derived from class Event");
+                          "Can only subscribe to types derived from class Events::Base");
 
             subscribeAsync<E>(subscriber);
         }
 
-        template <class E, class T, typename std::enable_if<std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
+        template <class E,
+                  class T,
+                  typename std::enable_if<
+                      std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
         static void unsubscribe(T &subscriber)
         {
             static_assert(std::is_base_of<Base, E>::value,
-                          "Can only unsubscribe from types derived from class Event");
+                          "Can only unsubscribe from types derived from class Events::Base");
 
             unsubscribeSync<E>(subscriber);
         }
 
-        template <class E, class T, typename std::enable_if<std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
+        template <class E,
+                  class T,
+                  typename std::enable_if<
+                      std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
         static void unsubscribe(T &subscriber)
         {
             static_assert(std::is_base_of<Base, E>::value,
-                          "Can only unsubscribe from types derived from class Event");
+                          "Can only unsubscribe from types derived from class Events::Base");
 
             unsubscribeAsync<E>(subscriber);
         }
 
-        template <class T, typename std::enable_if<std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
+        template <class T,
+                  typename std::enable_if<
+                      std::is_base_of<Events::Subscriber, T>::value>::type* = nullptr>
         static void unsubscribe(T &subscriber)
         {
             unsubscribeSync(subscriber);
         }
 
-        template <class T, typename std::enable_if<std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
+        template <class T,
+                  typename std::enable_if<
+                      std::is_base_of<Events::AsyncSubscriber, T>::value>::type* = nullptr>
         static void unsubscribe(T &subscriber)
         {
             unsubscribeAsync(subscriber);
@@ -99,9 +115,6 @@ namespace Events
 
         template <class E, class... Args>
         static void raise(Args&& ... args);
-
-        //template <class E, class... Args>
-        //static void raiseAsync(Args&& ... args);
 
     private:
         template <class E, class T>
@@ -141,7 +154,7 @@ template <class E, class... Args>
 void Events::Dispatcher::raise(Args&& ... args)
 {
     static_assert(std::is_base_of<Base, E>::value,
-                  "Can only raise types derived from class Event");
+                  "Can only raise types derived from class Events::Base");
 
     auto event = std::make_shared<E>(std::forward<Args>(args)...);
     auto baseEvent = std::static_pointer_cast<Base>(event);

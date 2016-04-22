@@ -15,41 +15,31 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __SYSTEMS_BASE_HPP__
-#define __SYSTEMS_BASE_HPP__
+#ifndef __SYSTEMS_MOVEMENT_HPP__
+#define __SYSTEMS_MOVEMENT_HPP__
 
 #include "defines.hpp"
+#include "systems/base.hpp"
 
-#include <list>
-#include <memory>
-#include <typeindex>
-#include <unordered_map>
+#include <map>
 
-#include "stringable.hpp"
+#include "events/subscriber.hpp"
+#include "timer.hpp"
 
 namespace Systems
 {
-    class Base : public Stringable
+    class Movement : public Base, public Events::Subscriber
     {
     public:
-        template <class T>
-        using ComponentMap = std::unordered_map<std::type_index, std::shared_ptr<T>>;
+        Movement();
+        ~Movement();
 
-		template <class T>
-		using ComponentList = std::list<std::shared_ptr<T>>;
-
-        Base();
-        ~Base();
-
-		virtual void update(float dt) {}
-        virtual void destroy();
-
-        bool isDestroyed() const { return _destroyed; }
+        void destroy();
 
         std::string toString() const;
 
     private:
-        bool _destroyed;
+        Timer _timer;
     };
 }
 
