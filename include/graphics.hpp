@@ -69,9 +69,6 @@ namespace Graphics
     // SDL_Surface creation/manipulation
     SDL_Surface *loadSDLSurface(const std::string &filename,
                                 bool optimize = false);
-    //SDL_Surface *loadSDLSurface(const std::string &filename,
-    //                            SDL_Color colorKey,
-    //                            bool optimize = true);
     SDL_Surface *optimizeSDLSurface(SDL_Surface *surface,
                                     bool freeSurface = false);
     SDL_Surface *createBlankSDLSurface(int width,

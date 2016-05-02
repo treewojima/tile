@@ -38,15 +38,7 @@ void States::MainGame::initialize()
 
 void States::MainGame::destroy()
 {
-    LOG_DEBUG << "destroyed MainGameState";
-}
-
-void States::MainGame::postLoop()
-{
-}
-
-void States::MainGame::update(float dt)
-{
+    LOG_DEBUG << "destroyed States::MainGame";
 }
 
 void States::MainGame::draw(float dt)

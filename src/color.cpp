@@ -34,6 +34,8 @@ const SDL_Color Color::BLUE  = MAKE_COLOR(  0,   0, 255, 255);
 const SDL_Color Color::BROWN = MAKE_COLOR( 64,  13,  18, 255);
 const SDL_Color Color::GRAY  = MAKE_COLOR( 70,  70,  70, 255);
 
+const SDL_Color Color::COLOR_KEY = MAKE_COLOR(255, 0, 255, 0);
+
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 const uint32_t Color::RMASK = 0xff000000;
 const uint32_t Color::GMASK = 0x00ff0000;

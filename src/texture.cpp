@@ -47,7 +47,9 @@ Texture::Texture(const std::string &name,
     SDL_Surface *surface = Graphics::loadSDLSurface(filename);
 
     copySurfaceToGL(surface, colorKey);
+#ifndef PRESERVE_TEXTURE_SURFACE
     SDL_FreeSurface(surface);
+#endif
 
 #ifdef _DEBUG_TEXTURES
     LOG_INFO << "loaded texture \"" << _name << "\" from file \""
@@ -70,7 +72,11 @@ Texture::Texture(const std::string &name,
 
     copySurfaceToGL(surface, colorKey, optimize);
     if (freeSurface)
+#ifdef PRESERVE_TEXTURE_SURFACE
+        throw Exceptions::SDLException("tried to free surface, but PRESERVE_TEXTURE_SURFACE is set");
+#else
         SDL_FreeSurface(surface);
+#endif
 
 #ifdef _DEBUG_TEXTURES
     LOG_INFO << "loaded texture \"" << _name << "\" from SDL_Surface";
@@ -81,6 +87,11 @@ Texture::~Texture()
 {
     assert(glIsTexture(_texture));
     glDeleteTextures(1, &_texture);
+
+#ifdef PRESERVE_TEXTURE_SURFACE
+    assert(_surface);
+    SDL_FreeSurface(_surface);
+#endif
 
 #ifdef _DEBUG_TEXTURES
 	LOG_INFO << "released texture \"" << getName() << "\"";
@@ -129,6 +140,11 @@ void Texture::copySurfaceToGL(SDL_Surface *surface,
         throw Exceptions::SDLException(ss.str());
     }
 
+    if (SDL_MUSTLOCK(workingSurface))
+    {
+        SDL_LockSurface(workingSurface);
+    }
+
     // Loop through the surface pixel data and override the alpha value for any pixels
     // that match the color key, if one was set
     uint8_t *originalPixels = static_cast<uint8_t *>(workingSurface->pixels);
@@ -146,10 +162,19 @@ void Texture::copySurfaceToGL(SDL_Surface *surface,
         {
             // If the color key matches, set the alpha byte to zero
             keyedPixels[j + 3] = 0;
+#ifdef PREPROCESS_MAP
+            if (bytesPerPixel == 4)
+                originalPixels[j + 3] = 0;
+#endif
         }
         else
         {
             keyedPixels[j + 3] = 255;
+
+#ifdef PREPROCESS_MAP
+            if (bytesPerPixel == 4)
+                originalPixels[j + 3] = 255;
+#endif
         }
 
         keyedPixels[j]     = originalPixels[i];
@@ -157,9 +182,18 @@ void Texture::copySurfaceToGL(SDL_Surface *surface,
         keyedPixels[j + 2] = originalPixels[i + 2];
     }
 
+    if (SDL_MUSTLOCK(workingSurface))
+    {
+        SDL_UnlockSurface(workingSurface);
+    }
+
+#ifdef PRESERVE_TEXTURE_SURFACE
+    _surface = workingSurface;
+#else
     // Free the now-unnecessary SDL_Surface if it was optimized
     if (optimize)
         SDL_FreeSurface(workingSurface);
+#endif
 
     // Prepare to create an OpenGL texture
     glGenTextures(1, &_texture);

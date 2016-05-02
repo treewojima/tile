@@ -42,7 +42,11 @@ public:
     Texture(const std::string &name,
             SDL_Surface *surface,
             const SDL_Color *colorKey = nullptr,
+#ifdef PRESERVE_TEXTURE_SURFACE
+            bool freeSurface = false,
+#else
             bool freeSurface = true,
+#endif
             bool optimize = true);
     ~Texture();
 
@@ -50,6 +54,9 @@ public:
     inline int getWidth() const { return _width; }
     inline int getHeight() const { return _height; }
     inline GLuint getRawTexture() const { return _texture; }
+#ifdef PRESERVE_TEXTURE_SURFACE
+    inline SDL_Surface *getSurface() const { return _surface; }
+#endif
 
     std::string toString() const;
 
@@ -57,6 +64,9 @@ private:
     std::string _name;
     GLuint _texture;
     int _width, _height;
+#ifdef PRESERVE_TEXTURE_SURFACE
+    SDL_Surface *_surface;
+#endif
 
     void copySurfaceToGL(SDL_Surface *surface,
                          const SDL_Color *colorKey = nullptr,
@@ -64,14 +74,5 @@ private:
 };
 
 typedef ResourceManager<std::shared_ptr<Texture>> TextureManager;
-
-#if 0
-// Helper stream operator
-inline std::ostream &operator<<(std::ostream &stream, const Texture &t)
-{
-	stream << t.toString();
-	return stream;
-}
-#endif
 
 #endif

@@ -37,9 +37,6 @@ namespace States
         void initialize();
         void destroy();
 
-        void postLoop();
-
-        void update(float dt);
         void draw(float dt);
 
     private:

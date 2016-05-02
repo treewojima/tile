@@ -20,7 +20,6 @@
 
 #include "defines.hpp"
 
-#include <list>
 #include <memory>
 #include <string>
 #include <tmx/Map.h>
@@ -30,9 +29,10 @@
 #include "events/subscriber.hpp"
 #include "exceptions.hpp"
 #include "stringable.hpp"
+#include "texture.hpp"
 
 #ifdef _DEBUG
-#   define _DEBUG_MAP
+#   define DEBUG_MAP
 #endif
 
 class Map : public Events::Subscriber
@@ -43,8 +43,12 @@ public:
 
 	void destroy();
 
-    typedef std::list<std::shared_ptr<Components::MapPosition>> ComponentList;
-    ComponentList getComponentsAt(int col, int row);
+#ifdef PREPROCESS_MAP
+    void preprocess();
+#endif
+
+    typedef std::vector<std::shared_ptr<Entity>> EntityList;
+    EntityList getEntitiesAt(int col, int row);
 
     void onEvent(const Events::MapPositionComponentCreated &event);
 
@@ -68,12 +72,17 @@ private:
 	std::string _filename;
     std::unique_ptr<tmx::Map> _map;
 
+#ifdef PREPROCESS_MAP
+    std::vector<SDL_Surface *> _tilesetSurfaces;
+    std::shared_ptr<Texture> _preprocessedTexture;
+#endif
+
     //std::list<std::shared_ptr<Entity>> _entities;
     //std::list<std::shared_ptr<Components::MapPosition>> _components;
 
-    typedef std::vector<ComponentList> GridRow;
-    typedef std::vector<GridRow> PositionGrid;
-    PositionGrid _componentGrid;
+    typedef std::vector<EntityList> GridRow;
+    typedef std::vector<GridRow> EntityGrid;
+    EntityGrid _entityGrid;
 
     void loadTilesetTextures();
 };

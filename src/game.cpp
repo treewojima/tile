@@ -87,7 +87,9 @@ namespace
     void registerEvents();
     void handleEvents();
 
-	void togglePause();
+    void spacebar();
+    void leftClick(int col, int row);
+    void rightClick(int col, int row);
 
     // Catch-all game event handler
     class Subscriber : public Events::Subscriber
@@ -122,16 +124,21 @@ void Game::run(const Game::Options &options)
     initAudio();
 #endif
 
+
+
+    // Initialize entity manager
+    _entityMgr = std::make_unique<EntityManager>();
+    _entityMgr->initialize();
+
+    // Initialize movement system
+    _movementSys = std::make_unique<Systems::Movement>();
+
     // Set up various managers and miscellaneous objects that haven't been
     // initialized yet
     _fpsTimer = std::make_unique<Timer>();
     _stateMgr = std::make_unique<StateManager>();
     _texMgr = std::make_unique<TextureManager>();
     _graphicsSys = std::make_unique<Systems::Graphics>();
-
-    // TEST
-    _entityMgr = std::make_unique<EntityManager>();
-    _entityMgr->initialize();
 
 	_map = std::make_unique<Map>("res/desert.tmx");
 
@@ -184,10 +191,19 @@ void Game::run(const Game::Options &options)
             // since the last step
             dt = stepTimer.getTicks() / 1000.f;
 			state->update(dt);
+            _movementSys->update(dt);
 
             // Update the screen
+#ifdef PREPROCESS_MAP
+            Window::clear(255, 255, 255);
+            Graphics::blitTexture("PreprocessedMap",
+                                  Window::getDimensions() / 2);
+            Window::flip();
+#else
             state->draw(dt);
+#endif
 
+            // Restart timer
             stepTimer.start();
 
             // Post-processing
@@ -442,7 +458,20 @@ void handleEvents()
         {
         // Catch special keys and fall through to quit
         case SDL_KEYDOWN:
-            if (event.key.keysym.sym != SDLK_ESCAPE) break;
+            switch (event.key.keysym.sym)
+            {
+            case SDLK_SPACE:
+                spacebar();
+                break;
+
+            case SDLK_ESCAPE:
+                event.type = SDL_QUIT;
+                event.quit.timestamp = SDL_GetTicks();
+                SDL_PushEvent(&event);
+                break;
+            }
+            break;
+
         case SDL_QUIT:
             Events::Dispatcher::raise<Events::Quit>();
             break;
@@ -472,16 +501,43 @@ void handleEvents()
     }
 }
 
-void togglePause()
+void spacebar()
 {
-    if (_stateMgr->peek()->getType() == States::Type::Paused)
-	{
-        _stateMgr->pop();
-	}
-	else
-	{
-        _stateMgr->push(std::make_shared<States::Paused>());
-	}
+    _movementSys->dumpQueue();
+}
+
+void leftClick(int col, int row)
+{
+    std::ostringstream ss;
+    ss << "Entities at location: ";
+
+    try
+    {
+        auto list = _map->getEntitiesAt(col, row);
+        int size = list.size();
+        if (!size)
+        {
+            throw std::out_of_range("");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                ss << list[i]->getDebugName();
+                if (i != size - 1) ss << ", ";
+            }
+        }
+    }
+    catch (std::out_of_range)
+    {
+        ss << "<none>";
+    }
+
+    LOG_DEBUG << ss.str();
+}
+
+void rightClick(int col, int row)
+{
 }
 
 void Subscriber::onEvent(const Events::Quit &event)
@@ -495,28 +551,16 @@ void Subscriber::onEvent(const Events::MouseDown &event)
     auto col = event.position.x / 32;
     auto row = (Window::getHeight() - event.position.y) / 32;
 
-    LOG_DEBUG << "MouseDown event: "
-              << (event.button == Events::MouseDown::Button::Left ? "left" : "right")
-              << "@(" << col << ", " << row << ")";
-
-    std::ostringstream ss;
-    ss << "Entities at location: ";
-
-    try
+    switch (event.button)
     {
-        auto list = _map->getComponentsAt(col, row);
-        for (auto &e : list)
-        {
-            ss << e->getParent()->getDebugName() << ", ";
-        }
-    }
-    catch (std::out_of_range)
-    {
-        // Swallow exception
-    }
+    case Events::MouseDown::Button::Left:
+        leftClick(col, row);
+        break;
 
-    ss << "<end>";
-    LOG_DEBUG << ss.str();
+    case Events::MouseDown::Button::Right:
+        rightClick(col, row);
+        break;
+    }
 }
 
 }

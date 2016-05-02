@@ -19,7 +19,37 @@
 
 #include <sstream>
 
+#include "logger.hpp"
+
+#if 0
+Actions::Movement::Movement(const Vector2i &origin, const Vector2i &dest) :
+    _origin(origin),
+    _dest(dest),
+    _current()
+{
+}
+#endif
+
+Actions::Movement::Movement(std::shared_ptr<const Entity> entity_,
+                            const Vector2i &&origin_,
+                            const Vector2i &&dest_) :
+    entity(entity_),
+    origin(std::move(origin_)),
+    dest(std::move(dest_)),
+    current(origin_)
+{
+    if (origin == dest)
+    {
+        LOG_WARNING << *this << " will have a net movement of zero";
+    }
+}
+
 std::string Actions::Movement::toString() const
 {
-	return Base::toString().replace(9, 4, "Movement");
+    std::ostringstream ss;
+    ss << "Actions::Movement[entity = " << entity << ", "
+       << "origin = " << origin << ", "
+       << "current = " << current << ", "
+       << "dest = " << dest << "]";
+    return ss.str();
 }

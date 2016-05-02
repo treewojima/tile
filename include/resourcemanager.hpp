@@ -30,6 +30,16 @@
 #include "exceptions.hpp"
 //#include "logger.hpp"
 
+namespace Exceptions
+{
+    class NoSuchResource : public Base
+    {
+    public:
+        NoSuchResource(const std::string &name) :
+            Base(std::string("no such resource \"") + name + std::string("\"")) {}
+    };
+}
+
 template <class T>
 class KeyValuePair
 {
@@ -66,6 +76,7 @@ public:
     void add(const Key &name, Resource resource);
     bool has(const Key &name) const;
     Resource get(const Key &name) const;
+    void remove(const Key &name);
     void clear();
 
     Resource &operator[](const Key &name);
@@ -137,10 +148,23 @@ typename ResourceManager<T>::Resource ResourceManager<T>::get(const Key &name) c
     {
         return _map.at(name);
     }
-    catch (std::out_of_range &e)
+    catch (std::out_of_range)
     {
-        // For now, just rethrow the exception
-        throw e;
+        throw Exceptions::NoSuchResource(name);
+    }
+}
+
+template <class T>
+void ResourceManager<T>::remove(const Key &name)
+{
+    auto i = _map.find(name);
+    if (i == _map.end())
+    {
+        throw Exceptions::NoSuchResource(name);
+    }
+    else
+    {
+        _map.erase(i);
     }
 }
 
@@ -156,7 +180,14 @@ void ResourceManager<T>::clear()
 template <class T>
 typename ResourceManager<T>::Resource &ResourceManager<T>::operator[](const Key &name)
 {
-	return _map[name];
+    try
+    {
+        return _map.at(name);
+    }
+    catch (std::out_of_range)
+    {
+        throw Exceptions::NoSuchResource(name);
+    }
 }
 
 template <class T>

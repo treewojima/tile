@@ -23,8 +23,8 @@
 #include "window.hpp"
 
 Components::Position::Position(std::shared_ptr<Entity> parent,
-                               float x_,
-                               float y_) :
+                               int x_,
+                               int y_) :
     Base(parent, parent->getDebugName() + "Position"),
     x(x_),
     y(y_)
@@ -42,8 +42,8 @@ std::string Components::Position::toString() const
 
 std::shared_ptr<Components::Position>
 Components::Position::create(std::shared_ptr<Entity> parent,
-                             float x,
-                             float y)
+                             int x,
+                             int y)
 {
     auto ptr = std::shared_ptr<Position>(new Position(parent, x, y));
     Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
@@ -53,7 +53,7 @@ Components::Position::create(std::shared_ptr<Entity> parent,
 
 std::shared_ptr<Components::Position>
 Components::Position::create(std::shared_ptr<Entity> parent,
-                             const Vector2f &v)
+                             const Vector2i &v)
 {
     return create(parent, v.x, v.y);
 }
@@ -62,7 +62,7 @@ std::shared_ptr<Components::Position>
 Components::Position::create(std::shared_ptr<Entity> parent,
 							 const Components::MapPosition &mapPosition)
 {
-    float x = (mapPosition.x + 1) * Map::TILE_WIDTH - (Map::TILE_WIDTH / 2);
-    float y = (mapPosition.y + 1) * Map::TILE_HEIGHT - (Map::TILE_HEIGHT / 2);
+    int x = (mapPosition.x + 1) * Map::TILE_WIDTH - (Map::TILE_WIDTH / 2);
+    int y = (mapPosition.y + 1) * Map::TILE_HEIGHT - (Map::TILE_HEIGHT / 2);
 	return create(parent, x, y);
 }

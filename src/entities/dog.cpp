@@ -33,11 +33,14 @@
 
 namespace
 {
-    class DogKeyPressSubscriber : public Events::Subscriber
+    class DogEventSubscriber : public Events::Subscriber
     {
     public:
-        DogKeyPressSubscriber(std::shared_ptr<Components::Position> pos) :
-            _pos(pos) {}
+        DogEventSubscriber(std::shared_ptr<Entity> entity)
+        {
+            _pos = Game::getEntityMgr().getComponent<Components::Position>(entity->getUUID());
+            _mapPos = Game::getEntityMgr().getComponent<Components::MapPosition>(entity->getUUID());
+        }
 
         void onEvent(const Events::KeyDown &e)
         {
@@ -62,15 +65,29 @@ namespace
             }
         }
 
+        void onEvent(const Events::MouseDown &e)
+        {
+            if (e.button != Events::MouseDown::Button::Right) return;
+
+            auto col = e.position.x / 32;
+            auto row = (Window::getHeight() - e.position.y) / 32;
+
+            Actions::Movement m(_mapPos->getParent(),
+                                _mapPos->toVector(),
+                                Vector2i(col, row));
+            Game::getMovementSys().queueMovement(std::move(m));
+        }
+
         std::string toString() const
         {
-            return "KeyPressSubscriber";
+            return "DogEventSubscriber";
         }
 
     private:
         static const int MAGNITUDE = 1;
 
         std::shared_ptr<Components::Position> _pos;
+        std::shared_ptr<Components::MapPosition> _mapPos;
     };
 }
 
@@ -97,9 +114,10 @@ std::shared_ptr<Entity> createDog()
                                          texture->getName(),
                                          "Down");
 
-    auto subscriber = std::make_shared<DogKeyPressSubscriber>(pos);
-    Components::EventSubscriber::create(dog, subscriber);
+    auto subscriber = std::make_shared<DogEventSubscriber>(dog);
     Events::Dispatcher::subscribe<Events::KeyDown>(*subscriber);
+    Events::Dispatcher::subscribe<Events::MouseDown>(*subscriber);
+    Components::EventSubscriber::create(dog, subscriber);
 
     return dog;
 }

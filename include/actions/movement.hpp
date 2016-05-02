@@ -19,16 +19,26 @@
 #define __ACTIONS_MOVEMENT_HPP__
 
 #include "actions/base.hpp"
+//#include "direction.hpp"
+#include "entity.hpp"
+#include "vector.hpp"
 #include <memory>
 
 namespace Actions
 {
 	class Movement : public Base
-	{
+    {
 	public:
-        Movement();
+        //Movement(const Vector2i &origin, const Vector2i &dest);
+        Movement(std::shared_ptr<const Entity> entity_,
+                 const Vector2i &&origin_,
+                 const Vector2i &&dest_);
 
 		std::string toString() const;
+
+        std::shared_ptr<const Entity> entity;
+        const Vector2i origin, dest;
+        Vector2i current;
 	};
 }
 

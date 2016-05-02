@@ -19,26 +19,35 @@
 #define __SYSTEMS_MOVEMENT_HPP__
 
 #include "defines.hpp"
-#include "systems/base.hpp"
 
 #include <map>
+#include <queue>
 
-#include "events/subscriber.hpp"
+#include "actions/movement.hpp"
+#include "systems/base.hpp"
 #include "timer.hpp"
 
 namespace Systems
 {
-    class Movement : public Base, public Events::Subscriber
+    class Movement : public Base
     {
     public:
         Movement();
         ~Movement();
 
+        void update(float dt);
         void destroy();
+
+        void queueMovement(Actions::Movement &&movement);
+        void dumpQueue() const;
 
         std::string toString() const;
 
     private:
+        typedef std::queue<Actions::Movement> MovementQueue;
+        typedef std::map<Entity::UUID, MovementQueue> EntityMovementMap;
+
+        EntityMovementMap _movements;
         Timer _timer;
     };
 }

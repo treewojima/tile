@@ -44,9 +44,9 @@ Map::Map(const std::string &filename) :
     _map = tmx::Map::parseFile(filename);
 
     // Resize the internal grid
-    _componentGrid.resize(_map->getWidth());
-    _componentGrid.shrink_to_fit();
-    for (auto &row : _componentGrid)
+    _entityGrid.resize(_map->getWidth());
+    _entityGrid.shrink_to_fit();
+    for (auto &row : _entityGrid)
     {
         row.resize(_map->getHeight());
         row.shrink_to_fit();
@@ -56,6 +56,11 @@ Map::Map(const std::string &filename) :
 
     LayerVisitor visitor(this);
     _map->visitLayers(visitor);
+
+#ifdef PREPROCESS_MAP
+    // Create the preprocessed map texture
+    preprocess();
+#endif
 }
 
 Map::~Map()
@@ -69,20 +74,74 @@ void Map::destroy()
 
     Events::Dispatcher::unsubscribe(*this);
 
-    //_entities.clear();
-    //_components.clear();
-    _componentGrid.clear();
+    _entityGrid.clear();
+#ifdef PREPROCESS_MAP
+    Game::getTexMgr().remove(_preprocessedTexture->getName());
+    _preprocessedTexture.reset();
+#endif
 
     // NOTE: should components be unregistered here?
 
 	_destroyed = true;
 }
 
-Map::ComponentList Map::getComponentsAt(int col, int row)
+#ifdef PREPROCESS_MAP
+void Map::preprocess()
+{
+    // First, create an SDL surface to hold the map
+    const int mapWidth = _map->getWidth();
+    const int mapHeight = _map->getHeight();
+    const int tileWidth = _map->getTileWidth();
+    const int tileHeight = _map->getTileHeight();
+    SDL_Surface *surface = Graphics::createBlankSDLSurface(mapWidth * tileWidth,
+                                                           mapHeight * tileHeight);
+
+    // Iterate through map entities and blit their textures to the surface
+    for (const GridRow &row : _entityGrid)
+    {
+        for (const EntityList &entities : row)
+        {
+            for (const std::shared_ptr<Entity> &entity : entities)
+            {
+                Entity::UUID uuid = entity->getUUID();
+                std::shared_ptr<Components::Graphics::Sprite> sprite =
+                        Game::getEntityMgr().getComponent<Components::Graphics::Sprite>(uuid);
+                std::shared_ptr<Components::Position> pos =
+                        Game::getEntityMgr().getComponent<Components::Position>(uuid);
+
+                TextureManager::Resource texture = Game::getTexMgr()[sprite->texture];
+                SDL_Rect destRect = { pos->x,
+                                      mapHeight * tileHeight - pos->y,
+                                      tileWidth,
+                                      tileHeight };
+                SDL_BlitSurface(texture->getSurface(),
+                                nullptr,
+                                surface,
+                                &destRect);
+            }
+        }
+    }
+
+    // Replace the old preprocessed map texture with the new one
+    if (_preprocessedTexture)
+    {
+        Game::getTexMgr().remove(_preprocessedTexture->getName());
+    }
+    _preprocessedTexture.reset();
+    auto rgbStr = _map->getBackgroundColor().substr(1);
+    const SDL_Color colorKey = Color::parseRGBHexString(rgbStr);
+    _preprocessedTexture = std::make_shared<Texture>("PreprocessedMap",
+                                                     surface);
+    Game::getTexMgr().add(_preprocessedTexture->getName(),
+                          _preprocessedTexture);
+}
+#endif
+
+Map::EntityList Map::getEntitiesAt(int col, int row)
 {
     try
     {
-        return _componentGrid.at(col).at(row);
+        return _entityGrid.at(col).at(row);
     }
     catch (std::out_of_range &e)
     {
@@ -98,11 +157,14 @@ void Map::onEvent(const Events::MapPositionComponentCreated &event)
     //_parent->_entities.push_back(entity);
     //_parent->_components.push_back(mapPos);
 
-    auto c = event.component;
-    int col = c->x, row = c->y;
+    auto component = event.component;
+    int col = component->x;
+    int row = component->y;
+    auto entity = component->getParent();
+
     try
     {
-        _componentGrid.at(col).at(row).push_back(c);
+        _entityGrid.at(col).at(row).push_back(entity);
     }
     catch (std::out_of_range &e)
     {
@@ -122,10 +184,8 @@ std::string Map::toString() const
 
 void Map::loadTilesetTextures()
 {
-    // NOTE: This is very, very hacky and ignores the settings in the map file
-    //const SDL_Color colorKey = Color::makeColor(0xFF, 0, 0xFF);
-    auto rgbStr = _map->getBackgroundColor().substr(1);
-    const SDL_Color colorKey = Color::parseRGBHexString(rgbStr);
+    //auto rgbStr = _map->getBackgroundColor().substr(1);
+    //const SDL_Color colorKey = Color::parseRGBHexString(rgbStr);
 
     for (auto tileset : _map->getTileSets())
     {
@@ -155,17 +215,6 @@ void Map::loadTilesetTextures()
         const int numCols = tilesetWidth / tileWidth;
         const int numRows = tilesetHeight / tileHeight;
         const int margin = tileset->getMargin();
-
-#if 0
-        std::cout << "tileWidth     = "   << tileWidth
-                  << "\ntileHeight    = " << tileHeight
-                  << "\ntilesetWidth  = " << tilesetWidth
-                  << "\ntilesetHeight = " << tilesetHeight
-                  << "\nmargin        = " << margin
-                  << "\nnumCols       = " << numCols
-                  << "\nnumRows       = " << numRows
-                  << "\nfirstGid      = " << tileset->getFirstGID() << std::endl;
-#endif
 
         auto gid = tileset->getFirstGID();
         SDL_Rect srcRect;
@@ -201,7 +250,7 @@ void Map::loadTilesetTextures()
                 //       which is a leak!
                 auto texture = std::make_shared<Texture>(name.str(),
                                                          destSurface,
-                                                         &colorKey,
+                                                         &Color::COLOR_KEY, //&colorKey,
                                                          false,       // do NOT free the surface
                                                          true);
                 Game::getTexMgr().add(texture->getName(), texture);

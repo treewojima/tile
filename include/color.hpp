@@ -33,6 +33,8 @@ namespace Color
     extern const SDL_Color BROWN;
     extern const SDL_Color GRAY;
 
+    extern const SDL_Color COLOR_KEY;
+
     extern const uint32_t RMASK;
     extern const uint32_t GMASK;
     extern const uint32_t BMASK;

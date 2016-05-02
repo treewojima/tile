@@ -46,6 +46,36 @@ public:
 
     // TODO: Add more operators as necessary
 
+    inline T &operator[](int index)
+    {
+        switch (index)
+        {
+        case 0:
+            return x;
+
+        case 1:
+            return y;
+
+        default:
+            throw std::out_of_range("subscript out of range (0 -> x, 1 -> y)");
+        }
+    }
+
+    inline T operator[](int index) const
+    {
+        switch (index)
+        {
+        case 0:
+            return x;
+
+        case 1:
+            return y;
+
+        default:
+            throw std::out_of_range("subscript out of range (0 -> x, 1 -> y)");
+        }
+    }
+
     inline Vector2<T> &operator+=(const T &scalar)
     {
         x += scalar;
@@ -76,6 +106,18 @@ public:
 };
 
 template <class T>
+inline bool operator==(const Vector2<T> &lhs, const Vector2<T> &rhs)
+{
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+template <class T>
+inline bool operator!=(const Vector2<T> &lhs, const Vector2<T> &rhs)
+{
+    return lhs.x != rhs.x || lhs.y != rhs.y;
+}
+
+template <class T>
 inline Vector2<T> operator+(Vector2<T> lhs, const T &rhs)
 {
     lhs += rhs;
@@ -100,6 +142,22 @@ template <class T>
 inline Vector2<T> operator-(Vector2<T> lhs, const Vector2<T> &rhs)
 {
     lhs -= rhs;
+    return lhs;
+}
+
+template <class T>
+inline Vector2<T> operator/(Vector2<T> lhs, const T &rhs)
+{
+    lhs.x /= rhs;
+    lhs.y /= rhs;
+    return lhs;
+}
+
+template <class T>
+inline Vector2<T> operator/(Vector2<T> lhs, const Vector2<T> &rhs)
+{
+    lhs.x /= rhs.x;
+    lhs.y /= rhs.y;
     return lhs;
 }
 

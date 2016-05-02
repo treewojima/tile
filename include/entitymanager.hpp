@@ -32,6 +32,44 @@
 #include "logger.hpp"
 #include "systems/base.hpp"
 
+namespace Exceptions
+{
+    class NoSuchEntity : public Base
+    {
+    public:
+        NoSuchEntity(const Entity::UUID &uuid) : Base(error(uuid)) {}
+
+    private:
+        std::string error(const Entity::UUID &uuid)
+        {
+            std::ostringstream ss;
+            ss << "no such entity with UUID " << uuid;
+            return ss.str();
+        }
+    };
+
+    class NoSuchComponent : public Base
+    {
+    public:
+        NoSuchComponent(const Entity &entity,
+                        const std::type_info &type) :
+            Base(error(entity, type)) {}
+
+        NoSuchComponent(const std::shared_ptr<Entity> &entity,
+                        const std::type_info &type) :
+            Base(error(*entity, type)) {}
+
+
+    private:
+        std::string error(const Entity &entity, const std::type_info &type)
+        {
+            std::ostringstream ss;
+            ss << "entity " << entity << " does not contain a component "
+               << "of type " << boost::core::demangle(type.name());
+            return ss.str();
+        }
+    };
+}
 
 class EntityManager : public Events::Subscriber
 {
@@ -88,14 +126,13 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
     {
 		pair = &_map.at(uuid);
 	}
-	catch (std::out_of_range &e)
+    catch (std::out_of_range)
 	{
-		std::ostringstream ss;
-		ss << "no such entity for UUID " << uuid;
-        throw Exceptions::Base(ss.str());
+        throw Exceptions::NoSuchEntity(uuid);
 	}
 
 	// Try to find an entry for type T
+    const auto &entity = pair->first;
 	auto &componentsMap = pair->second;
 	std::shared_ptr<Components::Base> basePtr;
 	try
@@ -103,23 +140,37 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 		// should this use move semantics?
 		basePtr = componentsMap.at(typeid(T));
 	}
-	catch (std::out_of_range &e)
+    catch (std::out_of_range)
 	{
+        throw Exceptions::NoSuchComponent(entity, typeid(T));
+
+#if 0
 		std::ostringstream ss;
 		ss << "no entry for component of type "
 		   << boost::core::demangle(typeid(T).name())
 		   << " in entity " << pair->first;
         throw Exceptions::Base(ss.str());
+#endif
+
+        std::ostringstream ss;
+        ss << "no such entity for UUID " << uuid;
+        throw Exceptions::Base(ss.str());
 	}
 
 	// Make sure the pointer isn't null
 	if (!basePtr)
-	{
+    {
+        LOG_DEBUG << "component " << boost::core::demangle(typeid(T).name())
+                  << " belonging to entity " << entity << " is null";
+        throw Exceptions::NoSuchComponent(entity, typeid(T));
+
+#if 0
 		std::ostringstream ss;
 		ss << "entry for component of type "
 		   << boost::core::demangle(typeid(T).name())
 		   << " in entity " << pair->first << "is null";
         throw Exceptions::Base(ss.str());
+#endif
 	}
 
 	// Cast to the proper derived type
@@ -127,11 +178,18 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 	//ptr = std::move(std::static_pointer_cast<T>(basePtr));
 	if (!ptr)
 	{
+        LOG_DEBUG << "could not cast component from Components::Base to "
+                  << boost::core::demangle(typeid(T).name()) << " in entity "
+                  << entity;
+        throw Exceptions::NoSuchComponent(entity, typeid(T));
+
+#if 0
 		std::ostringstream ss;
 		ss << "could not cast component from Components::Base to "
 		   << boost::core::demangle(typeid(T).name()) << " in entity "
 		   << pair->first;
         throw Exceptions::Base(ss.str());
+#endif
     }
 
     return ptr;
