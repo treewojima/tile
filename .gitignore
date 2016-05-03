@@ -12,3 +12,4 @@ test64
 *.*sdf
 *.autosave
 oprofile_data
+*.includes
