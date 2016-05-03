@@ -63,10 +63,10 @@ namespace Graphics
 
 namespace Exceptions
 {
-    class RendererException : public Base
+    class RendererException : public GraphicsException
     {
     public:
-        using Base::Base;
+        using GraphicsException::GraphicsException;
     };
 }
 

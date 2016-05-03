@@ -28,14 +28,14 @@ Graphics::Renderer::Renderer()
     // Initialize SDL graphics subsystem
     if (SDL_InitSubSystem(SDL_INIT_VIDEO))
     {
-        throw Exceptions::RendererException(SDL_GetError());
+        throw Exceptions::RendererException();
     }
 
     // Initialize SDL_Image
     auto flags = IMG_INIT_PNG | IMG_INIT_JPG;
     if (!(IMG_Init(flags) & flags))
     {
-        throw Exceptions::RendererException(IMG_GetError());
+        throw Exceptions::RendererException();
     }
 
     // Create window and renderer
@@ -50,7 +50,7 @@ Graphics::Renderer::Renderer()
     _renderer = SDL_CreateRenderer(_window->_window, -1, flags);
     if (!_renderer)
     {
-        throw Exceptions::RendererException(SDL_GetError());
+        throw Exceptions::RendererException();
     }
 
     // Set clear color
@@ -67,6 +67,7 @@ void Graphics::Renderer::destroy()
     static bool destroyed = false;
     if (destroyed) return;
 
+    assert(_renderer);
     SDL_DestroyRenderer(_renderer);
     _window->destroy();
     _window.reset();
