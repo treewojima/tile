@@ -21,6 +21,7 @@
 #include "defines.hpp"
 
 #include "color.hpp"
+#include "graphics/surface.hpp"
 #include "resourcemanager.hpp"
 #include "stringable.hpp"
 #include "vector.hpp"
@@ -30,8 +31,6 @@
 //#   define _DEBUG_TEXTURES
 #endif
 
-class SDL_Texture;
-
 namespace Graphics
 {
     class Texture : public Stringable
@@ -39,30 +38,26 @@ namespace Graphics
         friend class Renderer;
 
     public:
+        // From Surface
+        static std::shared_ptr<Texture> create(const std::string &name,
+                                               std::shared_ptr<Surface> surface);
         // From file
         static std::shared_ptr<Texture> create(const std::string &name,
                                                const std::string &filename,
-                                               SDL_Color *colorKey = nullptr);
-        // From surface
-        static std::shared_ptr<Texture> create(const std::string &name,
-                                               SDL_Surface *surface,
-                                               SDL_Rect *rect = nullptr,
-                                               SDL_Color *colorKey = nullptr);
+                                               const SDL_Color &colorKey = Color::COLOR_KEY);
         // Blank/filled color
         static std::shared_ptr<Texture> create(const std::string &name,
                                                const Vector2i &dimensions,
-                                               SDL_Color *color = nullptr);
+                                               const SDL_Color &color = Color::WHITE);
 
     private:
         Texture(const std::string &name,
-                SDL_Surface *surface,
-                SDL_Rect *rect,
-                SDL_Color *colorKey);
-        Texture(const std::string &name,
-                SDL_Texture *rawTexture);
+                std::shared_ptr<Surface> surface);
 
     public:
         ~Texture();
+
+        void destroy();
 
         inline std::string getName() const { return _name; }
         Vector2i getDimensions() const;
@@ -74,10 +69,6 @@ namespace Graphics
     private:
         std::string _name;
         SDL_Texture *_texture;
-
-        static SDL_Surface *loadSurfaceFromFile(const std::string &filename);
-        static SDL_Surface *createBlankSurface(const Vector2i &dimensions,
-                                               SDL_Color *color = nullptr);
     };
 
     // Texture resource manager type

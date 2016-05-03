@@ -35,106 +35,46 @@
 
 std::shared_ptr<Graphics::Texture>
 Graphics::Texture::create(const std::string &name,
-                          const std::string &filename,
-                          SDL_Color *colorKey)
+                          std::shared_ptr<Surface> surface)
 {
-    return create(name, loadSurfaceFromFile(filename), nullptr, colorKey);
+    auto texture = std::shared_ptr<Texture>(new Texture(name, surface));
+    getGame().getTexMgr().add(name, texture);
+    return texture;
 }
 
 std::shared_ptr<Graphics::Texture>
 Graphics::Texture::create(const std::string &name,
-                          SDL_Surface *surface,
-                          SDL_Rect *rect,
-                          SDL_Color *colorKey)
+                          const std::string &filename,
+                          const SDL_Color &colorKey)
 {
-    auto texture = std::shared_ptr<Texture>(new Texture(name, surface, rect, colorKey));
-    getGame().getTexMgr().add(name, texture);
-    return texture;
+    return create(name, Surface::create(filename, colorKey));
 }
 
 std::shared_ptr<Graphics::Texture>
 Graphics::Texture::create(const std::string &name,
                           const Vector2i &dimensions,
-                          SDL_Color *color)
+                          const SDL_Color &color)
 {
-#if 1
-    return create(name, createBlankSurface(dimensions, color));
-#else
-    auto renderer = getGame().getRenderer()._renderer;
-    auto rawTexture = SDL_CreateTexture(renderer,
-                                        SDL_PIXELFORMAT_RGBA8888,
-                                        SDL_TEXTUREACCESS_TARGET,
-                                        dimensions.x,
-                                        dimensions.y);
-    if (!rawTexture)
-    {
-        throw Exceptions::RendererException(SDL_GetError());
-    }
-
-    // Do a bit of hackery to clear the new texture by setting it as the
-    // render destination and changing the screen clear color
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    SDL_SetRenderTarget(renderer, rawTexture);
-    SDL_RenderClear(renderer);
-
-    // Make sure to set it back
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_SetRenderTarget(renderer, nullptr);
-
-    auto texture = std::shared_ptr<Texture>(new Texture(name, rawTexture));
-    getGame().getTexMgr().add(name, texture);
-    return texture;
-#endif
+    return create(name, Surface::create(dimensions, color));
 }
 
 Graphics::Texture::Texture(const std::string &name,
-                           SDL_Surface *surface,
-                           SDL_Rect *rect,
-                           SDL_Color *colorKey) :
+                           std::shared_ptr<Surface> surface) :
     _name(name),
     _texture(nullptr)
 {
     if (!surface)
     {
-        throw Exceptions::Base("tried to create Texture from null surface");
-    }
-
-    // Set up color keying
-    auto color32 = Color::convertToUint32(colorKey ? *colorKey : Color::COLOR_KEY,
-                                          surface->format);
-    SDL_SetColorKey(surface, true, color32);
-
-    if (rect)
-    {
-        // Create an intermediate surface for the rect to blit
-        auto realSurface = createBlankSurface(Vector2i(rect->w, rect->h));
-        SDL_BlitSurface(surface, rect, realSurface, nullptr);
-        SDL_FreeSurface(surface);
-        surface = realSurface;
+        throw Exceptions::GraphicsException("tried to create Texture from null Surface");
     }
 
     // Create the texture
     _texture = SDL_CreateTextureFromSurface(getGame().getRenderer()._renderer,
-                                            surface);
+                                            surface->_surface);
     if (!_texture)
     {
-        throw Exceptions::RendererException(SDL_GetError());
+        throw Exceptions::GraphicsException();
     }
-
-    // Free the now-unused surface
-    SDL_FreeSurface(surface);
-
-#ifdef _DEBUG_TEXTURES
-    LOG_INFO << "created texture " << this;
-#endif
-}
-
-Graphics::Texture::Texture(const std::string &name,
-                           SDL_Texture *rawTexture) :
-    _name(name),
-    _texture(rawTexture)
-{
-    assert(rawTexture);
 
 #ifdef _DEBUG_TEXTURES
     LOG_INFO << "created texture " << this;
@@ -143,12 +83,24 @@ Graphics::Texture::Texture(const std::string &name,
 
 Graphics::Texture::~Texture()
 {
+    destroy();
+}
+
+void Graphics::Texture::destroy()
+{
+    static bool destroyed = false;
+    if (destroyed) return;
+
+    getGame().getTexMgr().remove(getName());
+
     assert(_texture);
     SDL_DestroyTexture(_texture);
 
 #ifdef _DEBUG_TEXTURES
     LOG_INFO << "released texture \"" << this << "\"";
 #endif
+
+    destroyed = true;
 }
 
 Vector2i Graphics::Texture::getDimensions() const
@@ -164,41 +116,3 @@ std::string Graphics::Texture::toString() const
     ss << "Texture[name = \"" << getName() << "\"]";
     return ss.str();
 }
-
-SDL_Surface *Graphics::Texture::loadSurfaceFromFile(const std::string &filename)
-{
-    SDL_Surface *s = IMG_Load(filename.c_str());
-    if (!s)
-    {
-        throw Exceptions::RendererException(SDL_GetError());
-    }
-
-    return s;
-}
-
-SDL_Surface *Graphics::Texture::createBlankSurface(const Vector2i &dimensions,
-                                                   SDL_Color *color)
-{
-    auto surface =
-            SDL_CreateRGBSurface(0,
-                                 dimensions.x,
-                                 dimensions.y,
-                                 32,
-                                 Color::RMASK,
-                                 Color::GMASK,
-                                 Color::BMASK,
-                                 Color::AMASK);
-
-    if (surface == nullptr)
-        throw Exceptions::RendererException(SDL_GetError());
-
-    if (!color) color = const_cast<SDL_Color *>(&Color::WHITE);
-
-    SDL_FillRect(surface,
-                 nullptr,
-                 SDL_MapRGBA(surface->format, color->r, color->g, color->b, color->a));
-
-    return surface;
-}
-
-
