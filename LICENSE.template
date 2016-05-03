@@ -15,36 +15,3 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __HELPER_EVENTS_HPP__
-#define __HELPER_EVENTS_HPP__
-
-#include "defines.hpp"
-#include "events/base.hpp"
-#include "vector.hpp"
-
-namespace Events
-{
-    // SDL quit event, or any keypress tied to it
-    class Quit : public Base {};
-
-    // Mouse down
-    class MouseDown : public Base
-    {
-    public:
-        enum class Button { Right, Left } button;
-        Vector2i position;
-
-        MouseDown(Button b, Vector2i pos) : button(b), position(pos) {}
-    };
-
-    // Key down
-    class KeyDown : public Base
-    {
-    public:
-        static const uint8_t *keys;
-
-        KeyDown() {}
-    };
-}
-
-#endif
