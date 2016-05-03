@@ -24,8 +24,6 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 
-namespace Game { struct Options; }
-
 namespace Logger
 {
 	typedef const char *SeverityType;
@@ -37,7 +35,8 @@ namespace Logger
 		extern SeverityType Error;
 	}
 
-	void init(const Game::Options &options);
+    void init(const std::string &logFile);
+    void destroy();
 }
 
 BOOST_LOG_GLOBAL_LOGGER(gLog, boost::log::sources::severity_logger_mt<Logger::SeverityType>)

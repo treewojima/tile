@@ -29,7 +29,6 @@
 #include "events/dispatcher.hpp"
 #include "game.hpp"
 #include "helper_events.hpp"
-#include "window.hpp"
 
 namespace
 {
@@ -38,8 +37,8 @@ namespace
     public:
         DogEventSubscriber(std::shared_ptr<Entity> entity)
         {
-            _pos = Game::getEntityMgr().getComponent<Components::Position>(entity->getUUID());
-            _mapPos = Game::getEntityMgr().getComponent<Components::MapPosition>(entity->getUUID());
+            _pos = getGame().getEntityMgr().getComponent<Components::Position>(entity->getUUID());
+            _mapPos = getGame().getEntityMgr().getComponent<Components::MapPosition>(entity->getUUID());
         }
 
         void onEvent(const Events::KeyDown &e)
@@ -70,12 +69,12 @@ namespace
             if (e.button != Events::MouseDown::Button::Right) return;
 
             auto col = e.position.x / 32;
-            auto row = (Window::getHeight() - e.position.y) / 32;
+            auto row = (getGame().getWindow().getHeight() - e.position.y) / 32;
 
             Actions::Movement m(_mapPos->getParent(),
                                 _mapPos->toVector(),
                                 Vector2i(col, row));
-            Game::getMovementSys().queueMovement(std::move(m));
+            getGame().getMovementSys().queueMovement(std::move(m));
         }
 
         std::string toString() const
@@ -95,9 +94,7 @@ std::shared_ptr<Entity> createDog()
 {
     auto dog = Entity::create("Dog");
 
-    SDL_Color colorKey = Color::makeColor(255, 0, 255);
-    auto texture = std::make_shared<Texture>("Dog", "res/dog/dog_down_0.png", &colorKey);
-    Game::getTexMgr().add(texture->getName(), texture);
+    auto texture = Graphics::Texture::create("dog", "res/dog/dog_down_0.png");
 
     //Game::getGraphicsSys().createSpriteComponent(dog, texture->getName());
     auto mapPos = Components::MapPosition::create(dog, 2, 2);
@@ -110,9 +107,9 @@ std::shared_ptr<Entity> createDog()
                                     Window::getWidth() / 64,
                                     Window::getHeight() / 64);*/
 
-    Components::Graphics::Sprite::create(dog,
-                                         texture->getName(),
-                                         "Down");
+    Components::Sprite::create(dog,
+                               texture->getName(),
+                               "Down");
 
     auto subscriber = std::make_shared<DogEventSubscriber>(dog);
     Events::Dispatcher::subscribe<Events::KeyDown>(*subscriber);

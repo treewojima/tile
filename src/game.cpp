@@ -15,116 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "defines.hpp"
 #include "game.hpp"
 
-#include <algorithm>
-#include <GL/glew.h>
-#include <list>
-#include <map>
-#include <memory>
-#include <random>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#ifdef _ENABLE_AUDIO
-#   include <SDL2/SDL_mixer.h>
-#endif
-#include <sstream>
+#include <events/dispatcher.hpp>
+#include <states/maingame.hpp>
 
-#include "color.hpp"
-#include "events/dispatcher.hpp"
-#include "exceptions.hpp"
-#include "graphics.hpp"
-#include "helper_events.hpp"
-#include "logger.hpp"
-#include "map.hpp"
-#include "states/maingame.hpp"
-#include "states/paused.hpp"
-#include "texture.hpp"
-#include "timer.hpp"
-#include "window.hpp"
-
-// Locals
-namespace
+Game::Game(const Options &options) :
+    _options(options),
+    _running(false)
 {
-    // Main loop status flag
-    bool _running = false;
-
-    // Map of event handles to event instances
-    //std::map<Game::Event::Handle, std::shared_ptr<Game::Event>> _events;
-
-    // Timer for tracking and calculating FPS
-    std::unique_ptr<Timer> _fpsTimer;
-
-    // Camera view
-    std::unique_ptr<Camera> _camera;
-
-	// Game map
-	std::unique_ptr<Map> _map;
-
-    // Entity manager
-    std::unique_ptr<EntityManager> _entityMgr;
-
-	// State stack
-    std::unique_ptr<StateManager> _stateMgr;
-
-    // Resource managers
-    std::unique_ptr<TextureManager> _texMgr;
-
-    // Component systems
-    std::unique_ptr<Systems::Graphics> _graphicsSys;
-    std::unique_ptr<Systems::Movement> _movementSys;
-
-    // Subsystem initialization and shutdown functions
-    void initSDL();
-    void initGL();
-#ifdef _ENABLE_AUDIO
-    void initAudio();
-#endif
-    void shutdownSDL();
-
-    // Event handling functions
-    void registerEvents();
-    void handleEvents();
-
-    void spacebar();
-    void leftClick(int col, int row);
-    void rightClick(int col, int row);
-
-    // Catch-all game event handler
-    class Subscriber : public Events::Subscriber
-    {
-    public:
-        void onEvent(const Events::MouseDown &event);
-        void onEvent(const Events::Quit &event);
-
-        std::string toString() const { return "Game::Subscriber"; }
-    };
-    Subscriber _subscriber;
+    Logger::init(options.logFile);
 }
 
-void Game::run(const Game::Options &options)
+void Game::run()
 {
-    // Initialize SDL and create the window
+    // Initialize SDL
     initSDL();
-    Window::create(options.windowWidth, options.windowHeight, options.vsync);
+
+    // Create the renderer and window
+    _renderer = std::make_unique<Graphics::Renderer>();
+    _window = _renderer->getWindow();
 
     // Set up the camera view
     _camera = std::make_unique<Camera>(
                    Vector2f::ZERO,                                        // worldMin
-                   Vector2f(options.windowWidth, options.windowHeight),   // worldMax
+                   Vector2f(_options.windowWidth, _options.windowHeight),   // worldMax
                    Vector2f::ZERO,                                        // screenMin
-                   Vector2f(options.windowWidth, options.windowHeight),   // screenMax
+                   Vector2f(_options.windowWidth, _options.windowHeight),   // screenMax
                    Vector2f::ZERO,                                        // screenMinInWorld
-                   Vector2f(options.windowWidth, options.windowHeight));  // screenMaxInWorld
-
-    // Further initialization for OpenGL and audio
-    initGL();
-#ifdef _ENABLE_AUDIO
-    initAudio();
-#endif
-
-
+                   Vector2f(_options.windowWidth, _options.windowHeight));  // screenMaxInWorld
 
     // Initialize entity manager
     _entityMgr = std::make_unique<EntityManager>();
@@ -137,15 +56,15 @@ void Game::run(const Game::Options &options)
     // initialized yet
     _fpsTimer = std::make_unique<Timer>();
     _stateMgr = std::make_unique<StateManager>();
-    _texMgr = std::make_unique<TextureManager>();
+    _texMgr = std::make_unique<Graphics::TextureManager>();
     _graphicsSys = std::make_unique<Systems::Graphics>();
 
-	_map = std::make_unique<Map>("res/desert.tmx");
+    //_map = std::make_unique<Map>("res/desert.tmx");
 
     // Set up event handling details
     registerEvents();
 
-	// Create the initial main game state
+    // Create the initial main game state
     _stateMgr->push(std::make_shared<States::MainGame>());
 
     // Main loop variables
@@ -167,47 +86,42 @@ void Game::run(const Game::Options &options)
             float avgFPS = countedFrames / (currentTicks / 1000.f);
             std::ostringstream ss;
             ss << "FPS: " << avgFPS;
-            Window::setTitle(ss.str());
+            _window->setTitle(ss.str());
             oldTicks = currentTicks;
         }
 
         // Update scene
         try
         {
-			// First, make sure we even have a state to begin with
+            // First, make sure we even have a state to begin with
             auto state = _stateMgr->peek();
-			if (!state)
-			{
+            if (!state)
+            {
                 throw Exceptions::EmptyStateStack();
-			}
+            }
 
-			// Pre-processing
-			state->preLoop();
-			
-			// Process the event queue
+            // Pre-processing
+            state->preLoop();
+
+            // Process the event queue
             handleEvents();
 
             // Update entities, making sure to let them know how long it's been
             // since the last step
             dt = stepTimer.getTicks() / 1000.f;
-			state->update(dt);
+            state->update(dt);
             _movementSys->update(dt);
 
             // Update the screen
-#ifdef PREPROCESS_MAP
-            Window::clear(255, 255, 255);
-            Graphics::blitTexture("PreprocessedMap",
-                                  Window::getDimensions() / 2);
-            Window::flip();
-#else
+            _renderer->clear();
             state->draw(dt);
-#endif
+            _renderer->present();
 
             // Restart timer
             stepTimer.start();
 
             // Post-processing
-			state->postLoop();
+            state->postLoop();
         }
         catch (std::exception &e)
         {
@@ -226,23 +140,13 @@ void Game::run(const Game::Options &options)
     _fpsTimer->stop();
 
     // Clean up
-	_map->destroy();
     _stateMgr->destroy();
+    _movementSys->destroy();
     _graphicsSys->destroy();
     _entityMgr->destroy();
     _texMgr->clear();
-    Window::destroy();
+    _renderer->destroy();
     shutdownSDL();
-}
-
-bool Game::isRunning()
-{
-    return _running;
-}
-
-void Game::setRunning(bool b)
-{
-    _running = b;
 }
 
 void Game::exit(const std::exception *e)
@@ -263,91 +167,36 @@ void Game::exit(const std::exception *e)
     std::exit(1);
 }
 
-Camera &Game::getCamera()
+void Game::onEvent(const Events::Quit &event)
 {
-    return *_camera;
+    setRunning(false);
+    LOG_INFO << "received quit signal";
 }
 
-EntityManager &Game::getEntityMgr()
+void Game::onEvent(const Events::MouseDown &event)
 {
-    return *_entityMgr;
+    auto col = event.position.x / 32;
+    auto row = (_window->getHeight() - event.position.y) / 32;
+
+    switch (event.button)
+    {
+    case Events::MouseDown::Button::Left:
+        leftClick(col, row);
+        break;
+
+    case Events::MouseDown::Button::Right:
+        rightClick(col, row);
+        break;
+    }
 }
 
-StateManager &Game::getStateMgr()
+void Game::initSDL()
 {
-    return *_stateMgr;
-}
-
-TextureManager &Game::getTexMgr()
-{
-    return *_texMgr;
-}
-
-Systems::Graphics &Game::getGraphicsSys()
-{
-    return *_graphicsSys;
-}
-
-Systems::Movement &Game::getMovementSys()
-{
-    return *_movementSys;
-}
-
-#ifndef NEW_STYLE_EVENTS
-Game::Event::Handle Game::registerEvent(SDL_Scancode key,
-                                        Game::Event::Callback callback,
-                                        const std::string &debugString)
-{
-    return registerEvent(std::shared_ptr<KeyEvent>(
-                             new KeyEvent(key, callback, debugString)));
-}
-
-Game::Event::Handle Game::registerEvent(std::shared_ptr<Game::Event> event)
-{
-    static Event::Handle currentHandle = 0;
-
-    _events[++currentHandle] = event;
-
-#ifdef _DEBUG_EVENTS
-    if (!event->debugString.empty())
-        LOG_DEBUG << "registered event " << event->debugString;
-#endif
-
-    return currentHandle;
-}
-
-void Game::unregisterEvent(Game::Event::Handle handle)
-{
-#ifdef _DEBUG_EVENTS
-    //BOOST_LOG_TRIVIAL(debug) << "trying to unregister event handle " << handle;
-    if (_events.count(handle))
-        LOG_DEBUG << "unregistered event " << _events[handle]->debugString;
-#endif
-
-    _events.erase(handle);
-}
-
-Game::Event::~Event()
-{
-#ifdef _DEBUG_EVENTS
-		LOG_DEBUG << "destroyed event \"" << debugString << "\"";
-#endif
-}
-#endif
-
-// Local functions
-namespace {
-
-void initSDL()
-{
-	int flags = SDL_INIT_VIDEO;
-#ifdef _ENABLE_AUDIO
-	flags |= SDL_INIT_AUDIO;
-#endif
-	if (SDL_Init(flags))
-	{
-        throw Exceptions::SDLException();
-	}
+    // Necessary for SDL_GetKeyboardState()?
+    if (SDL_InitSubSystem(SDL_INIT_EVENTS))
+    {
+        throw Exceptions::Base(SDL_GetError());
+    }
 
     SDL_version version;
     SDL_GetVersion(&version);
@@ -355,58 +204,9 @@ void initSDL()
              << static_cast<int>(version.minor) << "."
              << static_cast<int>(version.patch);
 
-    flags = IMG_INIT_PNG | IMG_INIT_JPG;
-    if (!(IMG_Init(flags) & flags))
-    {
-        SDL_Quit();
-        throw Exceptions::SDLImageException();
-    }
-
     // The internal SDL keystate pointer never changes, so go ahead and
     // assign it now
     Events::KeyDown::keys = SDL_GetKeyboardState(nullptr);
-}
-
-void initGL()
-{
-    auto errorCode = glewInit();
-    if (errorCode != GLEW_OK)
-    {
-        Window::destroy();
-        shutdownSDL();
-        throw Exceptions::GLEWException(errorCode);
-    }
-
-    LOG_INFO << "using GLEW " << glewGetString(GLEW_VERSION);
-    LOG_INFO << "using OpenGL " << glGetString(GL_VERSION);
-
-    glEnable(GL_TEXTURE_2D);
-    glDisable(GL_DEPTH_TEST);
-
-    // Enable alpha blending/transparency
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0);
-
-    //glViewport(0, 0, windowWidth, windowHeight);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    auto screenMinInWorld = _camera->getScreenMinInWorld();
-    auto screenMaxInWorld = _camera->getScreenMaxInWorld();
-    gluOrtho2D(screenMinInWorld.x, screenMaxInWorld.x,
-               screenMinInWorld.y, screenMaxInWorld.y);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    errorCode = glGetError();
-    if (errorCode != GL_NO_ERROR)
-    {
-        Window::destroy();
-        shutdownSDL();
-        throw Exceptions::GLException(errorCode);
-    }
 }
 
 #ifdef _ENABLE_AUDIO
@@ -427,25 +227,21 @@ void initAudio()
 }
 #endif
 
-void shutdownSDL()
+void Game::shutdownSDL()
 {
-#ifdef _ENABLE_AUDIO
-    Mix_Quit();
-#endif
-    IMG_Quit();
     SDL_Quit();
 }
 
-void registerEvents()
+void Game::registerEvents()
 {
     // Window/program quit event
-    Events::Dispatcher::subscribe<Events::Quit>(_subscriber);
+    Events::Dispatcher::subscribe<Events::Quit>(*this);
 
     // Mousedown test
-    Events::Dispatcher::subscribe<Events::MouseDown>(_subscriber);
+    Events::Dispatcher::subscribe<Events::MouseDown>(*this);
 }
 
-void handleEvents()
+void Game::handleEvents()
 {
     // Call input event handlers every tick
     Events::Dispatcher::raise<Events::KeyDown>();
@@ -460,10 +256,6 @@ void handleEvents()
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
-            case SDLK_SPACE:
-                spacebar();
-                break;
-
             case SDLK_ESCAPE:
                 event.type = SDL_QUIT;
                 event.quit.timestamp = SDL_GetTicks();
@@ -501,16 +293,12 @@ void handleEvents()
     }
 }
 
-void spacebar()
-{
-    _movementSys->dumpQueue();
-}
-
-void leftClick(int col, int row)
+void Game::leftClick(int col, int row)
 {
     std::ostringstream ss;
     ss << "Entities at location: ";
 
+#if 0
     try
     {
         auto list = _map->getEntitiesAt(col, row);
@@ -534,33 +322,9 @@ void leftClick(int col, int row)
     }
 
     LOG_DEBUG << ss.str();
+#endif
 }
 
-void rightClick(int col, int row)
+void Game::rightClick(int col, int row)
 {
-}
-
-void Subscriber::onEvent(const Events::Quit &event)
-{
-    Game::setRunning(false);
-    LOG_INFO << "received quit signal";
-}
-
-void Subscriber::onEvent(const Events::MouseDown &event)
-{
-    auto col = event.position.x / 32;
-    auto row = (Window::getHeight() - event.position.y) / 32;
-
-    switch (event.button)
-    {
-    case Events::MouseDown::Button::Left:
-        leftClick(col, row);
-        break;
-
-    case Events::MouseDown::Button::Right:
-        rightClick(col, row);
-        break;
-    }
-}
-
 }

@@ -29,7 +29,6 @@
 class StateManager
 {
 public:
-	StateManager() : _destroyed(false) {}
 	~StateManager();
 	void destroy();
 
@@ -42,7 +41,6 @@ public:
 private:
 	typedef std::stack<StatePtr> StateStack;
 
-	bool _destroyed;
 	StateStack _stateStack;
 };
 

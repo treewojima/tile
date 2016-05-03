@@ -19,15 +19,7 @@
 #define __EXCEPTION_HPP__
 
 #include "defines.hpp"
-#include <GL/glew.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#ifdef _ENABLE_AUDIO
-#   include <SDL2/SDL_mixer.h>
-#endif
-#include <sstream>
 #include <stdexcept>
-#include <string>
 #include "stringable.hpp"
 
 namespace Exceptions

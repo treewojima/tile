@@ -33,29 +33,35 @@ public:
 };
 
 // Helper ostream operators
-inline std::ostream &operator<<(std::ostream &stream, const Stringable &obj)
+inline std::ostream &operator<<(std::ostream &os, const Stringable &obj)
 {
-    stream << obj.toString();
-    return stream;
+    os << obj.toString();
+    return os;
+}
+
+inline std::ostream &operator<<(std::ostream &os, const Stringable *obj)
+{
+    os << (obj ? obj->toString() : "<null>");
+    return os;
 }
 
 template <class T>
-inline std::ostream &operator<<(std::ostream &os, const std::shared_ptr<T> &ptr)
+inline std::ostream &operator<<(std::ostream &os, const std::shared_ptr<T> &obj)
 {
 	static_assert(std::is_base_of<Stringable, T>::value,
 				  "Class T is not subclass of type Stringable");
-			
-	os << ptr->toString();
+
+    os << (obj ? obj->toString() : "<null>");
 	return os;
 }
 
 template <class T>
-inline std::ostream &operator<<(std::ostream &os, const std::unique_ptr<T> &ptr)
+inline std::ostream &operator<<(std::ostream &os, const std::unique_ptr<T> &obj)
 {
 	static_assert(std::is_base_of<Stringable, T>::value,
 			      "Class T is not subclass of type Stringable");
 
-	os << ptr->toString();
+    os << (obj ? obj->toString() : "<null>");
 	return os;
 }
 

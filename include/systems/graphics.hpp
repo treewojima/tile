@@ -23,7 +23,7 @@
 
 #include <map>
 
-#include "components/graphics/sprite.hpp"
+#include "components/sprite.hpp"
 #include "events/subscriber.hpp"
 
 namespace Systems
@@ -43,7 +43,7 @@ namespace Systems
         std::string toString() const;
 
     private:
-        typedef ComponentList<Components::Graphics::Sprite> SpriteComponentList;
+        typedef ComponentList<Components::Sprite> SpriteComponentList;
         SpriteComponentList _spriteComponents;
     };
 }

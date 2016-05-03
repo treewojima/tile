@@ -19,6 +19,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <SDL2/SDL_image.h>
 #include <sstream>
 #include <tmx/Cell.h>
 #include <tmx/TileLayer.h>
@@ -29,14 +30,13 @@
 #include "events/dispatcher.hpp"
 #include "exceptions.hpp"
 #include "game.hpp"
-#include "graphics.hpp"
-#include "window.hpp"
+//#include "graphics.hpp"
+//#include "window.hpp"
 
 const int Map::TILE_WIDTH = 32;
 const int Map::TILE_HEIGHT = Map::TILE_WIDTH;
 
 Map::Map(const std::string &filename) :
-    _destroyed(false),
 	_filename(filename)
 {
     Events::Dispatcher::subscribe<Events::MapPositionComponentCreated>(*this);
@@ -57,44 +57,41 @@ Map::Map(const std::string &filename) :
     LayerVisitor visitor(this);
     _map->visitLayers(visitor);
 
-#ifdef PREPROCESS_MAP
     // Create the preprocessed map texture
     preprocess();
-#endif
 }
 
 Map::~Map()
 {
-    if (!_destroyed) destroy();
+    destroy();
 }
 
 void Map::destroy()
 {
-	if (_destroyed) return;
+    static bool destroyed = false;
+    if (destroyed) return;
 
     Events::Dispatcher::unsubscribe(*this);
 
     _entityGrid.clear();
-#ifdef PREPROCESS_MAP
-    Game::getTexMgr().remove(_preprocessedTexture->getName());
+    getGame().getTexMgr().remove(_preprocessedTexture->getName());
     _preprocessedTexture.reset();
-#endif
 
     // NOTE: should components be unregistered here?
 
-	_destroyed = true;
+    destroyed = true;
 }
 
-#ifdef PREPROCESS_MAP
 void Map::preprocess()
 {
-    // First, create an SDL surface to hold the map
+    // First, create a texture to hold the map
     const int mapWidth = _map->getWidth();
     const int mapHeight = _map->getHeight();
     const int tileWidth = _map->getTileWidth();
     const int tileHeight = _map->getTileHeight();
-    SDL_Surface *surface = Graphics::createBlankSDLSurface(mapWidth * tileWidth,
-                                                           mapHeight * tileHeight);
+    auto texture = Graphics::Texture::create("PreprocessedMap",
+                                             Vector2i(mapWidth * tileWidth,
+                                                      mapHeight * tileHeight));
 
     // Iterate through map entities and blit their textures to the surface
     for (const GridRow &row : _entityGrid)
@@ -104,20 +101,20 @@ void Map::preprocess()
             for (const std::shared_ptr<Entity> &entity : entities)
             {
                 Entity::UUID uuid = entity->getUUID();
-                std::shared_ptr<Components::Graphics::Sprite> sprite =
-                        Game::getEntityMgr().getComponent<Components::Graphics::Sprite>(uuid);
+                std::shared_ptr<Components::Sprite> sprite =
+                        getGame().getEntityMgr().getComponent<Components::Sprite>(uuid);
                 std::shared_ptr<Components::Position> pos =
-                        Game::getEntityMgr().getComponent<Components::Position>(uuid);
+                        getGame().getEntityMgr().getComponent<Components::Position>(uuid);
 
-                TextureManager::Resource texture = Game::getTexMgr()[sprite->texture];
                 SDL_Rect destRect = { pos->x,
                                       mapHeight * tileHeight - pos->y,
                                       tileWidth,
                                       tileHeight };
-                SDL_BlitSurface(texture->getSurface(),
-                                nullptr,
-                                surface,
-                                &destRect);
+
+                getGame().getRenderer().blitToTexture(sprite->texture,
+                                                      nullptr,
+                                                      texture->getName(),
+                                                      &destRect);
             }
         }
     }
@@ -125,17 +122,13 @@ void Map::preprocess()
     // Replace the old preprocessed map texture with the new one
     if (_preprocessedTexture)
     {
-        Game::getTexMgr().remove(_preprocessedTexture->getName());
+        getGame().getTexMgr().remove(_preprocessedTexture->getName());
     }
     _preprocessedTexture.reset();
-    auto rgbStr = _map->getBackgroundColor().substr(1);
-    const SDL_Color colorKey = Color::parseRGBHexString(rgbStr);
-    _preprocessedTexture = std::make_shared<Texture>("PreprocessedMap",
-                                                     surface);
-    Game::getTexMgr().add(_preprocessedTexture->getName(),
-                          _preprocessedTexture);
+    _preprocessedTexture = texture;
+    getGame().getTexMgr().add(texture->getName(),
+                          texture);
 }
-#endif
 
 Map::EntityList Map::getEntitiesAt(int col, int row)
 {
@@ -190,7 +183,11 @@ void Map::loadTilesetTextures()
     for (auto tileset : _map->getTileSets())
     {
         auto image = tileset->getImage();
-        auto tilesetSurface = Graphics::loadSDLSurface(image->getSource().string());
+        auto tilesetSurface = IMG_Load(image->getSource().string().c_str());
+        if (!tilesetSurface)
+        {
+            throw Exceptions::MapException(IMG_GetError());
+        }
 
         const int tileWidth = tileset->getTileWidth();
 		if (tileWidth != TILE_WIDTH)
@@ -222,38 +219,17 @@ void Map::loadTilesetTextures()
         {
             for (int col = 0; col < numCols; col++)
             {
+                std::ostringstream name;
+                name << tileset->getName() << "-" << gid++;
+
                 srcRect.x = (margin * (col + 1)) + (tileWidth * col);
                 srcRect.y = (margin * (row + 1)) + (tileHeight * row);
                 srcRect.w = tileWidth;
                 srcRect.h = tileHeight;
 
-                auto destSurface = Graphics::createBlankSDLSurface(tileWidth, tileHeight);
-                assert(destSurface != nullptr);
-
-                SDL_BlitSurface(tilesetSurface,
-                                &srcRect,
-                                destSurface,
-                                nullptr);
-
-                std::ostringstream name;
-                name << tileset->getName() << "-" << gid++;
-
-                // NOTE: For some reason, freeing destSurface causes segfaults
-                //       or similar errors. It seems to be random exactly which
-                //       iteration of the loop it occurs, so I'm not sure what's
-                //       causing it. It's odd because the surface optimization
-                //       process frees an intermediate surface per iteration as
-                //       well, but with no errors.
-                //
-                //       By setting freeSurface to false this issue is avoided.
-                //       However, it leaves the intermediate surface in memory,
-                //       which is a leak!
-                auto texture = std::make_shared<Texture>(name.str(),
-                                                         destSurface,
-                                                         &Color::COLOR_KEY, //&colorKey,
-                                                         false,       // do NOT free the surface
-                                                         true);
-                Game::getTexMgr().add(texture->getName(), texture);
+                Graphics::Texture::create(name.str(),
+                                          tilesetSurface,
+                                          &srcRect);
             }
         }
 
@@ -298,11 +274,11 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
 
             auto absPos = Components::Position::create(entity, *mapPos);
 
-            auto texture = Game::getTexMgr().get(textureName.str());
+            auto texture = getGame().getTexMgr().get(textureName.str());
             //entity->graphics =
             //        std::make_shared<Components::StaticSprite>(texture,
             //                                                   entity->position);
-			Components::Graphics::Sprite::create(entity, textureName.str());
+            Components::Sprite::create(entity, textureName.str());
 //#define _DEBUG_ENTITIES
 #if defined(_DEBUG_MAP) && defined(_DEBUG_ENTITIES)
             LOG_DEBUG << "created entity: (" << mapPos->x << "," << mapPos->y << ") -> "

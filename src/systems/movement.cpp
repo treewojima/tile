@@ -60,9 +60,9 @@ void Systems::Movement::update(float dt)
 
             // Next, update the actual position components
             // NOTE: this is clunky code and should be changed
-            auto pos = Game::getEntityMgr().getComponent<Components::Position>(
+            auto pos = getGame().getEntityMgr().getComponent<Components::Position>(
                         m.entity->getUUID());
-            auto mapPos = Game::getEntityMgr().getComponent<Components::MapPosition>(
+            auto mapPos = getGame().getEntityMgr().getComponent<Components::MapPosition>(
                         m.entity->getUUID());
             mapPos->x = current.x;
             mapPos->y = current.y;

@@ -15,30 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WINDOW_HPP__
-#define __WINDOW_HPP__
+#ifndef __GRAPHICS_WINDOW_HPP__
+#define __GRAPHICS_WINDOW_HPP__
 
 #include "defines.hpp"
-
-#include <memory>
-
 #include "exceptions.hpp"
-#include "texture.hpp"
 #include "vector.hpp"
 
-namespace Window
+class SDL_Window;
+
+namespace Graphics
 {
-    void create(int width, int height, bool vsync);
-    void destroy();
+    class Window : public Stringable
+    {
+        friend class Renderer;
 
-    void clear(float r = 0, float g = 0, float b = 0, float a = 0);
-    void flip();
+    public:
+        Window();
+        ~Window();
 
-    void setTitle(const std::string &title);
+        void destroy();
 
-    Vector2i getDimensions();
-    inline int getWidth() { return getDimensions().x; }
-    inline int getHeight() { return getDimensions().y; }
+        void setTitle(const std::string &&title);
+
+        Vector2i getDimensions() const;
+        inline int getWidth() const { return getDimensions().x; }
+        inline int getHeight() const { return getDimensions().y; }
+
+        std::string toString() const;
+
+    private:
+        SDL_Window *_window;
+        unsigned _width, _height;
+    };
 }
 
 namespace Exceptions

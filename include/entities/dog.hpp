@@ -19,50 +19,8 @@
 #define __ENTITIES_DOG_HPP__
 
 #include "defines.hpp"
-
-#ifdef _USE_NEW_ENTITY
-
 #include "entity.hpp"
 
 std::shared_ptr<Entity> createDog();
-
-#else
-
-#include <memory>
-#include <vector>
-
-#include "components/animatedsprite.hpp"
-#include "entity.hpp"
-#include "game.hpp"
-
-class Dog : public Entity
-{
-public:
-	Dog();
-    ~Dog();
-
-private:
-	enum Direction
-	{
-		Up,
-		Down,
-		Left,
-		Right,
-		NUM_DIRECTIONS
-	};
-
-	static bool _texturesLoaded;
-	static const int NUM_FRAMES;
-	static const char *_strings[];
-	
-	std::shared_ptr<Components::AnimatedSprite> _directions[NUM_DIRECTIONS];
-	std::vector<Game::Event::Handle> _eventHandles;
-
-	static void loadTextures();
-
-	void registerEvents();
-};
-
-#endif
 
 #endif
