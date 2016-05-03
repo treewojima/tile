@@ -85,8 +85,8 @@ SDL_Color Color::parseRGBHexString(std::string s)
     return makeColor(c);
 }
 
-uint32_t Color::convertToUint32(const SDL_Color &color,
-                                 const SDL_PixelFormat *format)
+uint32_t Color::toUnsigned(const SDL_Color &color,
+                           const SDL_PixelFormat *format)
 {
     return SDL_MapRGBA(format, color.r, color.g, color.b, color.a);
 }

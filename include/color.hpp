@@ -45,8 +45,8 @@ namespace Color
 
     SDL_Color parseRGBHexString(std::string s);
 
-    uint32_t convertToUint32(const SDL_Color &color,
-                             const SDL_PixelFormat *format);
+    uint32_t toUnsigned(const SDL_Color &color,
+                        const SDL_PixelFormat *format);
 }
 
 #endif
