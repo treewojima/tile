@@ -27,9 +27,9 @@
 
 #include "components/mapposition.hpp"
 #include "events/subscriber.hpp"
+#include "graphics/texture.hpp"
 #include "exceptions.hpp"
 #include "stringable.hpp"
-#include "texture.hpp"
 
 #ifdef _DEBUG
 #   define DEBUG_MAP
@@ -43,9 +43,7 @@ public:
 
 	void destroy();
 
-#ifdef PREPROCESS_MAP
     void preprocess();
-#endif
 
     typedef std::vector<std::shared_ptr<Entity>> EntityList;
     EntityList getEntitiesAt(int col, int row);
@@ -68,14 +66,10 @@ private:
         Map *_parent;
     };
 
-	bool _destroyed;
 	std::string _filename;
     std::unique_ptr<tmx::Map> _map;
 
-#ifdef PREPROCESS_MAP
-    std::vector<SDL_Surface *> _tilesetSurfaces;
-    std::shared_ptr<Texture> _preprocessedTexture;
-#endif
+    std::shared_ptr<Graphics::Texture> _preprocessedTexture;
 
     //std::list<std::shared_ptr<Entity>> _entities;
     //std::list<std::shared_ptr<Components::MapPosition>> _components;

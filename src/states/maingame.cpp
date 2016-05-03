@@ -33,7 +33,7 @@ void States::MainGame::initialize()
     loadTextures();
     createEntities();
 
-    //_map = std::make_unique<Map>("desert", "res/desert.tmx");
+    //_map = std::make_unique<Map>("res/desert.tmx");
 }
 
 void States::MainGame::destroy()
@@ -43,55 +43,15 @@ void States::MainGame::destroy()
 
 void States::MainGame::draw(float dt)
 {
-    Game::getGraphicsSys().update(dt);
+    getGame().getGraphicsSys().update(dt);
 }
 
 void States::MainGame::loadTextures()
 {
-    const SDL_Color colorKey = Color::makeColor(255, 0, 255);
-    std::shared_ptr<Texture> texture;
-
-    //texture = std::make_shared<Texture>("tux", "res/tux.png", &colorKey);
-    //_texMgr.add(texture->getName(), texture);
-
-    //texture = std::make_shared<Texture>("beastie", "res/beastie.png", &colorKey);
-    //_texMgr.add(texture->getName(), texture);
-
-    for (int i = 1; i <= 4; i++)
-    {
-        std::ostringstream ss;
-        ss << "foo" << i;
-        texture = std::make_shared<Texture>(ss.str(), "res/" + ss.str() + ".png", &colorKey);
-        Game::getTexMgr().add(texture->getName(), texture);
-    }
 }
 
 void States::MainGame::createEntities()
 {
-#if 0
-    //_entities.push_back(std::make_shared<Tux>(Vector2f::ZERO));
-
-    auto tux = std::make_shared<Tux>();
-    tux->position = std::make_shared<Components::Position>(Window::getWidth() / 2,
-        Window::getHeight() / 2);
-
-    Components::AnimatedSprite::TextureList textures;
-    //textures.push_back(_texMgr.get("tux"));
-    //textures.push_back(_texMgr.get("beastie"));
-    for (int i = 1; i <= 4; i++)
-    {
-        std::ostringstream ss;
-        ss << "foo" << i;
-        textures.push_back(Game::getTexMgr().get(ss.str()));
-    }
-
-    tux->graphics = std::make_shared<Components::AnimatedSprite>(textures,
-        tux->position);
-
-    _entities.push_back(tux);
-#endif
-
-    //_entities.push_back(std::make_shared<Dog>());
     createDog();
 }
 

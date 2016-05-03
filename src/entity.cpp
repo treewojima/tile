@@ -27,7 +27,7 @@
 
 std::shared_ptr<Entity> Entity::create(const std::string &debugName)
 {
-    return Game::getEntityMgr().createEntity(debugName);
+    return getGame().getEntityMgr().createEntity(debugName);
 }
 
 Entity::Entity(UUID uuid, const std::string &debugName) :

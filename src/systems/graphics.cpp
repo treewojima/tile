@@ -22,9 +22,7 @@
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
 #include "game.hpp"
-#include "graphics.hpp"
 #include "logger.hpp"
-#include "window.hpp"
 
 Systems::Graphics::Graphics() : Base()
 {
@@ -48,18 +46,16 @@ void Systems::Graphics::destroy()
 
 void Systems::Graphics::update(float dt)
 {
-    Window::clear(255, 255, 255);
-
     // NOTE: This is pretty naive and slow. Make sure to implement some sort of caching
     //       system to optimize this!
 
     for (auto &sprite : _spriteComponents)
     {
         const auto &parent = sprite->getParent();
-        const auto &pos = Game::getEntityMgr().getComponent<Components::Position>(parent->getUUID());
+        const auto &pos = getGame().getEntityMgr().getComponent<Components::Position>(parent->getUUID());
         if (pos)
         {
-            ::Graphics::blitTexture(sprite->texture, pos->x, pos->y);
+            getGame().getRenderer().blitToScreen(sprite->texture, pos->x, pos->y);
         }
         else
         {
@@ -68,8 +64,6 @@ void Systems::Graphics::update(float dt)
             throw Exceptions::Base(ss.str());
         }
     }
-
-    Window::flip();
 }
 
 void Systems::Graphics::onEvent(const Events::SpriteComponentCreated &event)

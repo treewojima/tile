@@ -20,75 +20,93 @@
 
 #include "defines.hpp"
 
-#include <functional>
-#include <SDL2/SDL.h>
-#include <string>
+#include <memory>
 
 #include "camera.hpp"
 #include "entitymanager.hpp"
+#include "graphics/renderer.hpp"
+//#include "map.hpp"
+#include "helper_events.hpp"
 #include "statemanager.hpp"
 #include "systems/graphics.hpp"
 #include "systems/movement.hpp"
-#include "texture.hpp"
+#include "timer.hpp"
 
-#define NEW_STYLE_EVENTS
-
-namespace Game
+class Game : public Events::Subscriber
 {
+public:
     struct Options
     {
 		std::string programName;
-        int windowWidth, windowHeight;
+        unsigned windowWidth, windowHeight;
 		bool vsync;
 		std::string logFile;
     };
 
-#ifndef NEW_STYLE_EVENTS
-    class Event
-    {        
-    public:
-        typedef int Handle;
-        typedef std::function<void (const SDL_Event &e)> Callback;
+    Game(const Options &options);
 
-        Event(const std::string &debugString_ = std::string()) :
-            debugString(debugString_) {}
-
-		virtual ~Event();
-
-        virtual bool test(const SDL_Event &e) = 0;
-        virtual void fire(const SDL_Event &e) = 0;
-
-        std::string debugString;
-
-        // This doesn't quite work as const since the value can't be determined
-        // at compile time, so... don't fuck with this after it's set!
-        static Uint32 CUSTOM_KEYPRESS_EVENT;
-    };
-#endif
-
-    void run(const Options &options);
-
-    bool isRunning();
-    void setRunning(bool b);
-
+    void run();
     void exit(const std::exception *e = nullptr);
 
-    Camera &getCamera();
+    void onEvent(const Events::MouseDown &event);
+    void onEvent(const Events::Quit &event);
 
-    EntityManager &getEntityMgr();
-	StateManager &getStateMgr();
-    TextureManager &getTexMgr();
+    inline bool isRunning() { return _running; }
+    inline void setRunning(bool b) { _running = b; }
 
-    Systems::Graphics &getGraphicsSys();
-    Systems::Movement &getMovementSys();
+    inline const Options &getOptions() { return _options; }
 
-#ifndef NEW_STYLE_EVENTS
-    Event::Handle registerEvent(SDL_Scancode key,
-                                Event::Callback callback,
-                                const std::string &debugString = std::string());
-    Event::Handle registerEvent(std::shared_ptr<Event> event);
-    void unregisterEvent(Event::Handle handle);
+    inline Graphics::Window &getWindow() { return *_window; }
+    inline Graphics::Renderer &getRenderer() { return *_renderer; }
+    inline Camera &getCamera() { return *_camera; }
+
+    inline EntityManager &getEntityMgr() { return *_entityMgr; }
+    inline StateManager &getStateMgr() { return *_stateMgr; }
+    inline Graphics::TextureManager &getTexMgr() { return *_texMgr; }
+
+    inline Systems::Graphics &getGraphicsSys() { return *_graphicsSys; }
+    Systems::Movement &getMovementSys() { return *_movementSys; }
+
+    std::string toString() const { return "Game[]"; }
+
+private:
+    // Subsystem initialization/shutdown
+    void initSDL();
+#ifdef _ENABLE_AUDIO
+    initAudio();
 #endif
-}
+    void shutdownSDL();
+
+    // Event handling
+    void registerEvents();
+    void handleEvents();
+    void leftClick(int col, int row);
+    void rightClick(int col, int row);
+
+    // Game options and internal state
+    Options _options;
+    bool _running;
+
+    // Renderer and related objects
+    std::unique_ptr<Graphics::Renderer> _renderer;
+    std::shared_ptr<Graphics::Window> _window;
+    std::unique_ptr<Camera> _camera;
+
+    // FPS timer
+    std::unique_ptr<Timer> _fpsTimer;
+
+    // Test map
+    //std::unique_ptr<Map> _map;
+
+    // Entity and component systems
+    std::unique_ptr<EntityManager> _entityMgr;
+    std::unique_ptr<StateManager> _stateMgr;
+    std::unique_ptr<Graphics::TextureManager> _texMgr;
+    std::unique_ptr<Systems::Graphics> _graphicsSys;
+    std::unique_ptr<Systems::Movement> _movementSys;
+};
+
+// Global game instance getter (in main.cpp)
+Game &getGame();
 
 #endif

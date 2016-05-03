@@ -42,7 +42,7 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(gLog, src::severity_logger_mt<Logger::SeverityType>
 	return lg;
 }
 
-void Logger::init(const Game::Options &options)
+void Logger::init(const std::string &logFile)
 {
 	bl::core::get()->add_global_attribute("TimeStamp", attr::local_clock());
 	
@@ -51,7 +51,7 @@ void Logger::init(const Game::Options &options)
 
 	// File stream
     sink->locked_backend()->add_stream(
-                boost::make_shared<std::ofstream>(options.logFile));
+                boost::make_shared<std::ofstream>(logFile));
 
 	// std::cout stream
     sink->locked_backend()->add_stream(
@@ -72,4 +72,9 @@ void Logger::init(const Game::Options &options)
 #endif
 
 	bl::core::get()->add_sink(sink);
+}
+
+void Logger::destroy()
+{
+    bl::core::get()->remove_all_sinks();
 }

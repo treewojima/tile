@@ -41,6 +41,7 @@ public:
     inline State getState() const { return _state; }
 
 private:
+    static bool _initialized;
     long _startTicks;
     long _pausedTicks;
     State _state;

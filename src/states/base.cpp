@@ -22,5 +22,5 @@
 
 bool States::Base::isActive() const
 {
-	return (this == Game::getStateMgr().peek().get());
+    return (this == getGame().getStateMgr().peek().get());
 }

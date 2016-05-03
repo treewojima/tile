@@ -22,11 +22,18 @@
 
 #include "logger.hpp"
 
+bool Timer::_initialized = false;
+
 Timer::Timer() :
     _startTicks(0),
     _pausedTicks(0),
     _state(State::STOPPED)
 {
+    if (!_initialized)
+    {
+        SDL_InitSubSystem(SDL_INIT_TIMER);
+        _initialized = true;
+    }
 }
 
 void Timer::start()

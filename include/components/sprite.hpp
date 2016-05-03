@@ -15,31 +15,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPONENTS_GRAPHICS_BASE_HPP__
-#define __COMPONENTS_GRAPHICS_BASE_HPP__
+#ifndef __COMPONENTS_GRAPHICS_SPRITE_HPP__
+#define __COMPONENTS_SPRITE_HPP__
 
 #include "defines.hpp"
 
-#ifdef _USE_NEW_COMPONENTS
-
 #include "components/base.hpp"
+#include "graphics/texture.hpp"
 
 namespace Components
 {
-    namespace Graphics
+    class Sprite final : public Base
     {
-        class Base : public Components::Base
-        {
-        protected:
-            using Components::Base::Base;
+    public:
+        static std::shared_ptr<Sprite> create(std::shared_ptr<Entity> parent,
+                                              const Graphics::TextureManager::Key &texture_,
+                                              const std::string &debugName = "");
 
-        public:
-            std::string toString() const;
-        };
-    }
+    private:
+        Sprite(std::shared_ptr<Entity> parent,
+               const Graphics::TextureManager::Key &texture_,
+               const std::string &debugName);
+
+    public:
+        Graphics::TextureManager::Key texture;
+
+        std::string toString() const;
+    };
+}
+
+namespace Events
+{
+    typedef SpecificComponentCreated<Components::Sprite> SpriteComponentCreated;
 }
 
 #endif
-
-#endif
-

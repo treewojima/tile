@@ -28,27 +28,34 @@
 // Locals
 namespace
 {
-    const int DEFAULT_WINDOW_WIDTH  = 800;
-    const int DEFAULT_WINDOW_HEIGHT = 600;
+    const unsigned DEFAULT_WINDOW_WIDTH  = 800;
+    const unsigned DEFAULT_WINDOW_HEIGHT = 600;
 
 	Game::Options parseArgs(int argc, char *argv[]);
+
+    std::unique_ptr<Game> _game;
+}
+
+Game &getGame()
+{
+    return *_game;
 }
 
 int main(int argc, char *argv[])
 {
     try
     {
-		auto options = parseArgs(argc, argv);
-		Logger::init(options);
-		Game::run(options);
+        auto options = parseArgs(argc, argv);
+
+        _game = std::make_unique<Game>(options);
+        _game->run();
     }
     catch (std::exception &e)
     {
         LOG_ERROR << "EXCEPTION: " << e.what();
-        std::exit(1);
     }
 
-	LOG_INFO << "shut down cleanly";
+    LOG_INFO << "shut down cleanly";
     return 0;
 }
 
@@ -72,8 +79,8 @@ Game::Options parseArgs(int argc, char *argv[])
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "produce help message")
-		("width,w", po::value<int>(&options.windowWidth)->default_value(DEFAULT_WINDOW_WIDTH), "set window width")
-		("height,h", po::value<int>(&options.windowHeight)->default_value(DEFAULT_WINDOW_HEIGHT), "set window height")
+        ("width,w", po::value<unsigned>(&options.windowWidth)->default_value(DEFAULT_WINDOW_WIDTH), "set window width")
+        ("height,h", po::value<unsigned>(&options.windowHeight)->default_value(DEFAULT_WINDOW_HEIGHT), "set window height")
 		("vsync,v", "enable vsync")
 		("log-file", po::value<std::string>(&options.logFile)->default_value(defaultLogFile.str()), "set output log file");
 
@@ -87,14 +94,15 @@ Game::Options parseArgs(int argc, char *argv[])
 		std::exit(0);
 	}
 
-    if (map.count("vsync"))
+    options.vsync = map.count("vsync");
+    /*if (map.count("vsync"))
 	{
 		options.vsync = true;
 	}
 	else
 	{
 		options.vsync = false;
-	}
+    }*/
 
 	return options;
 #else

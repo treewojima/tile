@@ -20,7 +20,6 @@
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
 #include "map.hpp"
-#include "window.hpp"
 
 Components::Position::Position(std::shared_ptr<Entity> parent,
                                int x_,

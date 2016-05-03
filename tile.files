@@ -1,9 +1,7 @@
 include/defines.hpp
 include/exceptions.hpp
 include/game.hpp
-include/texture.hpp
 include/timer.hpp
-include/window.hpp
 src/entity.cpp.old
 src/game.cpp
 src/main.cpp
@@ -33,8 +31,6 @@ src/vector.cpp
 include/map.hpp
 src/map.cpp
 include/resourcemanager.hpp
-include/graphics.hpp
-src/graphics.cpp
 include/components/position.hpp
 src/components/position.cpp
 include/components/base.hpp
@@ -80,7 +76,6 @@ include/components/position.hpp
 include/components/staticsprite.hpp
 include/entities/dog.hpp
 include/entities/tux.hpp
-include/states/paused.hpp
 include/tmx/Adaptor.h
 include/tmx/Cell.h
 include/tmx/Component.h
@@ -120,7 +115,6 @@ src/components/position.cpp
 src/components/staticsprite.cpp
 src/entities/dog.cpp
 src/entities/tux.cpp
-src/states/paused.cpp
 src/tmx/Component.cpp
 src/tmx/Layers.cpp
 src/tmx/LayerVisitor.cpp
@@ -414,7 +408,6 @@ src/texture.cpp
 src/timer.cpp
 src/vector.cpp
 src/window.cpp
-include/components/graphics/base.hpp
 include/components/actionqueue.hpp
 include/components/animatedsprite.hpp
 include/components/base.hpp
@@ -422,7 +415,6 @@ include/components/graphics.hpp
 include/components/position.hpp
 include/components/propertylist.hpp
 include/components/staticsprite.hpp
-src/components/graphics/base.cpp
 src/components/actionqueue.cpp
 src/components/animatedsprite.cpp
 src/components/base.cpp
@@ -430,7 +422,6 @@ src/components/graphics.cpp
 src/components/position.cpp
 src/components/propertylist.cpp
 src/components/staticsprite.cpp
-include/components/graphics/sprite.hpp
 src/components/graphics/sprite.cpp
 include/components/new_base.hpp
 src/components/new_base.cpp
@@ -502,3 +493,11 @@ include/components/eventsubscriber.hpp
 src/components/eventsubscriber.cpp
 include/systems/movement.hpp
 src/systems/movement.cpp
+include/graphics/window.hpp
+src/graphics/window.cpp
+include/graphics/renderer.hpp
+src/graphics/renderer.cpp
+src/graphics/texture.cpp
+include/graphics/texture.hpp
+include/components/sprite.hpp
+src/components/sprite.cpp
