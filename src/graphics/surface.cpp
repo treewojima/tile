@@ -29,7 +29,8 @@ Graphics::Surface::create(SDL_Surface *surface,
 }
 
 std::shared_ptr<Graphics::Surface>
-Graphics::Surface::create(const Vector2i &dimensions, const SDL_Color &color)
+Graphics::Surface::create(const Vector2i &dimensions,
+                          const SDL_Color &color)
 {
     return create(createBlankSurface(dimensions, color));
 }
@@ -41,12 +42,13 @@ Graphics::Surface::create(const std::string &filename,
     auto surface = IMG_Load(filename.c_str());
     if (!surface)
         throw Exceptions::GraphicsException();
-    return create(surface, colorKey);
+    return create(surface, nullptr, colorKey);
 }
 
 Graphics::Surface::Surface(SDL_Surface *surface,
-                           SDL_Surface *rect,
-                           const SDL_Color &colorKey)
+                           SDL_Rect *rect,
+                           const SDL_Color &colorKey) :
+    _surface(nullptr)
 {
     if (!surface)
     {
@@ -55,13 +57,15 @@ Graphics::Surface::Surface(SDL_Surface *surface,
 
     if (rect)
     {
-        auto newSurface = createBlankSurface(Vector2i(rect->w, rect->h));
-        SDL_BlitSurface(surface, rect, newSurface, nullptr);
+        SDL_Surface *newSurface = createBlankSurface(Vector2i(rect->w, rect->h),
+                                                     Color::COLOR_KEY);
+        innerBlit(surface, rect, newSurface, nullptr);
         SDL_FreeSurface(surface);
         surface = newSurface;
     }
 
     SDL_SetColorKey(surface, true, Color::toUnsigned(colorKey, surface->format));
+    SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 
     _surface = surface;
 }
@@ -82,11 +86,27 @@ void Graphics::Surface::destroy()
     destroyed = true;
 }
 
+void Graphics::Surface::blit(std::shared_ptr<Surface> src,
+                             SDL_Rect *srcRect,
+                             std::shared_ptr<Surface> dest,
+                             SDL_Rect *destRect)
+{
+    innerBlit(src->_surface, srcRect, dest->_surface, destRect);
+}
+
 std::string Graphics::Surface::toString() const
 {
     std::ostringstream ss;
     ss << "Surface[dimensions = " << getDimensions() << "]";
     return ss.str();
+}
+
+void Graphics::Surface::innerBlit(SDL_Surface *src,
+                                  SDL_Rect *srcRect,
+                                  SDL_Surface *dest,
+                                  SDL_Rect *destRect)
+{
+    SDL_BlitSurface(src, srcRect, dest, destRect);
 }
 
 SDL_Surface *Graphics::Surface::createBlankSurface(const Vector2i &dimensions,

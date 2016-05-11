@@ -15,12 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPONENTS_BASE_HPP__
-#define __COMPONENTS_BASE_HPP__
+#ifndef __COMPONENTS_TILESETINFO_HPP__
+#define __COMPONENTS_TILESETINFO_HPP__
 
 #include "defines.hpp"
-
-#warning This header is deprecated; include "entity.hpp" instead
 #include "entity.hpp"
+#include "game.hpp"
+
+namespace Components
+{
+    class TilesetInfo : public Base
+    {
+    public:
+        std::shared_ptr<TilesetInfo> create(const Entity::UUID &parent,
+                                            int gid_,
+                                            const std::string &debugName = "TilesetInfo");
+
+    private:
+        TilesetInfo(const Entity::UUID &parent,
+                    int gid_,
+                    const std::string &debugName);
+
+    public:
+        int gid;
+
+        std::string toString() const;
+    };
+}
+
+namespace Events
+{
+    typedef SpecificComponentCreated<Components::TilesetInfo> TilesetInfoComponentCreated;
+}
 
 #endif

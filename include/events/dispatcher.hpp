@@ -31,7 +31,6 @@
 #include <unordered_map>
 #include <utility>
 
-//#include "components/base.hpp"
 #include "events/base.hpp"
 #include "events/subscriber.hpp"
 #ifdef _DEBUG_NEW_EVENTS

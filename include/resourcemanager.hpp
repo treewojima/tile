@@ -28,7 +28,6 @@
 #include <utility>
 
 #include "exceptions.hpp"
-//#include "logger.hpp"
 
 namespace Exceptions
 {
@@ -40,12 +39,13 @@ namespace Exceptions
     };
 }
 
-template <class T>
+#if 0
+template <class V, class K = std::string>
 class KeyValuePair
 {
 public:
-    typedef std::string Key;
-    typedef T Value;
+    typedef K Key;
+    typedef V Value;
 
     KeyValuePair(const Key &k, Value &v) : key(k), value(v) {}
     KeyValuePair(const std::pair<Key, Value> &pair) : key(pair.first), value(pair.second) {}
@@ -53,14 +53,15 @@ public:
     Key key;
     Value value;
 };
+#endif
 
-// Lightweight wrapper around a map with strings as keys
-template <class T>
+// Lightweight wrapper around a map
+template <class V, class K = std::string>
 class ResourceManager
 {
 public:
-    typedef T Resource;
-    typedef typename KeyValuePair<Resource>::Key Key;
+    typedef V Resource;
+    typedef K Key;
 
 private:
     // unordered_map is faster than map for random access, but slower
@@ -69,11 +70,10 @@ private:
     typedef std::unordered_map<Key, Resource> ResourceMap;
 
 public:
-	ResourceManager() : _destroyed(false) {}
     virtual ~ResourceManager();
 	void destroy();
 
-    void add(const Key &name, Resource resource);
+    void add(const Key &name, const Resource &resource);
     bool has(const Key &name) const;
     Resource get(const Key &name) const;
     void remove(const Key &name);
@@ -81,45 +81,35 @@ public:
 
     Resource &operator[](const Key &name);
 
-    void forEach(std::function<void(KeyValuePair<Resource>)> f) const;
+    void forEach(std::function<void (const std::pair<Key, Resource> &)> f) const;
 
 private:
-	bool _destroyed;
     ResourceMap _map;
 };
 
-template <class T>
-ResourceManager<T>::~ResourceManager()
+template <class V, class K>
+ResourceManager<V, K>::~ResourceManager()
 {
-	if (!_destroyed) destroy();
+    destroy();
 }
 
-template <class T>
-void ResourceManager<T>::destroy()
+template <class V, class K>
+void ResourceManager<V, K>::destroy()
 {
-	if (_destroyed) return;
+    static bool destroyed = false;
+    if (destroyed) return;
 
 	// NOTE: Should this just rely on clearing the map, or should it be ensured
 	//       that every ResourcePtr is dropped properly?
 
-	_map.clear();
+    clear();
 
-	_destroyed = true;
+    destroyed = true;
 }
 
-template <class T>
-void ResourceManager<T>::add(const Key &name, Resource resource)
+template <class V, class K>
+void ResourceManager<V, K>::add(const Key &name, const Resource &resource)
 {
-#if 0
-    if (!ptr)
-    {
-        std::ostringstream ss;
-        ss << "could not insert new resource \"" << name
-           << "\" into ResourceManager: NULL pointer";
-        throw Exception(ss.str());
-    }
-#endif
-
     auto ret = _map.insert(std::make_pair(name, resource));
     if (!ret.second)
     {
@@ -133,14 +123,14 @@ void ResourceManager<T>::add(const Key &name, Resource resource)
     }
 }
 
-template <class T>
-bool ResourceManager<T>::has(const Key &name) const
+template <class V, class K>
+bool ResourceManager<V, K>::has(const Key &name) const
 {
 	return _map.count(name);
 }
 
-template <class T>
-typename ResourceManager<T>::Resource ResourceManager<T>::get(const Key &name) const
+template <class V, class K> typename ResourceManager<V, K>::Resource
+ResourceManager<V, K>::get(const Key &name) const
 {
 	// NOTE: Should this use has() or the subscript operator instead?
 
@@ -154,8 +144,8 @@ typename ResourceManager<T>::Resource ResourceManager<T>::get(const Key &name) c
     }
 }
 
-template <class T>
-void ResourceManager<T>::remove(const Key &name)
+template <class V, class K>
+void ResourceManager<V, K>::remove(const Key &name)
 {
     auto i = _map.find(name);
     if (i == _map.end())
@@ -168,8 +158,8 @@ void ResourceManager<T>::remove(const Key &name)
     }
 }
 
-template <class T>
-void ResourceManager<T>::clear()
+template <class V, class K>
+void ResourceManager<V, K>::clear()
 {
     // NOTE: Should every ResourcePtr be properly dropped, or is clearing the
     //       internal map enough?
@@ -177,8 +167,8 @@ void ResourceManager<T>::clear()
     _map.clear();
 }
 
-template <class T>
-typename ResourceManager<T>::Resource &ResourceManager<T>::operator[](const Key &name)
+template <class V, class K> typename ResourceManager<V, K>::Resource
+&ResourceManager<V, K>::operator[](const Key &name)
 {
     try
     {
@@ -190,12 +180,13 @@ typename ResourceManager<T>::Resource &ResourceManager<T>::operator[](const Key 
     }
 }
 
-template <class T>
-void ResourceManager<T>::forEach(std::function<void(KeyValuePair<Resource>)> f) const
+template <class V, class K>
+void ResourceManager<V, K>::forEach(std::function<void (const std::pair<Key, Resource> &)> f) const
 {
-    for (auto iter = _map.begin() ; iter != _map.end(); iter++)
+    //for (const auto &iter = _map.begin() ; iter != _map.end(); iter++)
+    for (const auto &pair : _map)
     {
-        f(KeyValuePair<Resource>(*iter));
+        f(pair);
     }
 }
 

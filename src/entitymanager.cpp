@@ -79,6 +79,18 @@ void EntityManager::destroyEntity(UUID uuid)
     _map.erase(uuid);
 }
 
+std::shared_ptr<Entity> EntityManager::getEntity(UUID uuid)
+{
+    try
+    {
+        return _map.at(uuid).first;
+    }
+    catch (std::out_of_range)
+    {
+        throw Exceptions::NoSuchEntity(uuid);
+    }
+}
+
 /*void EntityManager::onEvent(const Events::EntityCreated &event)
 {
     EntityComponentsPair pair;

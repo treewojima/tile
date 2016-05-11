@@ -91,7 +91,7 @@ void Graphics::Texture::destroy()
     static bool destroyed = false;
     if (destroyed) return;
 
-    getGame().getTexMgr().remove(getName());
+    //getGame().getTexMgr().remove(getName());
 
     assert(_texture);
     SDL_DestroyTexture(_texture);

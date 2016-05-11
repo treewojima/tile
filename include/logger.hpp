@@ -28,7 +28,8 @@ namespace Logger
 {
 	typedef const char *SeverityType;
 	namespace Severity
-	{
+    {
+        extern SeverityType Plain;
 		extern SeverityType Debug;
 		extern SeverityType Info;
 		extern SeverityType Warning;
@@ -41,6 +42,7 @@ namespace Logger
 
 BOOST_LOG_GLOBAL_LOGGER(gLog, boost::log::sources::severity_logger_mt<Logger::SeverityType>)
 
+#define LOG_PLAIN   BOOST_LOG_SEV(gLog::get(), Logger::Severity::Plain)
 #define LOG_DEBUG   BOOST_LOG_SEV(gLog::get(), Logger::Severity::Debug)
 #define LOG_INFO    BOOST_LOG_SEV(gLog::get(), Logger::Severity::Info)
 #define LOG_WARNING BOOST_LOG_SEV(gLog::get(), Logger::Severity::Warning)

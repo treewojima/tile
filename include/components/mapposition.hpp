@@ -20,7 +20,7 @@
 
 #include "defines.hpp"
 
-#include "components/base.hpp"
+#include "entity.hpp"
 #include "events/base.hpp"
 #include "vector.hpp"
 
@@ -28,10 +28,20 @@ namespace Components
 {
 	class MapPosition : public Base
 	{
+    public:
+        static std::shared_ptr<MapPosition> create(const Entity::UUID &parent,
+                                                   int x,
+                                                   int y,
+                                                   const std::string &debugName = "MapPosition");
+        static std::shared_ptr<MapPosition> create(const Entity::UUID &parent,
+                                                   const Vector2i &v = Vector2i::ZERO,
+                                                   const std::string &debugName = "MapPosition");
+
 	private:
-		MapPosition(std::shared_ptr<Entity> parent,
-			int x_,
-			int y_);
+        MapPosition(const Entity::UUID &parent,
+                    int x_,
+                    int y_,
+                    const std::string &debugName);
 
 	public:
 		int x, y;
@@ -40,11 +50,7 @@ namespace Components
 
 		std::string toString() const;
 
-		static std::shared_ptr<MapPosition> create(std::shared_ptr<Entity> parent,
-												   int x,
-												   int y);
-		static std::shared_ptr<MapPosition> create(std::shared_ptr<Entity> parent,
-												   const Vector2i &v = Vector2i::ZERO);
+
 	};
 }
 

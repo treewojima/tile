@@ -16,11 +16,11 @@
  */
 
 #ifndef __COMPONENTS_GRAPHICS_SPRITE_HPP__
-#define __COMPONENTS_SPRITE_HPP__
+#define __COMPONENTS_GRAPHICS_SPRITE_HPP__
 
 #include "defines.hpp"
 
-#include "components/base.hpp"
+#include "entity.hpp"
 #include "graphics/texture.hpp"
 
 namespace Components
@@ -28,12 +28,12 @@ namespace Components
     class Sprite final : public Base
     {
     public:
-        static std::shared_ptr<Sprite> create(std::shared_ptr<Entity> parent,
+        static std::shared_ptr<Sprite> create(const Entity::UUID &parent,
                                               const Graphics::TextureManager::Key &texture_,
-                                              const std::string &debugName = "");
+                                              const std::string &debugName = "Sprite");
 
     private:
-        Sprite(std::shared_ptr<Entity> parent,
+        Sprite(const Entity::UUID &parent,
                const Graphics::TextureManager::Key &texture_,
                const std::string &debugName);
 

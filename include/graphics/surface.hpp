@@ -40,12 +40,19 @@ namespace Graphics
                                                const SDL_Color &colorKey = Color::COLOR_KEY);
 
     private:
-        Surface(SDL_Surface *surface, SDL_Surface *rect, const SDL_Color &colorKey);
+        Surface(SDL_Surface *surface,
+                SDL_Rect *rect,
+                const SDL_Color &colorKey);
 
     public:
         ~Surface();
 
         void destroy();
+
+        static void blit(std::shared_ptr<Surface> src,
+                         SDL_Rect *srcRect,
+                         std::shared_ptr<Surface> dest,
+                         SDL_Rect *destRect);
 
         inline unsigned getWidth() const { return _surface->w; }
         inline unsigned getHeight() const { return _surface->h; }
@@ -56,8 +63,13 @@ namespace Graphics
     private:
         SDL_Surface *_surface;
 
-        SDL_Surface *createBlankSurface(const Vector2i &dimensions,
-                                        const SDL_Color &color = Color::WHITE);
+        static void innerBlit(SDL_Surface *src,
+                              SDL_Rect *srcRect,
+                              SDL_Surface *dest,
+                              SDL_Rect *destRect);
+
+        static SDL_Surface *createBlankSurface(const Vector2i &dimensions,
+                                               const SDL_Color &color = Color::WHITE);
     };
 }
 
@@ -69,7 +81,7 @@ namespace Exceptions
     public:
         GraphicsException(const std::string &s) : Base(s) {}
         GraphicsException(const char *s) : Base(s) {}
-        GraphicsException() : Base(SDL_GetError());
+        GraphicsException() : Base(SDL_GetError()) {}
     };
 }
 

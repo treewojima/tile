@@ -25,7 +25,6 @@
 #endif
 #include <unordered_map>
 
-#include "components/base.hpp"
 #include "entity.hpp"
 #include "events/subscriber.hpp"
 #include "exceptions.hpp"
@@ -84,6 +83,8 @@ public:
 
     std::shared_ptr<Entity> createEntity(const std::string &debugName = "");
     void destroyEntity(UUID uuid);
+
+    std::shared_ptr<Entity> getEntity(UUID uuid);
 
     template <class T>
     std::shared_ptr<T> getComponent(UUID uuid);

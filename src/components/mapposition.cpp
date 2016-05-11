@@ -21,10 +21,31 @@
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
 
-Components::MapPosition::MapPosition(std::shared_ptr<Entity> parent,
-									 int x_,
-						             int y_) :
-	Base(parent, parent->getDebugName() + "Position"),
+std::shared_ptr<Components::MapPosition>
+Components::MapPosition::create(const Entity::UUID &parent,
+                                int x,
+                                int y,
+                                const std::string &debugName)
+{
+    auto ptr = std::shared_ptr<MapPosition>(new MapPosition(parent, x, y, debugName));
+    Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
+    Events::Dispatcher::raise<Events::MapPositionComponentCreated>(ptr);
+    return ptr;
+}
+
+std::shared_ptr<Components::MapPosition>
+Components::MapPosition::create(const Entity::UUID &parent,
+                                const Vector2i &v,
+                                const std::string &debugName)
+{
+    return create(parent, v.x, v.y, debugName);
+}
+
+Components::MapPosition::MapPosition(const Entity::UUID &parent,
+                                     int x_,
+                                     int y_,
+                                     const std::string &debugName) :
+    Base(parent, debugName),
 	x(x_),
 	y(y_)
 {
@@ -39,20 +60,4 @@ std::string Components::MapPosition::toString() const
 	return ss.str();
 }
 
-std::shared_ptr<Components::MapPosition>
-Components::MapPosition::create(std::shared_ptr<Entity> parent,
-								int x,
-								int y)
-{
-	auto ptr = std::shared_ptr<MapPosition>(new MapPosition(parent, x, y));
-	Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
-	Events::Dispatcher::raise<Events::MapPositionComponentCreated>(ptr);
-	return ptr;
-}
 
-std::shared_ptr<Components::MapPosition>
-Components::MapPosition::create(std::shared_ptr<Entity> parent,
-								const Vector2i &v)
-{
-	return create(parent, v.x, v.y);
-}

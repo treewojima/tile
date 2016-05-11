@@ -20,7 +20,7 @@
 #include "components/position.hpp"
 #include "game.hpp"
 #include "logger.hpp"
-#include "map.hpp"
+#include "map/map.hpp"
 
 Systems::Movement::Movement()
 {
@@ -66,8 +66,8 @@ void Systems::Movement::update(float dt)
                         m.entity->getUUID());
             mapPos->x = current.x;
             mapPos->y = current.y;
-            pos->x = (current.x + 1) * Map::TILE_WIDTH - (Map::TILE_WIDTH / 2);
-            pos->y = (current.y + 1) * Map::TILE_HEIGHT - (Map::TILE_HEIGHT / 2);
+            pos->x = (current.x + 1) * Map::Map::TILE_WIDTH - (Map::Map::TILE_WIDTH / 2);
+            pos->y = (current.y + 1) * Map::Map::TILE_HEIGHT - (Map::Map::TILE_HEIGHT / 2);
 
             if (m.current == m.dest)
             {
