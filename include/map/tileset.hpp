@@ -15,12 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPONENTS_BASE_HPP__
-#define __COMPONENTS_BASE_HPP__
+#ifndef __MAP__TILESETMANAGER_HPP__
+#define __MAP__TILESETMANAGER_HPP__
 
 #include "defines.hpp"
+#include <vector>
+#include "graphics/surface.hpp"
+#include "tmx/TileSet.h"
 
-#warning This header is deprecated; include "entity.hpp" instead
-#include "entity.hpp"
+namespace Map
+{
+    class Tileset
+    {
+    public:
+        Tileset(const tmx::TileSet *tileset);
+        ~Tileset();
+
+        void destroy();
+
+        inline std::shared_ptr<Graphics::Surface> getSurface() { return _surface; }
+        const SDL_Rect &getRect(unsigned gid);
+
+    private:
+        const tmx::TileSet *_tileset;
+        std::shared_ptr<Graphics::Surface> _surface;
+        std::vector<SDL_Rect> _rects;
+    };
+}
 
 #endif

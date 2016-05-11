@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "map.hpp"
+#include "map/old_map.hpp"
+
+#ifdef USE_OLD_MAP
 
 #include <cassert>
 #include <iostream>
@@ -26,6 +28,7 @@
 
 #include "color.hpp"
 #include "components/position.hpp"
+#include "components/tilesetinfo.hpp"
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
 #include "exceptions.hpp"
@@ -35,9 +38,11 @@
 
 const int Map::TILE_WIDTH = 32;
 const int Map::TILE_HEIGHT = Map::TILE_WIDTH;
+const std::string Map::PREPROCESSED_TEXTURE_NAME = "PreprocessedMap";
 
 Map::Map(const std::string &filename) :
-	_filename(filename)
+    _filename(filename),
+    _preprocessedTexture(nullptr)
 {
     Events::Dispatcher::subscribe<Events::MapPositionComponentCreated>(*this);
 
@@ -73,9 +78,11 @@ void Map::destroy()
 
     Events::Dispatcher::unsubscribe(*this);
 
+    _tilesetMgr->destroy();
+
     _entityGrid.clear();
     getGame().getTexMgr().remove(_preprocessedTexture->getName());
-    _preprocessedTexture.reset();
+    _preprocessedTexture->destroy();
 
     // NOTE: should components be unregistered here?
 
@@ -84,16 +91,15 @@ void Map::destroy()
 
 void Map::preprocess()
 {
-    // First, create a texture to hold the map
+    // First, create a new blank surface to hold the map texture
     const int mapWidth = _map->getWidth();
     const int mapHeight = _map->getHeight();
     const int tileWidth = _map->getTileWidth();
     const int tileHeight = _map->getTileHeight();
-    auto texture = Graphics::Texture::create("PreprocessedMap",
-                                             Vector2i(mapWidth * tileWidth,
+    auto surface = Graphics::Surface::create(Vector2i(mapWidth * tileWidth,
                                                       mapHeight * tileHeight));
 
-    // Iterate through map entities and blit their textures to the surface
+    // Iterate through map entities and blit corresponding tileset surface
     for (const GridRow &row : _entityGrid)
     {
         for (const EntityList &entities : row)
@@ -103,13 +109,18 @@ void Map::preprocess()
                 Entity::UUID uuid = entity->getUUID();
                 std::shared_ptr<Components::Sprite> sprite =
                         getGame().getEntityMgr().getComponent<Components::Sprite>(uuid);
-                std::shared_ptr<Components::Position> pos =
-                        getGame().getEntityMgr().getComponent<Components::Position>(uuid);
+                std::shared_ptr<Components::MapPosition> pos =
+                        getGame().getEntityMgr().getComponent<Components::MapPosition>(uuid);
+                std::shared_ptr<Components::TilesetInfo> tilesetInfo =
+                        getGame().getEntityMgr().getComponent<Components::TilesetInfo>(uuid);
 
-                SDL_Rect destRect = { pos->x,
-                                      mapHeight * tileHeight - pos->y,
-                                      tileWidth,
-                                      tileHeight };
+                SDL_Rect srcRect = { pos->x * tileWidth,
+                                     pos->y * tileHeight,
+                                     tileWidth,
+                                     tileHeight };
+                SDL_Rect dstRect =
+
+
 
                 getGame().getRenderer().blitToTexture(sprite->texture,
                                                       nullptr,
@@ -122,9 +133,8 @@ void Map::preprocess()
     // Replace the old preprocessed map texture with the new one
     if (_preprocessedTexture)
     {
-        getGame().getTexMgr().remove(_preprocessedTexture->getName());
+        _preprocessedTexture->destroy();
     }
-    _preprocessedTexture.reset();
     _preprocessedTexture = texture;
     getGame().getTexMgr().add(texture->getName(),
                           texture);
@@ -177,63 +187,32 @@ std::string Map::toString() const
 
 void Map::loadTilesetTextures()
 {
-    //auto rgbStr = _map->getBackgroundColor().substr(1);
-    //const SDL_Color colorKey = Color::parseRGBHexString(rgbStr);
+    auto rgbStr = _map->getBackgroundColor().substr(1);
+    const SDL_Color colorKey = Color::parseRGBHexString(rgbStr);
 
     for (auto tileset : _map->getTileSets())
     {
-        auto image = tileset->getImage();
-        auto tilesetSurface = IMG_Load(image->getSource().string().c_str());
-        if (!tilesetSurface)
-        {
-            throw Exceptions::MapException(IMG_GetError());
-        }
-
         const int tileWidth = tileset->getTileWidth();
-		if (tileWidth != TILE_WIDTH)
-		{
-			std::ostringstream ss;
-			ss << "Map " << _filename << " does not have a tile width of "
-			   << TILE_WIDTH << " (" << tileWidth << " instead)";
-            throw Exceptions::MapException(ss.str());
-		}
-
-		const int tileHeight = tileset->getTileHeight();
-		if (tileHeight != TILE_HEIGHT)
-		{
-			std::ostringstream ss;
-			ss << "Map " << _filename << " does not have a tile height of "
-				<< TILE_HEIGHT << " (" << tileHeight << " instead)";
-            throw Exceptions::Base(ss.str());
-		}
-
-        const int tilesetWidth = tilesetSurface->w;
-        const int tilesetHeight = tilesetSurface->h;
-        const int numCols = tilesetWidth / tileWidth;
-        const int numRows = tilesetHeight / tileHeight;
-        const int margin = tileset->getMargin();
-
-        auto gid = tileset->getFirstGID();
-        SDL_Rect srcRect;
-        for (int row = 0; row < numRows; row++)
+        if (tileWidth != TILE_WIDTH)
         {
-            for (int col = 0; col < numCols; col++)
-            {
-                std::ostringstream name;
-                name << tileset->getName() << "-" << gid++;
-
-                srcRect.x = (margin * (col + 1)) + (tileWidth * col);
-                srcRect.y = (margin * (row + 1)) + (tileHeight * row);
-                srcRect.w = tileWidth;
-                srcRect.h = tileHeight;
-
-                Graphics::Texture::create(name.str(),
-                                          tilesetSurface,
-                                          &srcRect);
-            }
+            std::ostringstream ss;
+            ss << "Map " << _filename << " does not have a tile width of "
+               << TILE_WIDTH << " (" << tileWidth << " instead)";
+            throw Exceptions::MapException(ss.str());
         }
 
-        SDL_FreeSurface(tilesetSurface);
+        const int tileHeight = tileset->getTileHeight();
+        if (tileHeight != TILE_HEIGHT)
+        {
+            std::ostringstream ss;
+            ss << "Map " << _filename << " does not have a tile height of "
+                << TILE_HEIGHT << " (" << tileHeight << " instead)";
+            throw Exceptions::Base(ss.str());
+        }
+
+        auto filename = tileset->getImage()->getSource().string().c_str();
+        auto surface = Graphics::Surface::create(filename, colorKey);
+        _tilesetMgr->add(tileset->getName(), surface);
     }
 }
 
@@ -250,11 +229,7 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
         auto gid = cell.getGID();
         if (gid)
         {
-            // Extrapolate the texture resource from the tileset name and cell GID
             auto tileset = map.getTileSetFromGID(gid);
-            //gid -= tileset->getFirstGID();
-            std::ostringstream textureName;
-            textureName << tileset->getName() << "-" << gid;
 
             // Calculate the tile's position on the screen/within the map
             auto col = cellID % map.getWidth();
@@ -271,8 +246,8 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
             auto mapPos = Components::MapPosition::create(entity,
                                                           col,
                                                           map.getHeight() - row - 1);
-
             auto absPos = Components::Position::create(entity, *mapPos);
+            Components::TilesetInfo::create(entity, gid);
 
             auto texture = getGame().getTexMgr().get(textureName.str());
             //entity->graphics =
@@ -289,3 +264,5 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
         cellID++;
     }
 }
+
+#endif

@@ -52,3 +52,30 @@ std::string Entity::toString() const
     ss << "Entity[uuid = " << _uuid << ", debugName = \"" << _debugName << "\"]";
     return ss.str();
 }
+
+Components::Base::Base(const Entity::UUID &parentUUID,
+                       const std::string &debugName) :
+    _parentUUID(parentUUID)
+{
+    setDebugName(getParent()->getDebugName() + debugName);
+}
+
+Components::Base::~Base()
+{
+#ifdef _DEBUG_COMPONENTS
+    LOG_DEBUG << "destroyed component \"" << getDebugName() << "\"";
+#endif
+}
+
+std::shared_ptr<Entity> Components::Base::getParent() const
+{
+    return getGame().getEntityMgr().getEntity(_parentUUID);
+}
+
+std::string Components::Base::toString() const
+{
+    std::ostringstream ss;
+    ss << "Components::Base[parent = " << getParent() << ", "
+       << "debugName = \"" << getDebugName() << "\"]";
+    return ss.str();
+}

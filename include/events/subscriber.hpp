@@ -23,21 +23,16 @@
 
 namespace Events
 {
+    // For use with static_assert
+    //class SubscriberBase : public Stringable {};
+
     // Must guarantee the following function:
     // (virtual) void onEvent(const <subclass of Event> &event)
-    class Subscriber : public Stringable
-    {
-    protected:
-        Subscriber() {}
-    };
+    class Subscriber : public Stringable {};
 
     // Must guarantee the following function:
     // (virtual) void queueEvent(std::shared_ptr<subclass of Event> event)
-    class AsyncSubscriber : public Stringable
-    {
-    protected:
-        AsyncSubscriber() {}
-    };
+    class AsyncSubscriber : public Stringable {};
 }
 
 #endif

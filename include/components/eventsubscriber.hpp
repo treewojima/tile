@@ -19,43 +19,67 @@
 #define __COMPONENTS_EVENTSUBSCRIBER_HPP__
 
 #include "defines.hpp"
-#include "components/base.hpp"
-#include "events/base.hpp"
-#include "events/subscriber.hpp"
+#include "entity.hpp"
+#include "events/dispatcher.hpp"
 
 namespace Components
 {
-    class EventSubscriber : public Base
+    template <class T>
+    class BaseEventSubscriber : public Base
     {
+    public:
+        static std::shared_ptr<BaseEventSubscriber<T>>
+            create(const Entity::UUID &parent,
+                   std::shared_ptr<T> subscriber_,
+                   const std::string &debugName = "")
+        {
+            auto ptr = std::shared_ptr<BaseEventSubscriber<T>>(
+                        new BaseEventSubscriber(parent, subscriber_, debugName));
+            Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
+            Events::Dispatcher::raise<
+                    Events::SpecificComponentCreated<BaseEventSubscriber<T>>>(ptr);
+            return ptr;
+        }
+
     private:
-        EventSubscriber(std::shared_ptr<Entity> parent,
-                        std::shared_ptr<Events::Subscriber> _subscriber);
+        BaseEventSubscriber(const Entity::UUID &parent,
+                            std::shared_ptr<T> subscriber_,
+                            const std::string &debugName) :
+            Base(parent),
+            subscriber(subscriber_)
+        {
+            static_assert(std::is_base_of<T, Events::Subscriber>::value ||
+                          std::is_base_of<T, Events::AsyncSubscriber>::value,
+                          "must be initialized from type Events::(Async)Subscriber");
+
+            if (!debugName.length())
+            {
+                setDebugName(getParent()->getDebugName() +
+                             boost::core::demangle(typeid(T).name()));
+            }
+        }
 
     public:
-        std::shared_ptr<Events::Subscriber> subscriber;
+        std::shared_ptr<T> subscriber;
 
-        std::string toString() const;
+        std::string toString() const
+        {
+            std::ostringstream ss;
+            ss << "Components::";
 
-        static std::shared_ptr<EventSubscriber>
-            create(std::shared_ptr<Entity> parent,
-                   std::shared_ptr<Events::Subscriber> _subscriber);
+            if (std::is_same<T, Events::AsyncSubscriber>::value)
+                ss << "Async";
+
+            ss << "EventSubscriber[debugName = \"" << getDebugName() << "\", "
+               << "parent = " << getParent() << "\", "
+               << "subscriber = " << subscriber << "]";
+
+            return ss.str();
+        }
     };
 
-    class AsyncEventSubscriber : public Base
-    {
-    private:
-        AsyncEventSubscriber(std::shared_ptr<Entity> parent,
-                             std::shared_ptr<Events::AsyncSubscriber> _subscriber);
-
-    public:
-        std::shared_ptr<Events::AsyncSubscriber> subscriber;
-
-        std::string toString() const;
-
-        static std::shared_ptr<AsyncEventSubscriber>
-            create(std::shared_ptr<Entity> parent,
-                   std::shared_ptr<Events::AsyncSubscriber> _subscriber);
-    };
+    typedef BaseEventSubscriber<Events::Subscriber> EventSubscriber;
+    typedef BaseEventSubscriber<Events::AsyncSubscriber> AsyncEventSubscriber;
 }
 
 namespace Events

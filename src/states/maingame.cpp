@@ -30,14 +30,16 @@ void States::MainGame::initialize()
 {
     LOG_DEBUG << "initialized States::MainGame";
 
+    _map = std::make_shared<Map::Map>("res/desert.tmx");
+
     loadTextures();
     createEntities();
-
-    //_map = std::make_unique<Map>("res/desert.tmx");
 }
 
 void States::MainGame::destroy()
 {
+    _map->destroy();
+
     LOG_DEBUG << "destroyed States::MainGame";
 }
 

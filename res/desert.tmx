@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="32" tileheight="32" backgroundcolor="#ff00ff" nextobjectid="1">
- <tileset firstgid="1" name="desert" tilewidth="32" tileheight="32" tilecount="325">
+ <tileset firstgid="1" name="desert" tilewidth="32" tileheight="32" tilecount="325" columns="13">
   <image source="desert.png" trans="ff00ff" width="416" height="800"/>
   <terraintypes>
    <terrain name="Grass" tile="27"/>

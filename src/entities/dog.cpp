@@ -97,8 +97,8 @@ std::shared_ptr<Entity> createDog()
     auto texture = Graphics::Texture::create("dog", "res/dog/dog_down_0.png");
 
     //Game::getGraphicsSys().createSpriteComponent(dog, texture->getName());
-    auto mapPos = Components::MapPosition::create(dog, 2, 2);
-    auto pos = Components::Position::create(dog, *mapPos);
+    auto mapPos = Components::MapPosition::create(dog->getUUID(), 2, 2);
+    auto pos = Components::Position::create(dog->getUUID(), *mapPos);
 
     /*Components::Position::create(dog,
 								 Window::getWidth() / 2,
@@ -107,14 +107,14 @@ std::shared_ptr<Entity> createDog()
                                     Window::getWidth() / 64,
                                     Window::getHeight() / 64);*/
 
-    Components::Sprite::create(dog,
+    Components::Sprite::create(dog->getUUID(),
                                texture->getName(),
                                "Down");
 
     auto subscriber = std::make_shared<DogEventSubscriber>(dog);
     Events::Dispatcher::subscribe<Events::KeyDown>(*subscriber);
     Events::Dispatcher::subscribe<Events::MouseDown>(*subscriber);
-    Components::EventSubscriber::create(dog, subscriber);
+    Components::EventSubscriber::create(dog->getUUID(), subscriber);
 
     return dog;
 }

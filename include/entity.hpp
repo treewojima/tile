@@ -20,6 +20,7 @@
 
 #include "defines.hpp"
 
+#include <boost/core/demangle.hpp>
 #include <memory>
 #include <sstream>
 
@@ -35,8 +36,10 @@
 #endif
 
 #ifdef _DEBUG
-//#   define _DEBUG_ENTITIES
+#   define _DEBUG_ENTITIES
 #endif
+
+namespace Components { class Base; }
 
 // Conceptually, an Entity should be nothing more than an identifier (an
 // int, a string, etc). BUT, for convenience, make it a class with absolutely
@@ -65,13 +68,56 @@ public:
 
     bool dirty;
 
+    // Helper method for chaining component creation calls
+    template <class C, class... Args>
+    Entity *component(Args&& ... args)
+    {
+        static_assert(std::is_base_of<Components::Base, C>::value,
+                      "Can only add components of a type derived from class Components::Base");
+
+        C::create(_uuid, std::forward<Args>(args)...);
+
+        return this;
+    }
+
     std::string toString() const;
+
+protected:
+    //inline void setDebugName(const std::string &name) { _debugName = name; }
+    inline void setDebugName(std::string &&name) { _debugName = std::move(name); }
 
 private:
     UUID _uuid;
     std::string _debugName;
 };
 
+// The component base class is in this file to prevent cyclic preprocessor includes
+namespace Components
+{
+    class Base : public Stringable
+    {
+    protected:
+        Base(const Entity::UUID &parentUUID, const std::string &debugName = "Component");
+
+    public:
+        virtual ~Base();
+
+        inline std::string getDebugName() const { return _debugName; }
+        std::shared_ptr<Entity> getParent() const;
+
+        std::string toString() const;
+
+    protected:
+        //inline void setDebugName(const std::string &name) { _debugName = name; }
+        inline void setDebugName(std::string &&name) { _debugName = std::move(name); }
+
+    private:
+        Entity::UUID _parentUUID;
+        std::string _debugName;
+    };
+}
+
+// Entity and component creation events
 namespace Events
 {
     class EntityCreated : public Events::Base
@@ -90,6 +136,28 @@ namespace Events
             return ss.str();
         }
     };
+
+    template <class T>
+    class SpecificComponentCreated : public Events::Base
+    {
+    public:
+        std::shared_ptr<T> component;
+
+        SpecificComponentCreated(std::shared_ptr<T> component_) :
+            Events::Base(),
+            component(component_) {}
+
+        std::string toString() const
+        {
+            std::ostringstream ss;
+            ss << "Events::SpecificComponentCreated<"
+               << boost::core::demangle(typeid(T).name()) << ">"
+               << "[component = " << component << "]";
+            return ss.str();
+        }
+    };
+
+    typedef SpecificComponentCreated<Components::Base> ComponentCreated;
 }
 
 #endif

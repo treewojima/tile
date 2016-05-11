@@ -20,7 +20,7 @@
 #include "events/dispatcher.hpp"
 
 std::shared_ptr<Components::Sprite>
-Components::Sprite::create(std::shared_ptr<Entity> parent,
+Components::Sprite::create(const Entity::UUID &parent,
                            const Graphics::TextureManager::Key &texture_,
                            const std::string &debugName)
 {
@@ -30,10 +30,10 @@ Components::Sprite::create(std::shared_ptr<Entity> parent,
     return ptr;
 }
 
-Components::Sprite::Sprite(std::shared_ptr<Entity> parent,
+Components::Sprite::Sprite(const Entity::UUID &parent,
                            const Graphics::TextureManager::Key &texture_,
                            const std::string &debugName) :
-    Components::Base(parent, parent->getDebugName() + "Sprite" + debugName),
+    Components::Base(parent, debugName),
     texture(texture_)
 {
 }

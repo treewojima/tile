@@ -24,7 +24,7 @@
 #include <memory>
 
 #include "entity.hpp"
-#include "map.hpp"
+#include "map/map.hpp"
 #include "states/base.hpp"
 
 namespace States
@@ -40,7 +40,7 @@ namespace States
         void draw(float dt);
 
     private:
-        std::unique_ptr<Map> _map;
+        std::shared_ptr<Map::Map> _map;
 
         void loadTextures();
         void createEntities();

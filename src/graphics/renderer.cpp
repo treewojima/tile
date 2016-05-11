@@ -54,7 +54,7 @@ Graphics::Renderer::Renderer()
     }
 
     // Set clear color
-    SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
 }
 
 Graphics::Renderer::~Renderer()

@@ -22,7 +22,7 @@
 
 #include <functional>
 
-#include "components/base.hpp"
+#include "entity.hpp"
 
 class Entity;
 
@@ -33,21 +33,27 @@ namespace Components
     public:
         typedef std::function<void(uint8_t *)> Callback;
 
+        static std::shared_ptr<InputHandler> create(const Entity::UUID &parent,
+                                                    const Callback &&callback_,
+                                                    const std::string &debugName = "InputHandler");
+
     private:
-        InputHandler(std::shared_ptr<Entity> parent, const Callback &callback_);
-        InputHandler(std::shared_ptr<Entity> parent, const Callback &&callback_);
+        InputHandler(const Entity::UUID &parent,
+                     const Callback &&callback_,
+                     const std::string &debugName);
 
     public:
         Callback callback;
 
         std::string toString() const;
 
-        static std::shared_ptr<InputHandler> create(std::shared_ptr<Entity> parent,
-                                                    const Callback &callback_);
-        static std::shared_ptr<InputHandler> create(std::shared_ptr<Entity> parent,
-                                                    const Callback &&callback_);
+
     };
 }
 
-#endif
+namespace Events
+{
+    typedef SpecificComponentCreated<Components::InputHandler> InputHandlerComponentCreated;
+}
 
+#endif
