@@ -1,4 +1,4 @@
-CC         := g++
+CC         := clang++
 WARNINGS   := -Wall -Wnon-virtual-dtor -Wno-ctor-dtor-privacy
 BOOST_VER  :=
 BOOST_LIBS := -lboost_filesystem$(BOOST_VER) -lboost_log$(BOOST_VER) \
@@ -29,6 +29,5 @@ clean:
 -include $(DEPFILES)
 
 %.o: %.cpp
-	@echo CC $<
-	@$(CC) -o $@ $(CFLAGS) -MMD -MP $<
+	$(CC) -o $@ $(CFLAGS) -MMD -MP $<
 
