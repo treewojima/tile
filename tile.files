@@ -511,3 +511,4 @@ src/map.cpp
 include/map/map.hpp
 src/map/map.cpp
 src/map/tileset.cpp
+include/pool.hpp
