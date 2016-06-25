@@ -20,9 +20,7 @@
 
 #include "defines.hpp"
 
-#ifndef _USE_NEW_UUID
-#   include <boost/uuid/random_generator.hpp>
-#endif
+#include <boost/functional/hash.hpp>
 #include <unordered_map>
 
 #include "entity.hpp"
@@ -96,21 +94,13 @@ public:
 
 private:
     bool _destroyed;
-#ifndef _USE_NEW_UUID
-    boost::uuids::random_generator _generator;
-#endif
 
     // Subject to change based on performance considerations
     typedef Systems::Base::ComponentMap<Components::Base> ComponentMap; 
     typedef std::pair<std::shared_ptr<Entity>, ComponentMap> EntityComponentsPair;
-
-#ifdef _USE_NEW_UUID
-    typedef std::unordered_map<UUID, EntityComponentsPair> EntityMap;
-#else
-	typedef std::unordered_map<UUID,
-							   EntityComponentsPair,
-							   boost::hash<boost::uuids::uuid>> EntityMap;
-#endif
+    typedef std::unordered_map<UUID,
+                               EntityComponentsPair,
+                               boost::hash<uuid::uuid>> EntityMap;
 
     EntityMap _map;
 };

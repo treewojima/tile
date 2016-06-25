@@ -19,11 +19,21 @@
 #define __UUID_HPP__
 
 #include "defines.hpp"
-#include <cstdint>
+
+#ifdef _USE_NEW_UUID
+#   include <cstdint>
+#else
+#   include <boost/uuid/uuid.hpp>
+#   include <boost/uuid/uuid_io.hpp> // for uuid ostream operator
+#endif
 
 namespace uuid
 {
+#ifdef _USE_NEW_UUID
     typedef uint64_t uuid;
+#else
+    typedef boost::uuids::uuid uuid;
+#endif
 
     void initialize();
     uuid generate();

@@ -24,7 +24,7 @@
 #define _USE_NEW_ENTITY
 #define _USE_NEW_COMPONENTS
 //#define _NO_PROGRAM_OPTIONS
-#define _USE_NEW_UUID
+//#define _USE_NEW_UUID
 
 #define PREPROCESS_MAP
 #define PRESERVE_TEXTURE_SURFACE

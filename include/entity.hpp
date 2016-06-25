@@ -26,14 +26,7 @@
 
 #include "events/base.hpp"
 #include "stringable.hpp"
-
-#ifdef _USE_NEW_UUID
-#   include "uuid.hpp"
-#else
-#   include <boost/functional/hash.hpp>
-#   include <boost/uuid/uuid.hpp>
-#   include <boost/uuid/uuid_io.hpp> // for uuid ostream operator
-#endif
+#include "uuid.hpp"
 
 #ifdef _DEBUG
 #   define _DEBUG_ENTITIES
@@ -49,11 +42,7 @@ class Entity final : public Stringable
     friend class EntityManager;
 
 public:
-#ifdef _USE_NEW_UUID
     typedef uuid::uuid UUID;
-#else
-    typedef boost::uuids::uuid UUID;
-#endif
 
     static std::shared_ptr<Entity> create(const std::string &debugName);
 

@@ -17,22 +17,33 @@
 
 #include "uuid.hpp"
 
-#include <cstdlib>
-#include <ctime>
+#ifdef _USE_NEW_UUID
+#   include <cstdlib>
+#   include <ctime>
+#else
+#   include <boost/uuid/random_generator.hpp>
+#endif
 
 namespace
 {
     bool _initialized = false;
+
+#ifdef _USE_NEW_UUID
     uuid::uuid _state[2];
+#else
+    boost::uuids::random_generator _generator;
+#endif
 }
 
 void uuid::initialize()
 {
+#ifdef _USE_NEW_UUID
     using namespace std;
 
     srand(time(nullptr));
     _state[0] = rand();
     _state[1] = rand();
+#endif
 
     _initialized = true;
 }
@@ -41,6 +52,7 @@ uuid::uuid uuid::generate()
 {
     if (!_initialized) initialize();
 
+#ifdef _USE_NEW_UUID
     // This uses the xorshift128+ random number method, it's basically a
     // random number generator
     uuid x = _state[0];
@@ -49,4 +61,7 @@ uuid::uuid uuid::generate()
     x ^= x << 23;
     _state[1] = x ^ y ^ (x >> 17) ^ (y >> 26);
     return _state[1] + y;
+#else
+    return _generator();
+#endif
 }
