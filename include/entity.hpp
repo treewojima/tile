@@ -25,6 +25,7 @@
 #include <sstream>
 
 #include "events/base.hpp"
+#include "pool.hpp"
 #include "stringable.hpp"
 #include "uuid.hpp"
 
@@ -37,14 +38,17 @@ namespace Components { class Base; }
 // Conceptually, an Entity should be nothing more than an identifier (an
 // int, a string, etc). BUT, for convenience, make it a class with absolutely
 // no additional functionality other than wrapper methods to EntityManager
-class Entity final : public Stringable
+static const unsigned ENTITY_POOL_CAPACITY = 10;
+class Entity final :
+        public Stringable,
+        public PoolableObject<Entity, ENTITY_POOL_CAPACITY>
 {
     friend class EntityManager;
 
 public:
     typedef uuid::uuid UUID;
 
-    static std::shared_ptr<Entity> create(const std::string &debugName);
+    static Entity *create(const std::string &debugName);
 
 private:
     Entity(UUID uuid, const std::string &debugName);
@@ -83,7 +87,10 @@ private:
 // The component base class is in this file to prevent cyclic preprocessor includes
 namespace Components
 {
-    class Base : public Stringable
+    static const unsigned COMPONENT_POOL_CAPACITY = 50;
+    class Base :
+            public Stringable,
+            public PoolableObject<Base, COMPONENT_POOL_CAPACITY>
     {
     protected:
         Base(const Entity::UUID &parentUUID, const std::string &debugName = "Component");
@@ -106,22 +113,40 @@ namespace Components
     };
 }
 
-// Entity and component creation events
+// Entity and component events
 namespace Events
 {
     class EntityCreated : public Events::Base
     {
     public:
-        std::shared_ptr<Entity> entity;
+        Entity::UUID uuid;
 
-        EntityCreated(std::shared_ptr<Entity> entity_) :
+        EntityCreated(Entity::UUID uuid_) :
             Events::Base(),
-            entity(entity_) {}
+            uuid(uuid_) {}
 
         std::string toString() const
         {
             std::ostringstream ss;
-            ss << "Events::EntityCreated[entity = " << entity << "]";
+            ss << "Events::EntityCreated[uuid = " << uuid << "]";
+            return ss.str();
+        }
+    };
+
+    class EntityDestroyed : public Events::Base
+    {
+    public:
+        Entity::UUID uuid;
+
+        EntityDestroyed(Entity::UUID uuid_) :
+            Events::Base(),
+            uuid(uuid_) {}
+
+
+        std::string toString() const
+        {
+            std::ostringstream ss;
+            ss << "Events::EntityDestroyed[uuid = " << uuid << "]";
             return ss.str();
         }
     };
@@ -130,9 +155,9 @@ namespace Events
     class SpecificComponentCreated : public Events::Base
     {
     public:
-        std::shared_ptr<T> component;
+        T *component;
 
-        SpecificComponentCreated(std::shared_ptr<T> component_) :
+        SpecificComponentCreated(T *component_) :
             Events::Base(),
             component(component_) {}
 

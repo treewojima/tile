@@ -32,7 +32,7 @@ public:
 	~StateManager();
 	void destroy();
 
-    typedef std::shared_ptr<States::Base> StatePtr;
+    typedef States::Base *StatePtr;
 
 	void push(StatePtr state);
 	StatePtr pop();

@@ -56,26 +56,28 @@ void EntityManager::destroy()
     _destroyed = true;
 }
 
-std::shared_ptr<Entity> EntityManager::createEntity(const std::string &debugName)
+Entity *EntityManager::createEntity(const std::string &debugName)
 {
-    auto entity =
-            std::shared_ptr<Entity>(new Entity(uuid::generate(), debugName));
+    auto entity = new Entity(uuid::generate(), debugName);
 
     EntityComponentsPair pair;
     pair.first = entity;
     _map[entity->getUUID()] = pair;
 
-    Events::Dispatcher::raise<Events::EntityCreated>(entity);
+    Events::Dispatcher::raise<Events::EntityCreated>(entity->getUUID());
 
     return entity;
 }
 
 void EntityManager::destroyEntity(UUID uuid)
 {
-    _map.erase(uuid);
+    auto *entity = getEntity(uuid);
+    // NOTE: there should be some deconstruction here
+    delete entity;
+    Events::Dispatcher::raise<Events::EntityDestroyed>(uuid);
 }
 
-std::shared_ptr<Entity> EntityManager::getEntity(UUID uuid)
+Entity *EntityManager::getEntity(UUID uuid)
 {
     try
     {

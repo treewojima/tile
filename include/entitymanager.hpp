@@ -27,6 +27,7 @@
 #include "events/subscriber.hpp"
 #include "exceptions.hpp"
 #include "logger.hpp"
+#include "pool.hpp"
 #include "systems/base.hpp"
 
 namespace Exceptions
@@ -52,7 +53,7 @@ namespace Exceptions
                         const std::type_info &type) :
             Base(error(entity, type)) {}
 
-        NoSuchComponent(const std::shared_ptr<Entity> &entity,
+        NoSuchComponent(const Entity *entity,
                         const std::type_info &type) :
             Base(error(*entity, type)) {}
 
@@ -79,13 +80,13 @@ public:
     void initialize();
     void destroy();
 
-    std::shared_ptr<Entity> createEntity(const std::string &debugName = "");
+    Entity *createEntity(const std::string &debugName = "");
     void destroyEntity(UUID uuid);
 
-    std::shared_ptr<Entity> getEntity(UUID uuid);
+    Entity *getEntity(UUID uuid);
 
     template <class T>
-    std::shared_ptr<T> getComponent(UUID uuid);
+    T *getComponent(UUID uuid);
 
     //void onEvent(const Events::EntityCreated &event);
     void onEvent(const Events::ComponentCreated &event);
@@ -95,9 +96,12 @@ public:
 private:
     bool _destroyed;
 
+    // Entity memory pool
+    Pool<Entity> _entityPool;
+
     // Subject to change based on performance considerations
     typedef Systems::Base::ComponentMap<Components::Base> ComponentMap; 
-    typedef std::pair<std::shared_ptr<Entity>, ComponentMap> EntityComponentsPair;
+    typedef std::pair<Entity*, ComponentMap> EntityComponentsPair;
     typedef std::unordered_map<UUID,
                                EntityComponentsPair,
                                boost::hash<uuid::uuid>> EntityMap;
@@ -106,10 +110,9 @@ private:
 };
 
 template <class T>
-std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
+EntityManager::T *EntityManager::getComponent(UUID uuid)
 {
-	std::shared_ptr<T> ptr(nullptr);
-
+    T *ptr = nullptr;
 	EntityComponentsPair *pair;
 
 	// First, see if we have an entity entry that matches uuid
@@ -125,7 +128,7 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 	// Try to find an entry for type T
     const auto &entity = pair->first;
 	auto &componentsMap = pair->second;
-	std::shared_ptr<Components::Base> basePtr;
+    Components::Base *basePtr = nullptr;
 	try
 	{
 		// should this use move semantics?
@@ -165,7 +168,7 @@ std::shared_ptr<T> EntityManager::getComponent(UUID uuid)
 	}
 
 	// Cast to the proper derived type
-	ptr = std::move(std::dynamic_pointer_cast<T>(basePtr));
+    ptr = dynamic_cast<T>(basePtr);
 	//ptr = std::move(std::static_pointer_cast<T>(basePtr));
 	if (!ptr)
 	{

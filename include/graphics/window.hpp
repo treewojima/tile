@@ -19,10 +19,11 @@
 #define __GRAPHICS_WINDOW_HPP__
 
 #include "defines.hpp"
+
+#include <SDL2/SDL.h>
+
 #include "exceptions.hpp"
 #include "vector.hpp"
-
-class SDL_Window;
 
 namespace Graphics
 {

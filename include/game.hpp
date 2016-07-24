@@ -20,14 +20,12 @@
 
 #include "defines.hpp"
 
-#include <memory>
-
 #include "camera.hpp"
 #include "entitymanager.hpp"
 #include "graphics/renderer.hpp"
 //#include "map.hpp"
 #include "helper_events.hpp"
-#include "statemanager.hpp"
+#include "states/manager.hpp"
 #include "systems/graphics.hpp"
 #include "systems/movement.hpp"
 #include "timer.hpp"
@@ -88,22 +86,22 @@ private:
     bool _running;
 
     // Renderer and related objects
-    std::unique_ptr<Graphics::Renderer> _renderer;
-    std::shared_ptr<Graphics::Window> _window;
-    std::unique_ptr<Camera> _camera;
+    Graphics::Renderer *_renderer;
+    Graphics::Window *_window;
+    Camera *_camera;
 
     // FPS timer
-    std::unique_ptr<Timer> _fpsTimer;
+    Timer *_fpsTimer;
 
     // Test map
     //std::unique_ptr<Map> _map;
 
     // Entity and component systems
-    std::unique_ptr<EntityManager> _entityMgr;
-    std::unique_ptr<StateManager> _stateMgr;
-    std::unique_ptr<Graphics::TextureManager> _texMgr;
-    std::unique_ptr<Systems::Graphics> _graphicsSys;
-    std::unique_ptr<Systems::Movement> _movementSys;
+    EntityManager *_entityMgr;
+    StateManager *_stateMgr;
+    Graphics::TextureManager *_texMgr;
+    Systems::Graphics *_graphicsSys;
+    Systems::Movement *_movementSys;
 };
 
 // Global game instance getter (in main.cpp)

@@ -24,7 +24,9 @@
 
 namespace Exceptions
 {
-    class Base : public std::runtime_error, public Stringable
+    class Base :
+            public std::runtime_error,
+            public Stringable
     {
     public:
         using std::runtime_error::runtime_error;

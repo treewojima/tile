@@ -101,7 +101,6 @@ include/level.hpp
 include/logger.hpp
 include/map.hpp
 include/resourcemanager.hpp
-include/statemanager.hpp
 include/texture.hpp
 include/timer.hpp
 include/vector.hpp
@@ -131,7 +130,6 @@ src/logger.cpp
 src/main.cpp
 src/map.cpp
 src/state.cpp
-src/statemanager.cpp
 src/texture.cpp
 src/timer.cpp
 src/vector.cpp
@@ -512,3 +510,5 @@ include/map/map.hpp
 src/map/map.cpp
 src/map/tileset.cpp
 include/pool.hpp
+include/states/manager.hpp
+src/states/manager.cpp

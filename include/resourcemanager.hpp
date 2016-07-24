@@ -21,7 +21,6 @@
 #include "defines.hpp"
 
 #include <functional>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <unordered_map>

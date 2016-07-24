@@ -1,8 +1,17 @@
 #ifndef __POOL_HPP__
 #define __POOL_HPP__
 
+#include "defines.hpp"
+
 #include <cassert>
 #include <type_traits>
+
+#include "exceptions.hpp"
+
+#ifdef _DEBUG
+#   include "logger.hpp"
+#   define _DEBUG_POOL
+#endif
 
 // Compile-time-sized pool class
 template <class T, unsigned N>
@@ -29,15 +38,17 @@ private:
     PoolObject *_freeListHead;
 };
 
-// Poolable object that overrides operators new and delete
+// Simple poolable object that overrides operators new and delete
 template <class T, unsigned N>
 class PoolableObject
 {
 public:
     static void *operator new(std::size_t sz)
     {
-        void *p = getPool().allocate();
-        std::cout << "allocated object at " << p << std::endl;
+        void *p = getPool().allocate();  
+#ifdef _DEBUG_POOL
+        LOG_DEBUG << "allocated object at " << p;
+#endif
         return p;
     }
 
@@ -45,9 +56,17 @@ public:
     {
         if (p)
         {
-            std::cout << "releasing object at " << p << std::endl;
+#ifdef _DEBUG_POOL
+            LOG_DEBUG << "releasing object at " << p;
+#endif
             getPool().release(static_cast<T *>(p));
         }
+#ifdef _DEBUG
+        else
+        {
+            LOG_DEBUG << "deleting null object";
+        }
+#endif
     }
 
 protected:
@@ -57,6 +76,11 @@ protected:
         return pool;
     }
 };
+
+namespace Exceptions
+{
+    class PoolOutOfMemory : public std::bad_alloc {};
+}
 
 template <class T, unsigned N>
 Pool<T, N>::Pool() :
@@ -96,7 +120,7 @@ U *Pool<T, N>::allocate()
                   "can only allocate subclasses of identical size to pool base type");
 
     // If free list is empty, nothing left to allocate
-    if (!_freeListHead) throw std::bad_alloc();
+    if (!_freeListHead) throw Exceptions::PoolOutOfMemory();
 
     // Pop an entry off the free list
     U *object = reinterpret_cast<U *>(&_freeListHead->data);
