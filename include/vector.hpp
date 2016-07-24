@@ -20,6 +20,7 @@
 
 #include <boost/core/demangle.hpp>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <typeinfo>
 

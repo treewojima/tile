@@ -61,7 +61,6 @@ Graphics::Renderer::~Renderer()
 {
     assert(_renderer);
     SDL_DestroyRenderer(_renderer);
-    _window->destroy();
     delete _window;
 
     IMG_Quit();

@@ -40,7 +40,7 @@ namespace States
         void draw(float dt);
 
     private:
-        std::shared_ptr<Map::Map> _map;
+        Map::Map *_map;
 
         void loadTextures();
         void createEntities();

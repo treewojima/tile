@@ -23,7 +23,7 @@
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
 
-EntityManager::EntityManager() : _destroyed(true)
+EntityManager::EntityManager()
 {
     //Events::Dispatcher::subscribe<Events::EntityCreated>(*this);
     Events::Dispatcher::subscribe<Events::ComponentCreated>(*this);
@@ -31,19 +31,6 @@ EntityManager::EntityManager() : _destroyed(true)
 
 EntityManager::~EntityManager()
 {
-    if (!_destroyed) destroy();
-}
-
-void EntityManager::initialize()
-{
-    _destroyed = false;
-    //_map.clear();
-}
-
-void EntityManager::destroy()
-{
-	if (_destroyed) return;
-
     // TODO: update this as necessary for additional cleanup procedures
 
     //for (auto &pair : _map)
@@ -52,8 +39,6 @@ void EntityManager::destroy()
 
     Events::Dispatcher::unsubscribe(*this);
     _map.clear();
-
-    _destroyed = true;
 }
 
 Entity *EntityManager::createEntity(const std::string &debugName)
@@ -103,7 +88,7 @@ void EntityManager::onEvent(const Events::ComponentCreated &event)
 
     // TODO: Should this have error checking in case the entity doesn't exist?
     //_map[component->getParent()->getUUID()].second.push_back(component);
-	_map[component->getParent()->getUUID()].second[typeid(*component)] = component;
+    _map[component->getParent()].second[typeid(component)] = component;
 }
 
 std::string EntityManager::toString() const

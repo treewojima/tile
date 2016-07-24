@@ -29,13 +29,12 @@
 class StateManager
 {
 public:
-	~StateManager();
-	void destroy();
+    ~StateManager();
 
     typedef States::Base *StatePtr;
 
 	void push(StatePtr state);
-	StatePtr pop();
+    StatePtr pop();
 	StatePtr peek() const;
 
 private:

@@ -52,7 +52,7 @@ namespace Graphics
 
     private:
         Texture(const std::string &name,
-                Surface *surface);
+                const Surface *surface);
 
     public:
         ~Texture();
@@ -70,7 +70,7 @@ namespace Graphics
     };
 
     // Texture resource manager type
-    typedef ResourceManager<std::shared_ptr<Texture>> TextureManager;
+    typedef ResourceManager<Texture*> TextureManager;
 }
 
 #endif

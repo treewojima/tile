@@ -25,7 +25,7 @@
 #include "game.hpp"
 #include "logger.hpp"
 
-std::shared_ptr<Entity> Entity::create(const std::string &debugName)
+Entity *Entity::create(const std::string &debugName)
 {
     return getGame().getEntityMgr().createEntity(debugName);
 }
@@ -57,7 +57,8 @@ Components::Base::Base(const Entity::UUID &parentUUID,
                        const std::string &debugName) :
     _parentUUID(parentUUID)
 {
-    setDebugName(getParent()->getDebugName() + debugName);
+    auto parent = getGame().getEntityMgr().getEntity(parentUUID);
+    setDebugName(parent->getDebugName() + debugName);
 }
 
 Components::Base::~Base()
@@ -65,11 +66,6 @@ Components::Base::~Base()
 #ifdef _DEBUG_COMPONENTS
     LOG_DEBUG << "destroyed component \"" << getDebugName() << "\"";
 #endif
-}
-
-std::shared_ptr<Entity> Components::Base::getParent() const
-{
-    return getGame().getEntityMgr().getEntity(_parentUUID);
 }
 
 std::string Components::Base::toString() const

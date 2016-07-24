@@ -99,7 +99,7 @@ namespace Components
         virtual ~Base();
 
         inline std::string getDebugName() const { return _debugName; }
-        std::shared_ptr<Entity> getParent() const;
+        inline Entity::UUID getParent() const { return _parentUUID; }
 
         std::string toString() const;
 

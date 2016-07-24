@@ -76,9 +76,9 @@ Graphics::Surface::~Surface()
     SDL_FreeSurface(_surface);
 }
 
-void Graphics::Surface::blit(std::shared_ptr<Surface> src,
+void Graphics::Surface::blit(Surface *src,
                              SDL_Rect *srcRect,
-                             std::shared_ptr<Surface> dest,
+                             Surface *dest,
                              SDL_Rect *destRect)
 {
     innerBlit(src->_surface, srcRect, dest->_surface, destRect);

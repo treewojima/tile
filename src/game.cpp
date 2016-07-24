@@ -33,11 +33,10 @@ void Game::run()
     initSDL();
 
     // Create the renderer and window
-    _renderer = std::make_unique<Graphics::Renderer>();
-    _window = _renderer->getWindow();
+    _renderer = new Graphics::Renderer();
 
     // Set up the camera view
-    _camera = std::make_unique<Camera>(
+    _camera = new Camera(
                    Vector2f::ZERO,                                        // worldMin
                    Vector2f(_options.windowWidth, _options.windowHeight),   // worldMax
                    Vector2f::ZERO,                                        // screenMin
@@ -46,18 +45,17 @@ void Game::run()
                    Vector2f(_options.windowWidth, _options.windowHeight));  // screenMaxInWorld
 
     // Initialize entity manager
-    _entityMgr = std::make_unique<EntityManager>();
-    _entityMgr->initialize();
+    _entityMgr = new EntityManager();
 
     // Initialize movement system
-    _movementSys = std::make_unique<Systems::Movement>();
+    _movementSys = new Systems::Movement();
 
     // Set up various managers and miscellaneous objects that haven't been
     // initialized yet
-    _fpsTimer = std::make_unique<Timer>();
-    _stateMgr = std::make_unique<StateManager>();
-    _texMgr = std::make_unique<Graphics::TextureManager>();
-    _graphicsSys = std::make_unique<Systems::Graphics>();
+    _fpsTimer = new Timer();
+    _stateMgr = new StateManager();
+    _texMgr = new Graphics::TextureManager();
+    _graphicsSys = new Systems::Graphics();
 
     //_map = std::make_unique<Map>("res/desert.tmx");
 
@@ -65,7 +63,8 @@ void Game::run()
     registerEvents();
 
     // Create the initial main game state
-    _stateMgr->push(std::make_shared<States::MainGame>());
+    _mainGameState = new States::MainGame();
+    _stateMgr->push(_mainGameState);
 
     // Main loop variables
     Timer stepTimer;
@@ -86,7 +85,7 @@ void Game::run()
             float avgFPS = countedFrames / (currentTicks / 1000.f);
             std::ostringstream ss;
             ss << "FPS: " << avgFPS;
-            _window->setTitle(ss.str());
+            getWindow().setTitle(ss.str());
             oldTicks = currentTicks;
         }
 
@@ -140,12 +139,15 @@ void Game::run()
     _fpsTimer->stop();
 
     // Clean up
-    _stateMgr->destroy();
-    _movementSys->destroy();
-    _graphicsSys->destroy();
-    _entityMgr->destroy();
-    _texMgr->clear();
-    _renderer->destroy();
+    delete _stateMgr->pop();
+    delete _graphicsSys;
+    delete _texMgr;
+    delete _stateMgr;
+    delete _fpsTimer;
+    delete _movementSys;
+    delete _entityMgr;
+    delete _camera;
+    delete _renderer;
     shutdownSDL();
 }
 
@@ -176,7 +178,7 @@ void Game::onEvent(const Events::Quit &event)
 void Game::onEvent(const Events::MouseDown &event)
 {
     auto col = event.position.x / 32;
-    auto row = (_window->getHeight() - event.position.y) / 32;
+    auto row = (getWindow().getHeight() - event.position.y) / 32;
 
     switch (event.button)
     {

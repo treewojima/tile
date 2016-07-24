@@ -511,4 +511,3 @@ src/map/map.cpp
 src/map/tileset.cpp
 include/pool.hpp
 include/states/manager.hpp
-src/states/manager.cpp

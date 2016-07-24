@@ -25,7 +25,8 @@
 #include "graphics/renderer.hpp"
 //#include "map.hpp"
 #include "helper_events.hpp"
-#include "states/manager.hpp"
+#include "statemanager.hpp"
+#include "states/maingame.hpp"
 #include "systems/graphics.hpp"
 #include "systems/movement.hpp"
 #include "timer.hpp"
@@ -54,7 +55,7 @@ public:
 
     inline const Options &getOptions() { return _options; }
 
-    inline Graphics::Window &getWindow() { return *_window; }
+    inline Graphics::Window &getWindow() { return *_renderer->getWindow(); }
     inline Graphics::Renderer &getRenderer() { return *_renderer; }
     inline Camera &getCamera() { return *_camera; }
 
@@ -87,7 +88,6 @@ private:
 
     // Renderer and related objects
     Graphics::Renderer *_renderer;
-    Graphics::Window *_window;
     Camera *_camera;
 
     // FPS timer
@@ -95,6 +95,9 @@ private:
 
     // Test map
     //std::unique_ptr<Map> _map;
+
+    // Main game state
+    States::MainGame *_mainGameState;
 
     // Entity and component systems
     EntityManager *_entityMgr;

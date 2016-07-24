@@ -19,20 +19,10 @@
 
 StateManager::~StateManager()
 {
-    destroy();
-}
-
-void StateManager::destroy()
-{
-    static bool destroyed = false;
-    if (destroyed) return;
-
-	while (!_stateStack.empty())
+    while (!_stateStack.empty())
 	{
 		pop();
-	}
-
-    destroyed = true;
+    }
 }
 
 void StateManager::push(StatePtr state)

@@ -59,7 +59,7 @@ Graphics::Texture
 }
 
 Graphics::Texture::Texture(const std::string &name,
-                           Surface *surface) :
+                           const Surface *surface) :
     _name(name),
     _texture(nullptr)
 {

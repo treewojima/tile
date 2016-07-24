@@ -77,9 +77,6 @@ public:
     EntityManager();
     ~EntityManager();
 
-    void initialize();
-    void destroy();
-
     Entity *createEntity(const std::string &debugName = "");
     void destroyEntity(UUID uuid);
 
@@ -94,10 +91,8 @@ public:
 	std::string toString() const;
 
 private:
-    bool _destroyed;
-
     // Entity memory pool
-    Pool<Entity> _entityPool;
+    Pool<Entity, ENTITY_POOL_CAPACITY> _entityPool;
 
     // Subject to change based on performance considerations
     typedef Systems::Base::ComponentMap<Components::Base> ComponentMap; 
@@ -110,7 +105,7 @@ private:
 };
 
 template <class T>
-EntityManager::T *EntityManager::getComponent(UUID uuid)
+T *EntityManager::getComponent(UUID uuid)
 {
     T *ptr = nullptr;
 	EntityComponentsPair *pair;
