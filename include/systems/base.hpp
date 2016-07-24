@@ -33,10 +33,10 @@ namespace Systems
     {
     public:
         template <class T>
-        using ComponentMap = std::unordered_map<std::type_index, std::shared_ptr<T>>;
+        using ComponentMap = std::unordered_map<std::type_index, T*>;
 
 		template <class T>
-		using ComponentList = std::list<std::shared_ptr<T>>;
+        using ComponentList = std::list<T*>;
 
         Base();
         ~Base();

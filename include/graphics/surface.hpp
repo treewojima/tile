@@ -31,13 +31,13 @@ namespace Graphics
         friend class Texture;
 
     public:
-        static std::shared_ptr<Surface> create(SDL_Surface *surface,
-                                               SDL_Rect *rect = nullptr,
-                                               const SDL_Color &colorKey = Color::COLOR_KEY);
-        static std::shared_ptr<Surface> create(const Vector2i &dimensions,
-                                               const SDL_Color &color = Color::WHITE);
-        static std::shared_ptr<Surface> create(const std::string &filename,
-                                               const SDL_Color &colorKey = Color::COLOR_KEY);
+        static Surface *create(SDL_Surface *surface,
+                               SDL_Rect *rect = nullptr,
+                               const SDL_Color &colorKey = Color::COLOR_KEY);
+        static Surface *create(const Vector2i &dimensions,
+                               const SDL_Color &color = Color::WHITE);
+        static Surface *create(const std::string &filename,
+                               const SDL_Color &colorKey = Color::COLOR_KEY);
 
     private:
         Surface(SDL_Surface *surface,
@@ -47,11 +47,9 @@ namespace Graphics
     public:
         ~Surface();
 
-        void destroy();
-
-        static void blit(std::shared_ptr<Surface> src,
+        static void blit(Surface *src,
                          SDL_Rect *srcRect,
-                         std::shared_ptr<Surface> dest,
+                         Surface *dest,
                          SDL_Rect *destRect);
 
         inline unsigned getWidth() const { return _surface->w; }

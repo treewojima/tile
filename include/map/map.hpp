@@ -36,8 +36,6 @@ namespace Map
         Map(const std::string &filename);
         ~Map();
 
-        void destroy();
-
     private:
         class LayerVisitor : public tmx::LayerVisitor
         {
@@ -54,7 +52,7 @@ namespace Map
             const Map *_parent;
         };
 
-        std::shared_ptr<tmx::Map> _map;
+        std::unique_ptr<tmx::Map> _map;
         std::map<std::string, std::shared_ptr<Tileset>> _tilesets;
 
         void loadTilesets();

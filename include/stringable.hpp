@@ -20,9 +20,16 @@
 
 #include "defines.hpp"
 
-#include <memory>
+#ifdef _DEBUG
+//#   define DEBUG_USE_SMART_PTRS
+#endif
+
 #include <string>
-#include <type_traits>
+
+#if DEBUG_USE_SMART_PTRS
+#   include <memory>
+#   include <type_traits>
+#endif
 
 // Interface that guarantees a toString() method
 class Stringable
@@ -45,6 +52,7 @@ inline std::ostream &operator<<(std::ostream &os, const Stringable *obj)
     return os;
 }
 
+#if DEBUG_USE_SMART_PTRS
 template <class T>
 inline std::ostream &operator<<(std::ostream &os, const std::shared_ptr<T> &obj)
 {
@@ -64,5 +72,6 @@ inline std::ostream &operator<<(std::ostream &os, const std::unique_ptr<T> &obj)
     os << (obj ? obj->toString() : "<null>");
 	return os;
 }
+#endif
 
 #endif

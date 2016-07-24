@@ -30,13 +30,13 @@ namespace Actions
     {
 	public:
         //Movement(const Vector2i &origin, const Vector2i &dest);
-        Movement(std::shared_ptr<const Entity> entity_,
+        Movement(const Entity::UUID &&entity_,
                  const Vector2i &&origin_,
                  const Vector2i &&dest_);
 
 		std::string toString() const;
 
-        std::shared_ptr<const Entity> entity;
+        Entity::UUID entity;
         const Vector2i origin, dest;
         Vector2i current;
 	};

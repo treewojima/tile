@@ -33,9 +33,9 @@ namespace Components
     public:
         typedef std::function<void(uint8_t *)> Callback;
 
-        static std::shared_ptr<InputHandler> create(const Entity::UUID &parent,
-                                                    const Callback &&callback_,
-                                                    const std::string &debugName = "InputHandler");
+        static InputHandler *create(const Entity::UUID &parent,
+                                    const Callback &&callback_,
+                                    const std::string &debugName = "InputHandler");
 
     private:
         InputHandler(const Entity::UUID &parent,

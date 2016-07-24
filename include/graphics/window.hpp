@@ -35,8 +35,6 @@ namespace Graphics
         Window();
         ~Window();
 
-        void destroy();
-
         void setTitle(const std::string &&title);
 
         Vector2i getDimensions() const;

@@ -33,33 +33,33 @@
 #   define IS_POWER_OF_TWO(n) true
 #endif
 
-std::shared_ptr<Graphics::Texture>
-Graphics::Texture::create(const std::string &name,
-                          std::shared_ptr<Surface> surface)
+Graphics::Texture
+*Graphics::Texture::create(const std::string &name,
+                           const Surface *surface)
 {
-    auto texture = std::shared_ptr<Texture>(new Texture(name, surface));
+    auto texture = new Texture(name, surface);
     getGame().getTexMgr().add(name, texture);
     return texture;
 }
 
-std::shared_ptr<Graphics::Texture>
-Graphics::Texture::create(const std::string &name,
-                          const std::string &filename,
-                          const SDL_Color &colorKey)
+Graphics::Texture
+*Graphics::Texture::create(const std::string &name,
+                           const std::string &filename,
+                           const SDL_Color &colorKey)
 {
     return create(name, Surface::create(filename, colorKey));
 }
 
-std::shared_ptr<Graphics::Texture>
-Graphics::Texture::create(const std::string &name,
-                          const Vector2i &dimensions,
-                          const SDL_Color &color)
+Graphics::Texture
+*Graphics::Texture::create(const std::string &name,
+                           const Vector2i &dimensions,
+                           const SDL_Color &color)
 {
     return create(name, Surface::create(dimensions, color));
 }
 
 Graphics::Texture::Texture(const std::string &name,
-                           std::shared_ptr<Surface> surface) :
+                           Surface *surface) :
     _name(name),
     _texture(nullptr)
 {
@@ -83,14 +83,6 @@ Graphics::Texture::Texture(const std::string &name,
 
 Graphics::Texture::~Texture()
 {
-    destroy();
-}
-
-void Graphics::Texture::destroy()
-{
-    static bool destroyed = false;
-    if (destroyed) return;
-
     //getGame().getTexMgr().remove(getName());
 
     assert(_texture);
@@ -99,8 +91,6 @@ void Graphics::Texture::destroy()
 #ifdef _DEBUG_TEXTURES
     LOG_INFO << "released texture \"" << this << "\"";
 #endif
-
-    destroyed = true;
 }
 
 Vector2i Graphics::Texture::getDimensions() const

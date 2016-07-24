@@ -28,13 +28,12 @@ namespace Components
     class BaseEventSubscriber : public Base
     {
     public:
-        static std::shared_ptr<BaseEventSubscriber<T>>
-            create(const Entity::UUID &parent,
-                   std::shared_ptr<T> subscriber_,
-                   const std::string &debugName = "")
+        static BaseEventSubscriber<T>
+            *create(const Entity::UUID &parent,
+                    T *subscriber_,
+                    const std::string &debugName = "")
         {
-            auto ptr = std::shared_ptr<BaseEventSubscriber<T>>(
-                        new BaseEventSubscriber(parent, subscriber_, debugName));
+            auto ptr = new BaseEventSubscriber(parent, subscriber_, debugName);
             Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
             Events::Dispatcher::raise<
                     Events::SpecificComponentCreated<BaseEventSubscriber<T>>>(ptr);
@@ -43,7 +42,7 @@ namespace Components
 
     private:
         BaseEventSubscriber(const Entity::UUID &parent,
-                            std::shared_ptr<T> subscriber_,
+                            T *subscriber_,
                             const std::string &debugName) :
             Base(parent),
             subscriber(subscriber_)
@@ -60,7 +59,7 @@ namespace Components
         }
 
     public:
-        std::shared_ptr<T> subscriber;
+        T *subscriber;
 
         std::string toString() const
         {

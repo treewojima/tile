@@ -49,10 +49,10 @@ namespace Graphics
                            const TextureManager::Key &dest_,
                            SDL_Rect *destRect);
 
-        inline std::shared_ptr<Window> getWindow() { return _window; }
+        inline Window *getWindow() { return _window; }
 
     private:
-        std::shared_ptr<Window> _window;
+        Window *_window;
         SDL_Renderer *_renderer;
 
         void blit(SDL_Texture *texture,

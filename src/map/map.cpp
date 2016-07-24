@@ -36,7 +36,7 @@ inline std::ostream &operator<<(std::ostream &os, const SDL_Rect &rect)
 
 Map::Map::Map(const std::string &filename)
 {
-    _map = std::shared_ptr<tmx::Map>(tmx::Map::parseFile(filename));
+    _map = tmx::Map::parseFile(filename);
 
     loadTilesets();
 
@@ -46,18 +46,8 @@ Map::Map::Map(const std::string &filename)
 
 Map::Map::~Map()
 {
-    destroy();
-}
-
-void Map::Map::destroy()
-{
-    static bool destroyed = false;
-    if (destroyed) return;
-
     _tilesets.clear();
     _map.reset();
-
-    destroyed = true;
 }
 
 void Map::Map::loadTilesets()

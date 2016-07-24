@@ -39,7 +39,7 @@ Graphics::Renderer::Renderer()
     }
 
     // Create window and renderer
-    _window = std::make_shared<Window>();
+    _window = new Window();
 
     flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE;
     if (getGame().getOptions().vsync)
@@ -59,23 +59,13 @@ Graphics::Renderer::Renderer()
 
 Graphics::Renderer::~Renderer()
 {
-    destroy();
-}
-
-void Graphics::Renderer::destroy()
-{
-    static bool destroyed = false;
-    if (destroyed) return;
-
     assert(_renderer);
     SDL_DestroyRenderer(_renderer);
     _window->destroy();
-    _window.reset();
+    delete _window;
 
     IMG_Quit();
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
-
-    destroyed = true;
 }
 
 void Graphics::Renderer::clear()
@@ -100,7 +90,7 @@ void Graphics::Renderer::blitToScreen(const TextureManager::Key &texture_,
                                       int x,
                                       int y)
 {
-    std::shared_ptr<Texture> texture = getGame().getTexMgr()[texture_];
+    auto *texture = getGame().getTexMgr()[texture_];
 
     auto dimensions = texture->getDimensions();
     SDL_Rect r = { x + dimensions.x / 2,
@@ -116,8 +106,8 @@ void Graphics::Renderer::blitToTexture(const TextureManager::Key &src_,
                                        const TextureManager::Key &dest_,
                                        SDL_Rect *destRect)
 {
-    std::shared_ptr<Texture> src = getGame().getTexMgr()[src_];
-    std::shared_ptr<Texture> dest = getGame().getTexMgr()[dest_];
+    auto *src = getGame().getTexMgr()[src_];
+    auto *dest = getGame().getTexMgr()[dest_];
 
     if (SDL_SetRenderTarget(_renderer, dest->_texture))
     {

@@ -39,25 +39,23 @@ namespace Graphics
 
     public:
         // From Surface
-        static std::shared_ptr<Texture> create(const std::string &name,
-                                               std::shared_ptr<Surface> surface);
+        static Texture *create(const std::string &name,
+                               const Surface *surface);
         // From file
-        static std::shared_ptr<Texture> create(const std::string &name,
-                                               const std::string &filename,
-                                               const SDL_Color &colorKey = Color::COLOR_KEY);
+        static Texture *create(const std::string &name,
+                               const std::string &filename,
+                               const SDL_Color &colorKey = Color::COLOR_KEY);
         // Blank/filled color
-        static std::shared_ptr<Texture> create(const std::string &name,
-                                               const Vector2i &dimensions,
-                                               const SDL_Color &color = Color::WHITE);
+        static Texture *create(const std::string &name,
+                               const Vector2i &dimensions,
+                               const SDL_Color &color = Color::WHITE);
 
     private:
         Texture(const std::string &name,
-                std::shared_ptr<Surface> surface);
+                Surface *surface);
 
     public:
         ~Texture();
-
-        void destroy();
 
         inline std::string getName() const { return _name; }
         Vector2i getDimensions() const;

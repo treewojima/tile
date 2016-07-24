@@ -39,7 +39,6 @@
 
 namespace Events
 {
-    // TODO: This class is ripe for refactoring
     class Dispatcher
     {
     private:

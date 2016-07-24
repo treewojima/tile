@@ -28,9 +28,9 @@ namespace Components
     class Sprite final : public Base
     {
     public:
-        static std::shared_ptr<Sprite> create(const Entity::UUID &parent,
-                                              const Graphics::TextureManager::Key &texture_,
-                                              const std::string &debugName = "Sprite");
+        static Sprite *create(const Entity::UUID &parent,
+                              const Graphics::TextureManager::Key &texture_,
+                              const std::string &debugName = "Sprite");
 
     private:
         Sprite(const Entity::UUID &parent,

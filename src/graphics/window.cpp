@@ -45,18 +45,8 @@ Graphics::Window::Window()
 
 Graphics::Window::~Window()
 {
-    destroy();
-}
-
-void Graphics::Window::destroy()
-{
-    static bool destroyed = false;
-    if (destroyed) return;
-
     SDL_DestroyWindow(_window);
-
     LOG_DEBUG << "destroyed window";
-    destroyed = true;
 }
 
 void Graphics::Window::setTitle(const std::string &&title)

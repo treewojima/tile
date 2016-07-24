@@ -27,9 +27,9 @@ namespace Components
     class TilesetInfo : public Base
     {
     public:
-        std::shared_ptr<TilesetInfo> create(const Entity::UUID &parent,
-                                            int gid_,
-                                            const std::string &debugName = "TilesetInfo");
+        TilesetInfo *create(const Entity::UUID &parent,
+                            int gid_,
+                            const std::string &debugName = "TilesetInfo");
 
     private:
         TilesetInfo(const Entity::UUID &parent,

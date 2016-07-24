@@ -20,24 +20,24 @@
 #include <cassert>
 #include <SDL2/SDL_image.h>
 
-std::shared_ptr<Graphics::Surface>
-Graphics::Surface::create(SDL_Surface *surface,
-                          SDL_Rect *rect,
-                          const SDL_Color &colorKey)
+Graphics::Surface
+*Graphics::Surface::create(SDL_Surface *surface,
+                           SDL_Rect *rect,
+                           const SDL_Color &colorKey)
 {
-    return std::shared_ptr<Surface>(new Surface(surface, rect, colorKey));
+    return new Surface(surface, rect, colorKey);
 }
 
-std::shared_ptr<Graphics::Surface>
-Graphics::Surface::create(const Vector2i &dimensions,
-                          const SDL_Color &color)
+Graphics::Surface
+*Graphics::Surface::create(const Vector2i &dimensions,
+                           const SDL_Color &color)
 {
     return create(createBlankSurface(dimensions, color));
 }
 
-std::shared_ptr<Graphics::Surface>
-Graphics::Surface::create(const std::string &filename,
-                          const SDL_Color &colorKey)
+Graphics::Surface
+*Graphics::Surface::create(const std::string &filename,
+                           const SDL_Color &colorKey)
 {
     auto surface = IMG_Load(filename.c_str());
     if (!surface)
@@ -72,18 +72,8 @@ Graphics::Surface::Surface(SDL_Surface *surface,
 
 Graphics::Surface::~Surface()
 {
-    destroy();
-}
-
-void Graphics::Surface::destroy()
-{
-    static bool destroyed = false;
-    if (destroyed) return;
-
     assert(_surface);
     SDL_FreeSurface(_surface);
-
-    destroyed = true;
 }
 
 void Graphics::Surface::blit(std::shared_ptr<Surface> src,

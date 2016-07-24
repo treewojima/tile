@@ -21,6 +21,6 @@
 #include "defines.hpp"
 #include "entity.hpp"
 
-std::shared_ptr<Entity> createDog();
+Entity *createDog();
 
 #endif

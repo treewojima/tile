@@ -30,10 +30,10 @@ Actions::Movement::Movement(const Vector2i &origin, const Vector2i &dest) :
 }
 #endif
 
-Actions::Movement::Movement(std::shared_ptr<const Entity> entity_,
+Actions::Movement::Movement(const Entity::UUID &&entity_,
                             const Vector2i &&origin_,
                             const Vector2i &&dest_) :
-    entity(entity_),
+    entity(std::move(entity_)),
     origin(std::move(origin_)),
     dest(std::move(dest_)),
     current(origin_)

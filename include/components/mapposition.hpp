@@ -29,13 +29,13 @@ namespace Components
 	class MapPosition : public Base
 	{
     public:
-        static std::shared_ptr<MapPosition> create(const Entity::UUID &parent,
-                                                   int x,
-                                                   int y,
-                                                   const std::string &debugName = "MapPosition");
-        static std::shared_ptr<MapPosition> create(const Entity::UUID &parent,
-                                                   const Vector2i &v = Vector2i::ZERO,
-                                                   const std::string &debugName = "MapPosition");
+        static MapPosition *create(const Entity::UUID &parent,
+                                   int x,
+                                   int y,
+                                   const std::string &debugName = "MapPosition");
+        static MapPosition *create(const Entity::UUID &parent,
+                                   const Vector2i &v = Vector2i::ZERO,
+                                   const std::string &debugName = "MapPosition");
 
 	private:
         MapPosition(const Entity::UUID &parent,
