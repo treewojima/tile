@@ -35,10 +35,10 @@ namespace
     class DogEventSubscriber : public Events::Subscriber
     {
     public:
-        DogEventSubscriber(std::shared_ptr<Entity> entity)
+        DogEventSubscriber(Entity::UUID entity)
         {
-            _pos = getGame().getEntityMgr().getComponent<Components::Position>(entity->getUUID());
-            _mapPos = getGame().getEntityMgr().getComponent<Components::MapPosition>(entity->getUUID());
+            _pos = getGame().getEntityMgr().getComponent<Components::Position>(entity);
+            _mapPos = getGame().getEntityMgr().getComponent<Components::MapPosition>(entity);
         }
 
         void onEvent(const Events::KeyDown &e)
@@ -85,20 +85,20 @@ namespace
     private:
         static const int MAGNITUDE = 1;
 
-        std::shared_ptr<Components::Position> _pos;
-        std::shared_ptr<Components::MapPosition> _mapPos;
+        Components::Position *_pos;
+        Components::MapPosition *_mapPos;
     };
 }
 
-std::shared_ptr<Entity> createDog()
+Entity::UUID createDog()
 {
     auto dog = Entity::create("Dog");
 
     auto texture = Graphics::Texture::create("dog", "res/dog/dog_down_0.png");
 
     //Game::getGraphicsSys().createSpriteComponent(dog, texture->getName());
-    auto mapPos = Components::MapPosition::create(dog->getUUID(), 2, 2);
-    auto pos = Components::Position::create(dog->getUUID(), *mapPos);
+    auto mapPos = Components::MapPosition::create(dog, 2, 2);
+    auto pos = Components::Position::create(dog, *mapPos);
 
     /*Components::Position::create(dog,
 								 Window::getWidth() / 2,
@@ -107,14 +107,14 @@ std::shared_ptr<Entity> createDog()
                                     Window::getWidth() / 64,
                                     Window::getHeight() / 64);*/
 
-    Components::Sprite::create(dog->getUUID(),
+    Components::Sprite::create(dog,
                                texture->getName(),
                                "Down");
 
-    auto subscriber = std::make_shared<DogEventSubscriber>(dog);
+    auto subscriber = new DogEventSubscriber(dog);
     Events::Dispatcher::subscribe<Events::KeyDown>(*subscriber);
     Events::Dispatcher::subscribe<Events::MouseDown>(*subscriber);
-    Components::EventSubscriber::create(dog->getUUID(), subscriber);
+    Components::EventSubscriber::create(dog, subscriber);
 
     return dog;
 }

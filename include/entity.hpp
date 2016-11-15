@@ -35,53 +35,41 @@
 
 namespace Components { class Base; }
 
-// Conceptually, an Entity should be nothing more than an identifier (an
-// int, a string, etc). BUT, for convenience, make it a class with absolutely
-// no additional functionality other than wrapper methods to EntityManager
-static const unsigned ENTITY_POOL_CAPACITY = 10;
-class Entity final :
-        public Stringable,
-        public PoolableObject<Entity, ENTITY_POOL_CAPACITY>
+// Conceptually, an Entity should be nothing more than an identifier. This
+// class is a light convenience wrapper around functionality that EntityManager
+// provides
+class Entity final : public Stringable
 {
     friend class EntityManager;
 
 public:
     typedef uuid::uuid UUID;
 
-    static Entity *create(const std::string &debugName);
+    static UUID create(const std::string &debugName);
 
 private:
     Entity(UUID uuid, const std::string &debugName);
 
 public:
-    ~Entity();
-
     inline UUID getUUID() const { return _uuid; }
-    inline std::string getDebugName() const { return _debugName; }
-
-    bool dirty;
 
     // Helper method for chaining component creation calls
     template <class C, class... Args>
-    Entity *component(Args&& ... args)
+    Entity &component(Args&& ... args)
     {
         static_assert(std::is_base_of<Components::Base, C>::value,
                       "Can only add components of a type derived from class Components::Base");
 
         C::create(_uuid, std::forward<Args>(args)...);
 
-        return this;
+        return *this;
     }
 
     std::string toString() const;
 
-protected:
-    //inline void setDebugName(const std::string &name) { _debugName = name; }
-    inline void setDebugName(std::string &&name) { _debugName = std::move(name); }
 
 private:
     UUID _uuid;
-    std::string _debugName;
 };
 
 // The component base class is in this file to prevent cyclic preprocessor includes

@@ -25,7 +25,7 @@
 #include "game.hpp"
 #include "logger.hpp"
 
-Entity *Entity::create(const std::string &debugName)
+Entity::UUID Entity::create(const std::string &debugName)
 {
     return getGame().getEntityMgr().createEntity(debugName);
 }
@@ -57,7 +57,7 @@ Components::Base::Base(const Entity::UUID &parentUUID,
                        const std::string &debugName) :
     _parentUUID(parentUUID)
 {
-    auto parent = getGame().getEntityMgr().getEntity(parentUUID);
+    auto parent = getGame().getEntityMgr().getEntityPtr(parentUUID);
     setDebugName(parent->getDebugName() + debugName);
 }
 

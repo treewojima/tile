@@ -19,12 +19,12 @@
 #include <sstream>
 #include "events/dispatcher.hpp"
 
-std::shared_ptr<Components::Sprite>
-Components::Sprite::create(const Entity::UUID &parent,
-                           const Graphics::TextureManager::Key &texture_,
-                           const std::string &debugName)
+Components::Sprite
+*Components::Sprite::create(const Entity::UUID &parent,
+                            const Graphics::TextureManager::Key &texture_,
+                            const std::string &debugName)
 {
-    auto ptr = std::shared_ptr<Sprite>(new Sprite(parent, texture_, debugName));
+    auto ptr = new Sprite(parent, texture_, debugName);
     Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
     Events::Dispatcher::raise<Events::SpecificComponentCreated<Sprite>>(ptr);
     return ptr;

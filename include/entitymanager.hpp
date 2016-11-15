@@ -49,6 +49,10 @@ namespace Exceptions
     class NoSuchComponent : public Base
     {
     public:
+        NoSuchComponent(const Entity::UUID &uuid,
+                        const std::type_info &type) :
+            Base(error(Entity(uuid), type)) {}
+
         NoSuchComponent(const Entity &entity,
                         const std::type_info &type) :
             Base(error(entity, type)) {}
@@ -56,7 +60,6 @@ namespace Exceptions
         NoSuchComponent(const Entity *entity,
                         const std::type_info &type) :
             Base(error(*entity, type)) {}
-
 
     private:
         std::string error(const Entity &entity, const std::type_info &type)
@@ -77,10 +80,8 @@ public:
     EntityManager();
     ~EntityManager();
 
-    Entity *createEntity(const std::string &debugName = "");
+    UUID createEntity(const std::string &debugName = "");
     void destroyEntity(UUID uuid);
-
-    Entity *getEntity(UUID uuid);
 
     template <class T>
     T *getComponent(UUID uuid);
@@ -95,11 +96,9 @@ private:
     Pool<Entity, ENTITY_POOL_CAPACITY> _entityPool;
 
     // Subject to change based on performance considerations
-    typedef Systems::Base::ComponentMap<Components::Base> ComponentMap; 
-    typedef std::pair<Entity*, ComponentMap> EntityComponentsPair;
-    typedef std::unordered_map<UUID,
-                               EntityComponentsPair,
-                               boost::hash<uuid::uuid>> EntityMap;
+    typedef Systems::Base::ComponentMap<Components::Base> ComponentMap;
+    typedef std::unordered_map<UUID, ComponentMap, boost::hash<uuid::uuid>>
+        EntityMap;
 
     EntityMap _map;
 };
@@ -107,22 +106,18 @@ private:
 template <class T>
 T *EntityManager::getComponent(UUID uuid)
 {
-    T *ptr = nullptr;
-	EntityComponentsPair *pair;
-
 	// First, see if we have an entity entry that matches uuid
+    ComponentMap componentsMap;
     try
     {
-		pair = &_map.at(uuid);
+        componentsMap = &_map.at(uuid);
 	}
     catch (std::out_of_range)
 	{
         throw Exceptions::NoSuchEntity(uuid);
 	}
 
-	// Try to find an entry for type T
-    const auto &entity = pair->first;
-	auto &componentsMap = pair->second;
+    // Try to find an entry for type T
     Components::Base *basePtr = nullptr;
 	try
 	{
@@ -133,14 +128,6 @@ T *EntityManager::getComponent(UUID uuid)
 	{
         throw Exceptions::NoSuchComponent(entity, typeid(T));
 
-#if 0
-		std::ostringstream ss;
-		ss << "no entry for component of type "
-		   << boost::core::demangle(typeid(T).name())
-		   << " in entity " << pair->first;
-        throw Exceptions::Base(ss.str());
-#endif
-
         std::ostringstream ss;
         ss << "no such entity for UUID " << uuid;
         throw Exceptions::Base(ss.str());
@@ -150,35 +137,19 @@ T *EntityManager::getComponent(UUID uuid)
 	if (!basePtr)
     {
         LOG_DEBUG << "component " << boost::core::demangle(typeid(T).name())
-                  << " belonging to entity " << entity << " is null";
-        throw Exceptions::NoSuchComponent(entity, typeid(T));
-
-#if 0
-		std::ostringstream ss;
-		ss << "entry for component of type "
-		   << boost::core::demangle(typeid(T).name())
-		   << " in entity " << pair->first << "is null";
-        throw Exceptions::Base(ss.str());
-#endif
+                  << " belonging to entity " << uuid << " is null";
+        throw Exceptions::NoSuchComponent(uuid, typeid(T));
 	}
 
 	// Cast to the proper derived type
-    ptr = dynamic_cast<T>(basePtr);
+    T *ptr = dynamic_cast<T*>(basePtr);
 	//ptr = std::move(std::static_pointer_cast<T>(basePtr));
 	if (!ptr)
 	{
         LOG_DEBUG << "could not cast component from Components::Base to "
                   << boost::core::demangle(typeid(T).name()) << " in entity "
                   << entity;
-        throw Exceptions::NoSuchComponent(entity, typeid(T));
-
-#if 0
-		std::ostringstream ss;
-		ss << "could not cast component from Components::Base to "
-		   << boost::core::demangle(typeid(T).name()) << " in entity "
-		   << pair->first;
-        throw Exceptions::Base(ss.str());
-#endif
+        throw Exceptions::NoSuchComponent(uuid, typeid(T));
     }
 
     return ptr;

@@ -21,6 +21,6 @@
 #include "defines.hpp"
 #include "entity.hpp"
 
-Entity *createDog();
+Entity::UUID createDog();
 
 #endif

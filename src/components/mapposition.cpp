@@ -21,22 +21,22 @@
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
 
-std::shared_ptr<Components::MapPosition>
-Components::MapPosition::create(const Entity::UUID &parent,
-                                int x,
-                                int y,
-                                const std::string &debugName)
+Components::MapPosition
+*Components::MapPosition::create(const Entity::UUID &parent,
+                                 int x,
+                                 int y,
+                                 const std::string &debugName)
 {
-    auto ptr = std::shared_ptr<MapPosition>(new MapPosition(parent, x, y, debugName));
+    auto ptr = new MapPosition(parent, x, y, debugName);
     Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
     Events::Dispatcher::raise<Events::MapPositionComponentCreated>(ptr);
     return ptr;
 }
 
-std::shared_ptr<Components::MapPosition>
-Components::MapPosition::create(const Entity::UUID &parent,
-                                const Vector2i &v,
-                                const std::string &debugName)
+Components::MapPosition
+*Components::MapPosition::create(const Entity::UUID &parent,
+                                 const Vector2i &v,
+                                 const std::string &debugName)
 {
     return create(parent, v.x, v.y, debugName);
 }
@@ -55,8 +55,8 @@ std::string Components::MapPosition::toString() const
 {
 	std::ostringstream ss;
 	ss << "Components::MapPosition[debugName = \"" << getDebugName() << "\", "
-		<< "parent = " << getParent() << "\", "
-		<< "position = " << toVector() << "]";
+       << "parent = " << getParent() << "\", "
+       << "position = " << toVector() << "]";
 	return ss.str();
 }
 

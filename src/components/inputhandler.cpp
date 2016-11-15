@@ -22,15 +22,14 @@
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
 
-std::shared_ptr<Components::InputHandler>
-Components::InputHandler::create(const Entity::UUID &parent,
-                                 const Callback &&callback_,
-                                 const std::string &debugName)
+Components::InputHandler
+*Components::InputHandler::create(const Entity::UUID &parent,
+                                  const Callback &&callback_,
+                                  const std::string &debugName)
 {
-    auto ptr = std::shared_ptr<InputHandler>(
-                new InputHandler(parent,
-                                 std::move(callback_),
-                                 debugName));
+    auto ptr = new InputHandler(parent,
+                                std::move(callback_),
+                                debugName);
     Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
     Events::Dispatcher::raise<Events::InputHandlerComponentCreated>(ptr);
     return ptr;

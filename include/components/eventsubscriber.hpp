@@ -21,6 +21,7 @@
 #include "defines.hpp"
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
+#include "game.hpp"
 
 namespace Components
 {
@@ -53,7 +54,8 @@ namespace Components
 
             if (!debugName.length())
             {
-                setDebugName(getParent()->getDebugName() +
+                auto entity = getGame().getEntityMgr().getEntityPtr(parent);
+                setDebugName(entity->getDebugName() +
                              boost::core::demangle(typeid(T).name()));
             }
         }

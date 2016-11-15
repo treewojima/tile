@@ -21,30 +21,30 @@
 #include "events/dispatcher.hpp"
 #include "map/map.hpp"
 
-std::shared_ptr<Components::Position>
-Components::Position::create(const Entity::UUID &parent,
-                             int x,
-                             int y,
-                             const std::string &debugName)
+Components::Position
+*Components::Position::create(const Entity::UUID &parent,
+                              int x,
+                              int y,
+                              const std::string &debugName)
 {
-    auto ptr = std::shared_ptr<Position>(new Position(parent, x, y, debugName));
+    auto ptr = new Position(parent, x, y, debugName);
     Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
     Events::Dispatcher::raise<Events::PositionComponentCreated>(ptr);
     return ptr;
 }
 
-std::shared_ptr<Components::Position>
-Components::Position::create(const Entity::UUID &parent,
-                             const Vector2i &v,
-                             const std::string &debugName)
+Components::Position
+*Components::Position::create(const Entity::UUID &parent,
+                              const Vector2i &v,
+                              const std::string &debugName)
 {
     return create(parent, v.x, v.y, debugName);
 }
 
-std::shared_ptr<Components::Position>
-Components::Position::create(const Entity::UUID &parent,
-                             const Components::MapPosition &mapPosition,
-                             const std::string &debugName)
+Components::Position
+*Components::Position::create(const Entity::UUID &parent,
+                              const Components::MapPosition &mapPosition,
+                              const std::string &debugName)
 {
     int x = (mapPosition.x + 1) * Map::Map::TILE_WIDTH - (Map::Map::TILE_WIDTH / 2);
     int y = (mapPosition.y + 1) * Map::Map::TILE_HEIGHT - (Map::Map::TILE_HEIGHT / 2);

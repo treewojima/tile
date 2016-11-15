@@ -15,32 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "components/tilesetinfo.hpp"
+#include "components/debuginfo.hpp"
 #include "events/dispatcher.hpp"
 
-Components::TilesetInfo
-*Components::TilesetInfo::create(const Entity::UUID &parent,
-                                 int gid_,
-                                 const std::string &debugName)
+Components::DebugInfo
+*Components::DebugInfo::create(const Entity::UUID &parent,
+                               const std::string &name)
 {
-    auto ptr = new TilesetInfo(parent, gid_, debugName);
+    auto ptr = new DebugInfo(parent, name);
     Events::Dispatcher::raise<Events::ComponentCreated>(ptr);
-    Events::Dispatcher::raise<Events::TilesetInfoComponentCreated>(ptr);
+    Events::Dispatcher::raise<Events::DebugInfoComponentCreated>(ptr);
     return ptr;
 }
 
-Components::TilesetInfo::TilesetInfo(const Entity::UUID &parent,
-                                     int gid_,
-                                     const std::string &debugName) :
-    Base(parent, debugName),
-    gid(gid_)
+Components::DebugInfo
+*Components::DebugInfo::create(const Entity::UUID &parent,
+                               const std::string &name_) :
+    Base(parent, name_),
+    name(name_)
 {
 }
 
-std::string Components::TilesetInfo::toString() const
+std::string Components::DebugInfo::toString() const
 {
     std::ostringstream ss;
-    ss << "Components::TilesetInfo[parent = " << getParent()
-       << ", gid = " << gid << "]";
+    ss << "Components::DebugInfo[parent = " << getParent()
+       << ", name = " << name << "]";
     return ss.str();
 }

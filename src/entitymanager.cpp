@@ -41,28 +41,27 @@ EntityManager::~EntityManager()
     _map.clear();
 }
 
-Entity *EntityManager::createEntity(const std::string &debugName)
+Entity::UUID EntityManager::createEntity(const std::string &debugName)
 {
-    auto entity = new Entity(uuid::generate(), debugName);
+    auto uuid = uuid::generate();
 
     EntityComponentsPair pair;
-    pair.first = entity;
-    _map[entity->getUUID()] = pair;
+    pair.first = new Entity(uuid, debugName);
+    _map[uuid] = pair;
 
-    Events::Dispatcher::raise<Events::EntityCreated>(entity->getUUID());
+    Events::Dispatcher::raise<Events::EntityCreated>(uuid);
 
-    return entity;
+    return uuid;
 }
 
 void EntityManager::destroyEntity(UUID uuid)
 {
-    auto *entity = getEntity(uuid);
     // NOTE: there should be some deconstruction here
-    delete entity;
+    delete getEntityPtr(uuid);
     Events::Dispatcher::raise<Events::EntityDestroyed>(uuid);
 }
 
-Entity *EntityManager::getEntity(UUID uuid)
+Entity *EntityManager::getEntityPtr(UUID uuid)
 {
     try
     {

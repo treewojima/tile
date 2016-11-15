@@ -511,3 +511,5 @@ src/map/map.cpp
 src/map/tileset.cpp
 include/pool.hpp
 include/states/manager.hpp
+include/components/debuginfo.hpp
+src/components/debuginfo.cpp
