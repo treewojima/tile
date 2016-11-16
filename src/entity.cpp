@@ -30,26 +30,21 @@ Entity::UUID Entity::create(const std::string &debugName)
     return getGame().getEntityMgr().createEntity(debugName);
 }
 
-Entity::Entity(UUID uuid, const std::string &debugName) :
-    _uuid(uuid),
-    _debugName(debugName)
+Entity::Entity(const std::string &debugName)
 {
-#ifdef _DEBUG_ENTITIES
-    LOG_DEBUG << "created entity " << toString();
-#endif
+    _uuid = create(debugName);
 }
 
-Entity::~Entity()
+const std::string &Entity::getDebugName() const
 {
-#ifdef _DEBUG_ENTITIES
-    LOG_DEBUG << "destroyed entity " << toString();
-#endif
+    return getGame().getEntityMgr().getDebugName(_uuid);
 }
 
 std::string Entity::toString() const
 {
     std::ostringstream ss;
-    ss << "Entity[uuid = " << _uuid << ", debugName = \"" << _debugName << "\"]";
+    ss << "Entity[uuid = " << _uuid
+       << ", debugName = \"" << getDebugName() << "\"]";
     return ss.str();
 }
 
@@ -57,8 +52,7 @@ Components::Base::Base(const Entity::UUID &parentUUID,
                        const std::string &debugName) :
     _parentUUID(parentUUID)
 {
-    auto parent = getGame().getEntityMgr().getEntityPtr(parentUUID);
-    setDebugName(parent->getDebugName() + debugName);
+    setDebugName(Entity(parentUUID).getDebugName() + debugName);
 }
 
 Components::Base::~Base()

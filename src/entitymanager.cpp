@@ -23,6 +23,8 @@
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
 
+//unsigned EntityManager::ENTITY_POOL_CAPACITY = 100;
+
 EntityManager::EntityManager()
 {
     //Events::Dispatcher::subscribe<Events::EntityCreated>(*this);
@@ -45,32 +47,51 @@ Entity::UUID EntityManager::createEntity(const std::string &debugName)
 {
     auto uuid = uuid::generate();
 
-    EntityComponentsPair pair;
-    pair.first = new Entity(uuid, debugName);
-    _map[uuid] = pair;
+    if (_map.count(uuid))
+    {
+        throw Exceptions::EntityExists(uuid);
+    }
+    if (_debugNameMap.count(uuid))
+    {
+        LOG_WARNING << "entity with UUID " << uuid << " already exists in "
+                    << "_debugNameMap, but not in _map";
+    }
+
+    _map[uuid] = ComponentMap();
+    _debugNameMap[uuid] = debugName;
 
     Events::Dispatcher::raise<Events::EntityCreated>(uuid);
+
+#ifdef _DEBUG_ENTITIES
+    LOG_DEBUG << "created entity " << Entity(uuid).toString();
+#endif
 
     return uuid;
 }
 
 void EntityManager::destroyEntity(UUID uuid)
 {
-    // NOTE: there should be some deconstruction here
-    delete getEntityPtr(uuid);
-    Events::Dispatcher::raise<Events::EntityDestroyed>(uuid);
-}
+    // NOTE: there should be some more deconstruction here
 
-Entity *EntityManager::getEntityPtr(UUID uuid)
-{
-    try
-    {
-        return _map.at(uuid).first;
-    }
-    catch (std::out_of_range)
+    auto iter = _map.find(uuid);
+    if (iter == _map.end())
     {
         throw Exceptions::NoSuchEntity(uuid);
     }
+    _map.erase(iter);
+
+    auto iter2 = _debugNameMap.find(uuid);
+    if (iter2 == _debugNameMap.end())
+    {
+        LOG_WARNING << "entity with UUID " << uuid << " existed in _map, but "
+                    << "not in _debugNameMap";
+    }
+    else
+    {
+        _debugNameMap.erase(iter2);
+    }
+
+    Events::Dispatcher::raise<Events::EntityDestroyed>(uuid);
 }
 
 /*void EntityManager::onEvent(const Events::EntityCreated &event)
@@ -85,9 +106,34 @@ void EntityManager::onEvent(const Events::ComponentCreated &event)
 {
     auto component = event.component;
 
-    // TODO: Should this have error checking in case the entity doesn't exist?
-    //_map[component->getParent()->getUUID()].second.push_back(component);
-    _map[component->getParent()].second[typeid(component)] = component;
+    try
+    {
+        auto &componentMap = _map.at(component->getParent());
+        if (componentMap.count(typeid(*component)))
+        {
+            throw Exceptions::ComponentExists(component);
+        }
+        else
+        {
+            componentMap[typeid(*component)] = component;
+        }
+    }
+    catch (std::out_of_range)
+    {
+        throw Exceptions::NoSuchEntity(component->getParent());
+    }
+}
+
+const std::string &EntityManager::getDebugName(UUID uuid) const
+{
+    try
+    {
+        return _debugNameMap.at(uuid);
+    }
+    catch (std::out_of_range)
+    {
+        throw Exceptions::NoSuchEntity(uuid);
+    }
 }
 
 std::string EntityManager::toString() const

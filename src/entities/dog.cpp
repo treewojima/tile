@@ -94,19 +94,10 @@ Entity::UUID createDog()
 {
     auto dog = Entity::create("Dog");
 
-    auto texture = Graphics::Texture::create("dog", "res/dog/dog_down_0.png");
-
-    //Game::getGraphicsSys().createSpriteComponent(dog, texture->getName());
     auto mapPos = Components::MapPosition::create(dog, 2, 2);
-    auto pos = Components::Position::create(dog, *mapPos);
+    Components::Position::create(dog, *mapPos);
 
-    /*Components::Position::create(dog,
-								 Window::getWidth() / 2,
-							     Window::getHeight() / 2);
-    Components::MapPosition::create(dog,
-                                    Window::getWidth() / 64,
-                                    Window::getHeight() / 64);*/
-
+    auto texture = Graphics::Texture::create("dog", "res/dog/dog_down_0.png");
     Components::Sprite::create(dog,
                                texture->getName(),
                                "Down");

@@ -51,8 +51,8 @@ void Systems::Graphics::update(float dt)
 
     for (auto &sprite : _spriteComponents)
     {
-        const auto &parent = sprite->getParent();
-        const auto &pos = getGame().getEntityMgr().getComponent<Components::Position>(parent->getUUID());
+        auto parentUUID = sprite->getParent();
+        const auto &pos = getGame().getEntityMgr().getComponent<Components::Position>(parentUUID);
         if (pos)
         {
             getGame().getRenderer().blitToScreen(sprite->texture, pos->x, pos->y);

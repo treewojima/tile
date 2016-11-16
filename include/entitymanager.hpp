@@ -46,27 +46,58 @@ namespace Exceptions
         }
     };
 
+    class EntityExists : public Base
+    {
+    public:
+        EntityExists(const Entity::UUID &uuid) : Base(error(uuid)) {}
+
+    private:
+        std::string error(const Entity::UUID &uuid)
+        {
+            std::ostringstream ss;
+            ss << "entity already exists with UUID " << uuid;
+            return ss.str();
+        }
+    };
+
     class NoSuchComponent : public Base
     {
     public:
         NoSuchComponent(const Entity::UUID &uuid,
                         const std::type_info &type) :
-            Base(error(Entity(uuid), type)) {}
+            Base(error(uuid, type)) {}
 
         NoSuchComponent(const Entity &entity,
                         const std::type_info &type) :
-            Base(error(entity, type)) {}
+            Base(error(entity.getUUID(), type)) {}
 
         NoSuchComponent(const Entity *entity,
                         const std::type_info &type) :
-            Base(error(*entity, type)) {}
+            Base(error(entity->getUUID(), type)) {}
 
     private:
-        std::string error(const Entity &entity, const std::type_info &type)
+        std::string error(const Entity::UUID &uuid, const std::type_info &type)
         {
             std::ostringstream ss;
-            ss << "entity " << entity << " does not contain a component "
+            ss << "entity " << uuid << " does not contain a component "
                << "of type " << boost::core::demangle(type.name());
+            return ss.str();
+        }
+    };
+
+    class ComponentExists : public Base
+    {
+    public:
+        ComponentExists(const Components::Base &c) : Base(error(c)) {}
+        ComponentExists(const Components::Base *c) : Base(error(*c)) {}
+
+    private:
+        std::string error(const Components::Base &c)
+        {
+            std::ostringstream ss;
+            ss << "component of type "
+               << boost::core::demangle(typeid(c).name())
+               << " already exists in parent";
             return ss.str();
         }
     };
@@ -89,18 +120,26 @@ public:
     //void onEvent(const Events::EntityCreated &event);
     void onEvent(const Events::ComponentCreated &event);
 
+    const std::string &getDebugName(UUID uuid) const;
+
 	std::string toString() const;
 
 private:
     // Entity memory pool
+    // NOTE: Should this be a #define instead?
+    static constexpr unsigned ENTITY_POOL_CAPACITY = 100;
     Pool<Entity, ENTITY_POOL_CAPACITY> _entityPool;
 
     // Subject to change based on performance considerations
     typedef Systems::Base::ComponentMap<Components::Base> ComponentMap;
     typedef std::unordered_map<UUID, ComponentMap, boost::hash<uuid::uuid>>
         EntityMap;
-
     EntityMap _map;
+
+    // Moved from Entity class
+    typedef std::unordered_map<UUID, std::string, boost::hash<uuid::uuid>>
+        EntityDebugNameMap;
+    EntityDebugNameMap _debugNameMap;
 };
 
 template <class T>
@@ -110,7 +149,7 @@ T *EntityManager::getComponent(UUID uuid)
     ComponentMap componentsMap;
     try
     {
-        componentsMap = &_map.at(uuid);
+        componentsMap = _map.at(uuid);
 	}
     catch (std::out_of_range)
 	{
@@ -126,11 +165,7 @@ T *EntityManager::getComponent(UUID uuid)
 	}
     catch (std::out_of_range)
 	{
-        throw Exceptions::NoSuchComponent(entity, typeid(T));
-
-        std::ostringstream ss;
-        ss << "no such entity for UUID " << uuid;
-        throw Exceptions::Base(ss.str());
+        throw Exceptions::NoSuchComponent(uuid, typeid(T));
 	}
 
 	// Make sure the pointer isn't null
@@ -148,7 +183,7 @@ T *EntityManager::getComponent(UUID uuid)
 	{
         LOG_DEBUG << "could not cast component from Components::Base to "
                   << boost::core::demangle(typeid(T).name()) << " in entity "
-                  << entity;
+                  << uuid;
         throw Exceptions::NoSuchComponent(uuid, typeid(T));
     }
 

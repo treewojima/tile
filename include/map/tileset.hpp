@@ -33,12 +33,12 @@ namespace Map
 
         void destroy();
 
-        inline std::shared_ptr<Graphics::Surface> getSurface() { return _surface; }
+        inline Graphics::Surface *getSurface() { return _surface; }
         const SDL_Rect &getRect(unsigned gid);
 
     private:
         const tmx::TileSet *_tileset;
-        std::shared_ptr<Graphics::Surface> _surface;
+        Graphics::Surface *_surface;
         std::vector<SDL_Rect> _rects;
     };
 }

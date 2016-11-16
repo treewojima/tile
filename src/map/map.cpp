@@ -99,6 +99,6 @@ void Map::Map::LayerVisitor::visitTileLayer(const tmx::Map &map,
     Graphics::Texture::create(layer.getName(), layerSurface);
 
     auto layerName = layer.getName();
-    Entity::create(layerName)->component<Components::Position>()
-                             ->component<Components::Sprite>(layerName);
+    Entity(layerName).component<Components::Position>()
+                     .component<Components::Sprite>(layerName);
 }

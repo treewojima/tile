@@ -3,6 +3,7 @@
 
 #include "defines.hpp"
 
+#include <boost/core/demangle.hpp>
 #include <cassert>
 #include <type_traits>
 
@@ -79,7 +80,20 @@ protected:
 
 namespace Exceptions
 {
-    class PoolOutOfMemory : public std::bad_alloc {};
+    class PoolOutOfMemory : public Base
+    {
+    public:
+        PoolOutOfMemory(const std::type_info &t) : Base(error(t)) {}
+
+    private:
+        std::string error(const std::type_info &t)
+        {
+            std::ostringstream ss;
+            ss << "out of memory while allocating type "
+               << boost::core::demangle(t.name());
+            return ss.str();
+        }
+    };
 }
 
 template <class T, unsigned N>
@@ -120,7 +134,7 @@ U *Pool<T, N>::allocate()
                   "can only allocate subclasses of identical size to pool base type");
 
     // If free list is empty, nothing left to allocate
-    if (!_freeListHead) throw Exceptions::PoolOutOfMemory();
+    if (!_freeListHead) throw Exceptions::PoolOutOfMemory(typeid(T));
 
     // Pop an entry off the free list
     U *object = reinterpret_cast<U *>(&_freeListHead->data);

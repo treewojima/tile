@@ -61,9 +61,9 @@ void Systems::Movement::update(float dt)
             // Next, update the actual position components
             // NOTE: this is clunky code and should be changed
             auto pos = getGame().getEntityMgr().getComponent<Components::Position>(
-                        m.entity->getUUID());
+                        m.entity);
             auto mapPos = getGame().getEntityMgr().getComponent<Components::MapPosition>(
-                        m.entity->getUUID());
+                        m.entity);
             mapPos->x = current.x;
             mapPos->y = current.y;
             pos->x = (current.x + 1) * Map::Map::TILE_WIDTH - (Map::Map::TILE_WIDTH / 2);
@@ -117,7 +117,7 @@ void Systems::Movement::queueMovement(Actions::Movement &&movement)
     if (movement.origin != movement.dest)
     {
         LOG_DEBUG << "queueing movement action " << movement;
-        _movements[std::move(movement.entity->getUUID())].push(std::move(movement));
+        _movements[std::move(movement.entity)].push(std::move(movement));
     }
 }
 

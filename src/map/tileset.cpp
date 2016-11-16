@@ -53,7 +53,7 @@ void Map::Tileset::destroy()
     static bool destroyed = false;
     if (destroyed) return;
 
-    _surface->destroy();
+    delete _surface;
 
     destroyed = true;
 }

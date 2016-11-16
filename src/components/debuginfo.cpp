@@ -28,9 +28,8 @@ Components::DebugInfo
     return ptr;
 }
 
-Components::DebugInfo
-*Components::DebugInfo::create(const Entity::UUID &parent,
-                               const std::string &name_) :
+Components::DebugInfo::DebugInfo(const Entity::UUID &parent,
+                                 const std::string &name_) :
     Base(parent, name_),
     name(name_)
 {

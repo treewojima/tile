@@ -20,7 +20,7 @@
 
 #include "defines.hpp"
 
-#warning This header is deprecated; include "entity.hpp" instead
-#include "entity.hpp"
+#error This header is deprecated; include "entity.hpp" instead
+//#include "entity.hpp"
 
 #endif

@@ -54,8 +54,7 @@ namespace Components
 
             if (!debugName.length())
             {
-                auto entity = getGame().getEntityMgr().getEntityPtr(parent);
-                setDebugName(entity->getDebugName() +
+                setDebugName(Entity(parent).getDebugName() +
                              boost::core::demangle(typeid(T).name()));
             }
         }
