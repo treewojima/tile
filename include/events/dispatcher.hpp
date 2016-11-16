@@ -33,7 +33,9 @@
 
 #include "events/base.hpp"
 #include "events/subscriber.hpp"
-#ifdef _DEBUG_NEW_EVENTS
+
+#ifdef _DEBUG
+#   define _DEBUG_EVENTS
 #   include "logger.hpp"
 #endif
 
@@ -157,7 +159,7 @@ void Events::Dispatcher::raise(Args&& ... args)
     auto event = std::make_shared<E>(std::forward<Args>(args)...);
     auto baseEvent = std::static_pointer_cast<Base>(event);
 
-#ifdef _DEBUG_NEW_EVENTS
+#ifdef _DEBUG_EVENTS
     LOG_DEBUG << "event raised: " << event;
 #endif
 
@@ -186,7 +188,7 @@ void Events::Dispatcher::subscribeSync(T &subscriber)
                 std::make_pair(static_cast<Subscriber *>(&subscriber),
                                callback));
 
-#ifdef _DEBUG_NEW_EVENTS
+#ifdef _DEBUG_EVENTS
     LOG_DEBUG << "subscriber " << subscriber
               << " is listening for events of type "
               << boost::core::demangle(typeid(E).name());
@@ -203,7 +205,7 @@ void Events::Dispatcher::subscribeAsync(T &subscriber)
                 std::make_pair(static_cast<AsyncSubscriber *>(&subscriber),
                                callback));
 
-#ifdef _DEBUG_NEW_EVENTS
+#ifdef _DEBUG_EVENTS
     LOG_DEBUG << "asynchronous subscriber " << subscriber
               << " is listening for events of type "
               << boost::core::demangle(typeid(E).name());
@@ -228,7 +230,7 @@ void Events::Dispatcher::unsubscribeSync(T &subscriber)
         }
     }
 
-#ifdef _DEBUG_NEW_EVENTS
+#ifdef _DEBUG_EVENTS
     LOG_DEBUG << "subscriber " << subscriber
               << " is no longer listening for events of type "
               << boost::core::demangle(typeid(E).name());
@@ -253,7 +255,7 @@ void Events::Dispatcher::unsubscribeAsync(T &subscriber)
         }
     }
 
-#ifdef _DEBUG_NEW_EVENTS
+#ifdef _DEBUG_EVENTS
     LOG_DEBUG << "asynchronous subscriber " << subscriber
               << " is no longer listening for events of type "
               << boost::core::demangle(typeid(E).name());
@@ -278,7 +280,7 @@ void Events::Dispatcher::unsubscribeSync(T &subscriber)
         }
     }
 
-#ifdef _DEBUG_NEW_EVENTS
+#ifdef _DEBUG_EVENTS
     LOG_DEBUG << "subscriber " << subscriber
               << " is no longer listening for events of any type";
 #endif
@@ -302,7 +304,7 @@ void Events::Dispatcher::unsubscribeAsync(T &subscriber)
         }
     }
 
-#ifdef _DEBUG_NEW_EVENTS
+#ifdef _DEBUG_EVENTS
     LOG_DEBUG << "asynchronous subscriber " << subscriber
               << " is no longer listening for events of any type";
 #endif

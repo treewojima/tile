@@ -48,7 +48,9 @@ public:
     {
         void *p = getPool().allocate();  
 #ifdef _DEBUG_POOL
-        LOG_DEBUG << "allocated object at " << p;
+        LOG_DEBUG << "allocated object of type "
+                  << boost::core::demangle(typeid(T).name())
+                  << " at " << p;
 #endif
         return p;
     }
@@ -58,14 +60,16 @@ public:
         if (p)
         {
 #ifdef _DEBUG_POOL
-            LOG_DEBUG << "releasing object at " << p;
+            LOG_DEBUG << "releasing object of type "
+                      << boost::core::demangle(typeid(T).name())
+                      << " at " << p;
 #endif
             getPool().release(static_cast<T *>(p));
         }
 #ifdef _DEBUG
         else
         {
-            LOG_DEBUG << "deleting null object";
+            LOG_WARNING << "deleting null object";
         }
 #endif
     }

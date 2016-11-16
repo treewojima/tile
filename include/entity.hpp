@@ -25,9 +25,11 @@
 #include <sstream>
 
 #include "events/base.hpp"
-#include "pool.hpp"
 #include "stringable.hpp"
 #include "uuid.hpp"
+
+#include "pool.hpp"
+static constexpr unsigned COMPONENT_POOL_SIZE = 100;
 
 #ifdef _DEBUG
 #   define _DEBUG_ENTITIES

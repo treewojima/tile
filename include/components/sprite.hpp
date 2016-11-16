@@ -25,7 +25,9 @@
 
 namespace Components
 {
-    class Sprite final : public Base
+    class Sprite final :
+            public Base,
+            public PoolableObject<Sprite, COMPONENT_POOL_SIZE>
     {
     public:
         static Sprite *create(const Entity::UUID &parent,

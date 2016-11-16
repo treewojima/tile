@@ -26,7 +26,9 @@
 
 namespace Components
 {
-	class MapPosition : public Base
+    class MapPosition :
+            public Base,
+            public PoolableObject<MapPosition, COMPONENT_POOL_SIZE>
 	{
     public:
         static MapPosition *create(const Entity::UUID &parent,
