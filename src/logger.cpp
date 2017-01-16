@@ -36,8 +36,8 @@ namespace src = bl::sources;
 
 namespace Logger
 {
-	namespace Severity
-	{
+    namespace Severity
+    {
         // It's a bit cludgy to include formatting in the SeverityType strings,
         // but it works
 
@@ -46,49 +46,49 @@ namespace Logger
         SeverityType Info    = " <Info>    ";
         SeverityType Warning = " <Warning> ";
         SeverityType Error   = " <Error>   ";
-	}
+    }
 }
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", Logger::SeverityType)
 
 BOOST_LOG_GLOBAL_LOGGER_INIT(gLog, src::severity_logger_mt<Logger::SeverityType>)
 {
-	src::severity_logger_mt<Logger::SeverityType> lg;
-	return lg;
+    src::severity_logger_mt<Logger::SeverityType> lg;
+    return lg;
 }
 
 void Logger::init(const std::string &logFile)
 {
-	bl::core::get()->add_global_attribute("TimeStamp", attr::local_clock());
-	
-	typedef bl::sinks::synchronous_sink<bl::sinks::text_ostream_backend> text_sink;
+    bl::core::get()->add_global_attribute("TimeStamp", attr::local_clock());
+    
+    typedef bl::sinks::synchronous_sink<bl::sinks::text_ostream_backend> text_sink;
     auto sink = boost::make_shared<text_sink>();
 
-	// File stream
+    // File stream
     sink->locked_backend()->add_stream(
                 boost::make_shared<std::ofstream>(logFile));
 
-	// std::cout stream
+    // std::cout stream
     sink->locked_backend()->add_stream(
                 boost::shared_ptr<std::ostream>(&std::clog, boost::null_deleter()));
 
-	// Flush after each log entry
-	sink->locked_backend()->auto_flush();
+    // Flush after each log entry
+    sink->locked_backend()->auto_flush();
 
-	// Set the log format
-	auto formatter = expr::stream
+    // Set the log format
+    auto formatter = expr::stream
         << "["
         << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%m-%d-%Y %H:%M:%S")
         << "]"
         << expr::attr<Logger::SeverityType>("Severity")
-		<< expr::smessage;
-	sink->set_formatter(formatter);
+        << expr::smessage;
+    sink->set_formatter(formatter);
 
 #ifndef _DEBUG
     sink->set_filter(severity != Logger::Severity::Debug);
 #endif
 
-	bl::core::get()->add_sink(sink);
+    bl::core::get()->add_sink(sink);
 }
 
 void Logger::destroy()

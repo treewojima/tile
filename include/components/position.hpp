@@ -54,7 +54,7 @@ namespace Components
         inline Vector2i toVector() const { return Vector2i(x, y); }
 
         std::string toString() const;
-	};
+    };
 }
 
 namespace Events

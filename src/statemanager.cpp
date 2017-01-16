@@ -20,32 +20,31 @@
 StateManager::~StateManager()
 {
     while (!_stateStack.empty())
-	{
-		pop();
+    {
+        pop();
     }
 }
 
 void StateManager::push(StatePtr state)
 {
-	state->initialize();
+    state->initialize();
 
-	// NOTE: should this check for duplicate states?
-	_stateStack.push(state);
+    // NOTE: should this check for duplicate states?
+    _stateStack.push(state);
 }
 
 StateManager::StatePtr StateManager::pop()
 {
-	auto state = peek();
-    if (!state)
-        throw Exceptions::EmptyStateStack();
+    auto state = peek();
+    if (!state) throw Exceptions::EmptyStateStack();
 
-	_stateStack.pop();
-	state->destroy();
-	
-	return state;
+    _stateStack.pop();
+    state->destroy();
+    
+    return state;
 }
 
 StateManager::StatePtr StateManager::peek() const
 {
-	return (_stateStack.empty() ? nullptr : _stateStack.top());
+    return (_stateStack.empty() ? nullptr : _stateStack.top());
 }

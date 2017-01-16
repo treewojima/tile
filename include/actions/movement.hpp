@@ -26,20 +26,20 @@
 
 namespace Actions
 {
-	class Movement : public Base
+    class Movement : public Base
     {
-	public:
+    public:
         //Movement(const Vector2i &origin, const Vector2i &dest);
         Movement(const Entity::UUID &&entity_,
                  const Vector2i &&origin_,
                  const Vector2i &&dest_);
 
-		std::string toString() const;
+        std::string toString() const;
 
         Entity::UUID entity;
         const Vector2i origin, dest;
         Vector2i current;
-	};
+    };
 }
 
 #endif

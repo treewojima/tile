@@ -35,13 +35,13 @@ namespace Systems
         template <class T>
         using ComponentMap = std::unordered_map<std::type_index, T*>;
 
-		template <class T>
+        template <class T>
         using ComponentList = std::list<T*>;
 
         Base();
         ~Base();
 
-		virtual void update(float dt) {}
+        virtual void update(float dt) {}
         virtual void destroy();
 
         bool isDestroyed() const { return _destroyed; }

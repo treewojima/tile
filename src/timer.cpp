@@ -73,7 +73,7 @@ void Timer::resume()
 {
     if (_state != State::PAUSED)
     {
-		LOG_WARNING << "tried to resume non-paused timer";
+        LOG_WARNING << "tried to resume non-paused timer";
     }
     else
     {

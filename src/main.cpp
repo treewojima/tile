@@ -31,7 +31,7 @@ namespace
     const unsigned DEFAULT_WINDOW_WIDTH  = 800;
     const unsigned DEFAULT_WINDOW_HEIGHT = 600;
 
-	Game::Options parseArgs(int argc, char *argv[]);
+    Game::Options parseArgs(int argc, char *argv[]);
 
     std::unique_ptr<Game> _game;
 }
@@ -66,45 +66,45 @@ Game::Options parseArgs(int argc, char *argv[])
 {
 #ifndef _NO_PROGRAM_OPTIONS
     namespace fs = boost::filesystem;
-	namespace po = boost::program_options;
+    namespace po = boost::program_options;
 
-	Game::Options options;
+    Game::Options options;
 
-	fs::path programPath(argv[0]);
-	options.programName = programPath.filename().replace_extension().string();
+    fs::path programPath(argv[0]);
+    options.programName = programPath.filename().replace_extension().string();
 
-	std::ostringstream defaultLogFile;
-	defaultLogFile << "logs/" << options.programName << ".txt";
+    std::ostringstream defaultLogFile;
+    defaultLogFile << "logs/" << options.programName << ".txt";
 
-	po::options_description desc("Allowed options");
-	desc.add_options()
-		("help", "produce help message")
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help", "produce help message")
         ("width,w", po::value<unsigned>(&options.windowWidth)->default_value(DEFAULT_WINDOW_WIDTH), "set window width")
         ("height,h", po::value<unsigned>(&options.windowHeight)->default_value(DEFAULT_WINDOW_HEIGHT), "set window height")
-		("vsync,v", "enable vsync")
-		("log-file", po::value<std::string>(&options.logFile)->default_value(defaultLogFile.str()), "set output log file");
+        ("vsync,v", "enable vsync")
+        ("log-file", po::value<std::string>(&options.logFile)->default_value(defaultLogFile.str()), "set output log file");
 
     po::variables_map map;
     po::store(po::parse_command_line(argc, argv, desc), map);
     po::notify(map);
 
     if (map.count("help"))
-	{
-		std::cout << desc << std::endl;
-		std::exit(0);
-	}
+    {
+        std::cout << desc << std::endl;
+        std::exit(0);
+    }
 
     options.vsync = map.count("vsync");
     /*if (map.count("vsync"))
-	{
-		options.vsync = true;
-	}
-	else
-	{
-		options.vsync = false;
+    {
+        options.vsync = true;
+    }
+    else
+    {
+        options.vsync = false;
     }*/
 
-	return options;
+    return options;
 #else
 #warning "building w/o program options"
     Game::Options options;

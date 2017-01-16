@@ -26,15 +26,15 @@
 
 namespace Events
 {
-	class Callback : public Base
-	{
-	public:
-		//typedef std::function<bool()>
+    class Callback : public Base
+    {
+    public:
+        //typedef std::function<bool()>
 
-		Callback();
+        Callback();
 
-		std::string toString() const;
-	};
+        std::string toString() const;
+    };
 }
 
 #endif

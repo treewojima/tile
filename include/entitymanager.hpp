@@ -122,7 +122,7 @@ public:
 
     const std::string &getDebugName(UUID uuid) const;
 
-	std::string toString() const;
+    std::string toString() const;
 
 private:
     // Entity memory pool
@@ -145,42 +145,42 @@ private:
 template <class T>
 T *EntityManager::getComponent(UUID uuid)
 {
-	// First, see if we have an entity entry that matches uuid
+    // First, see if we have an entity entry that matches uuid
     ComponentMap componentsMap;
     try
     {
         componentsMap = _map.at(uuid);
-	}
+    }
     catch (std::out_of_range)
-	{
+    {
         throw Exceptions::NoSuchEntity(uuid);
-	}
+    }
 
     // Try to find an entry for type T
     Components::Base *basePtr = nullptr;
-	try
-	{
-		// should this use move semantics?
-		basePtr = componentsMap.at(typeid(T));
-	}
+    try
+    {
+        // should this use move semantics?
+        basePtr = componentsMap.at(typeid(T));
+    }
     catch (std::out_of_range)
-	{
+    {
         throw Exceptions::NoSuchComponent(uuid, typeid(T));
-	}
+    }
 
-	// Make sure the pointer isn't null
-	if (!basePtr)
+    // Make sure the pointer isn't null
+    if (!basePtr)
     {
         LOG_DEBUG << "component " << boost::core::demangle(typeid(T).name())
                   << " belonging to entity " << uuid << " is null";
         throw Exceptions::NoSuchComponent(uuid, typeid(T));
-	}
+    }
 
-	// Cast to the proper derived type
+    // Cast to the proper derived type
     T *ptr = dynamic_cast<T*>(basePtr);
-	//ptr = std::move(std::static_pointer_cast<T>(basePtr));
-	if (!ptr)
-	{
+    //ptr = std::move(std::static_pointer_cast<T>(basePtr));
+    if (!ptr)
+    {
         LOG_DEBUG << "could not cast component from Components::Base to "
                   << boost::core::demangle(typeid(T).name()) << " in entity "
                   << uuid;

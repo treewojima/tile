@@ -138,7 +138,7 @@ const std::string &EntityManager::getDebugName(UUID uuid) const
 
 std::string EntityManager::toString() const
 {
-	std::ostringstream ss;
-	ss << "EntityManager[entityCount = " << _map.size() << "]";
-	return ss.str();
+    std::ostringstream ss;
+    ss << "EntityManager[entityCount = " << _map.size() << "]";
+    return ss.str();
 }

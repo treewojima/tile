@@ -56,21 +56,21 @@ inline std::ostream &operator<<(std::ostream &os, const Stringable *obj)
 template <class T>
 inline std::ostream &operator<<(std::ostream &os, const std::shared_ptr<T> &obj)
 {
-	static_assert(std::is_base_of<Stringable, T>::value,
-				  "Class T is not subclass of type Stringable");
+    static_assert(std::is_base_of<Stringable, T>::value,
+                  "Class T is not subclass of type Stringable");
 
     os << (obj ? obj->toString() : "<null>");
-	return os;
+    return os;
 }
 
 template <class T>
 inline std::ostream &operator<<(std::ostream &os, const std::unique_ptr<T> &obj)
 {
-	static_assert(std::is_base_of<Stringable, T>::value,
-			      "Class T is not subclass of type Stringable");
+    static_assert(std::is_base_of<Stringable, T>::value,
+                  "Class T is not subclass of type Stringable");
 
     os << (obj ? obj->toString() : "<null>");
-	return os;
+    return os;
 }
 #endif
 

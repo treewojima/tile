@@ -46,18 +46,18 @@ Components::MapPosition::MapPosition(const Entity::UUID &parent,
                                      int y_,
                                      const std::string &debugName) :
     Base(parent, debugName),
-	x(x_),
-	y(y_)
+    x(x_),
+    y(y_)
 {
 }
 
 std::string Components::MapPosition::toString() const
 {
-	std::ostringstream ss;
-	ss << "Components::MapPosition[debugName = \"" << getDebugName() << "\", "
+    std::ostringstream ss;
+    ss << "Components::MapPosition[debugName = \"" << getDebugName() << "\", "
        << "parent = " << getParent() << "\", "
        << "position = " << toVector() << "]";
-	return ss.str();
+    return ss.str();
 }
 
 

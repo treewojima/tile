@@ -26,15 +26,15 @@
 
 namespace Logger
 {
-	typedef const char *SeverityType;
-	namespace Severity
+    typedef const char *SeverityType;
+    namespace Severity
     {
         extern SeverityType Plain;
-		extern SeverityType Debug;
-		extern SeverityType Info;
-		extern SeverityType Warning;
-		extern SeverityType Error;
-	}
+        extern SeverityType Debug;
+        extern SeverityType Info;
+        extern SeverityType Warning;
+        extern SeverityType Error;
+    }
 
     void init(const std::string &logFile);
     void destroy();

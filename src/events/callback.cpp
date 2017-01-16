@@ -27,7 +27,7 @@ Events::Callback::Callback()
 
 std::string Events::Callback::toString() const
 {
-	std::ostringstream ss;
+    std::ostringstream ss;
 
-	return ss.str();
+    return ss.str();
 }

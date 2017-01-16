@@ -29,7 +29,7 @@ namespace Components
     class MapPosition :
             public Base,
             public PoolableObject<MapPosition, COMPONENT_POOL_SIZE>
-	{
+    {
     public:
         static MapPosition *create(const Entity::UUID &parent,
                                    int x,
@@ -39,26 +39,26 @@ namespace Components
                                    const Vector2i &v = Vector2i::ZERO,
                                    const std::string &debugName = "MapPosition");
 
-	private:
+    private:
         MapPosition(const Entity::UUID &parent,
                     int x_,
                     int y_,
                     const std::string &debugName);
 
-	public:
-		int x, y;
+    public:
+        int x, y;
 
-		inline Vector2i toVector() const { return Vector2i(x, y); }
+        inline Vector2i toVector() const { return Vector2i(x, y); }
 
-		std::string toString() const;
+        std::string toString() const;
 
 
-	};
+    };
 }
 
 namespace Events
 {
-	typedef SpecificComponentCreated<Components::MapPosition> MapPositionComponentCreated;
+    typedef SpecificComponentCreated<Components::MapPosition> MapPositionComponentCreated;
 }
 
 #endif

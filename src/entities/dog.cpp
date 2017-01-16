@@ -124,94 +124,94 @@ Entity::UUID createDog()
 bool Dog::_texturesLoaded = false;
 const int Dog::NUM_FRAMES = 4;
 const char *Dog::_strings[Dog::Direction::NUM_DIRECTIONS] =
-	{ "up", "down", "left", "right" };
+    { "up", "down", "left", "right" };
 
 Dog::Dog() :
-	Entity("dog"),
-	_eventHandles(Direction::NUM_DIRECTIONS)
+    Entity("dog"),
+    _eventHandles(Direction::NUM_DIRECTIONS)
 {
-	// NOTE: This doesn't account for multiple dogs!
-	registerEvents();
+    // NOTE: This doesn't account for multiple dogs!
+    registerEvents();
 
-	loadTextures();
+    loadTextures();
 
-	auto startX = Window::getWidth() / 4;
-	auto startY = Window::getHeight() - (Window::getHeight() / 4);
-	position = std::make_shared<Components::Position>(startX, startY);
-	
-	for (int dir = 0; dir < Direction::NUM_DIRECTIONS; dir++)
-	{
-		Components::AnimatedSprite::TextureList textures;
-		for (int i = 0; i < NUM_FRAMES; i++)
-		{
-			std::ostringstream ss;
-			ss << "dog_" << _strings[dir] << "_" << i;
-			textures.push_back(Game::getTexMgr().get(ss.str()));
-		}
+    auto startX = Window::getWidth() / 4;
+    auto startY = Window::getHeight() - (Window::getHeight() / 4);
+    position = std::make_shared<Components::Position>(startX, startY);
+    
+    for (int dir = 0; dir < Direction::NUM_DIRECTIONS; dir++)
+    {
+        Components::AnimatedSprite::TextureList textures;
+        for (int i = 0; i < NUM_FRAMES; i++)
+        {
+            std::ostringstream ss;
+            ss << "dog_" << _strings[dir] << "_" << i;
+            textures.push_back(Game::getTexMgr().get(ss.str()));
+        }
 
-		_directions[dir] = std::make_shared<Components::AnimatedSprite>(textures,
-																		position);
-	}
-	graphics = _directions[Direction::Down];
+        _directions[dir] = std::make_shared<Components::AnimatedSprite>(textures,
+                                                                        position);
+    }
+    graphics = _directions[Direction::Down];
 
-	(*properties)["string"] = std::string("hai2u");
-	(*properties)["bool"] = true;
-	(*properties)["int"] = 17;
+    (*properties)["string"] = std::string("hai2u");
+    (*properties)["bool"] = true;
+    (*properties)["int"] = 17;
 }
 
 Dog::~Dog()
 {
-	for (auto handle : _eventHandles)
-	{
-		Game::unregisterEvent(handle);
-	}
+    for (auto handle : _eventHandles)
+    {
+        Game::unregisterEvent(handle);
+    }
 
-	LOG_DEBUG << *properties;
+    LOG_DEBUG << *properties;
 }
 
 void Dog::loadTextures()
 {
-	if (_texturesLoaded) return;
+    if (_texturesLoaded) return;
 
-	const SDL_Color colorKey = Color::makeColor(255, 0, 255);
-	std::shared_ptr<Texture> texture;
+    const SDL_Color colorKey = Color::makeColor(255, 0, 255);
+    std::shared_ptr<Texture> texture;
 
-	for (int dir = 0; dir < Direction::NUM_DIRECTIONS; dir++)
-	{
-		for (int i = 0; i < NUM_FRAMES; i++)
-		{
-			std::ostringstream ss;
-			ss << "dog_" << _strings[dir] << "_" << i;
-			texture = std::make_shared<Texture>(ss.str(),
-				"res/dog/" + ss.str() + ".png",
-				&colorKey);
-			Game::getTexMgr().add(texture->getName(), texture);
-		}
-	}
+    for (int dir = 0; dir < Direction::NUM_DIRECTIONS; dir++)
+    {
+        for (int i = 0; i < NUM_FRAMES; i++)
+        {
+            std::ostringstream ss;
+            ss << "dog_" << _strings[dir] << "_" << i;
+            texture = std::make_shared<Texture>(ss.str(),
+                "res/dog/" + ss.str() + ".png",
+                &colorKey);
+            Game::getTexMgr().add(texture->getName(), texture);
+        }
+    }
 
-	_texturesLoaded = true;
+    _texturesLoaded = true;
 }
 void Dog::registerEvents()
 {
-	_eventHandles[Direction::Up] = Game::registerEvent(
-		SDL_SCANCODE_UP,
-		[this](const SDL_Event &e) { graphics = _directions[Direction::Up]; },
-		"DogUpEvent");
+    _eventHandles[Direction::Up] = Game::registerEvent(
+        SDL_SCANCODE_UP,
+        [this](const SDL_Event &e) { graphics = _directions[Direction::Up]; },
+        "DogUpEvent");
 
-	_eventHandles[Direction::Down] = Game::registerEvent(
-		SDL_SCANCODE_DOWN,
-		[this](const SDL_Event &e) { graphics = _directions[Direction::Down]; },
-		"DogDownEvent");
+    _eventHandles[Direction::Down] = Game::registerEvent(
+        SDL_SCANCODE_DOWN,
+        [this](const SDL_Event &e) { graphics = _directions[Direction::Down]; },
+        "DogDownEvent");
 
-	_eventHandles[Direction::Left] = Game::registerEvent(
-		SDL_SCANCODE_LEFT,
-		[this](const SDL_Event &e) { graphics = _directions[Direction::Left]; },
-		"DogLeftEvent");
+    _eventHandles[Direction::Left] = Game::registerEvent(
+        SDL_SCANCODE_LEFT,
+        [this](const SDL_Event &e) { graphics = _directions[Direction::Left]; },
+        "DogLeftEvent");
 
-	_eventHandles[Direction::Right] = Game::registerEvent(
-		SDL_SCANCODE_RIGHT,
-		[this](const SDL_Event &e) { graphics = _directions[Direction::Right]; },
-		"DogRightEvent");
+    _eventHandles[Direction::Right] = Game::registerEvent(
+        SDL_SCANCODE_RIGHT,
+        [this](const SDL_Event &e) { graphics = _directions[Direction::Right]; },
+        "DogRightEvent");
 }
 
 #endif

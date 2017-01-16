@@ -33,14 +33,14 @@ public:
 
     typedef States::Base *StatePtr;
 
-	void push(StatePtr state);
+    void push(StatePtr state);
     StatePtr pop();
-	StatePtr peek() const;
+    StatePtr peek() const;
 
 private:
-	typedef std::stack<StatePtr> StateStack;
+    typedef std::stack<StatePtr> StateStack;
 
-	StateStack _stateStack;
+    StateStack _stateStack;
 };
 
 namespace Exceptions

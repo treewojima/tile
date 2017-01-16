@@ -23,9 +23,9 @@
 
 std::string Components::ActionQueue::toString() const
 {
-	std::ostringstream ss;
-	ss << "Components::ActionQueue[name = \"" << getName() << "\"]";
-	return ss.str();
+    std::ostringstream ss;
+    ss << "Components::ActionQueue[name = \"" << getName() << "\"]";
+    return ss.str();
 }
 
 #endif

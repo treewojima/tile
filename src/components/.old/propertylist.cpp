@@ -23,7 +23,7 @@
 
 Components::PropertyList::PropertyList(const std::string &name) :
     Base(name),
-	ResourceManager<Variant>()
+    ResourceManager<Variant>()
 {
 }
 
@@ -38,23 +38,23 @@ std::string Components::PropertyList::toString() const
         const auto &key = pair.key;
         const auto &value = pair.value;
 
-		ss << "\"" << key << "\" : ";
-		
-		switch (value.which())
-		{
-		// std::string
-		case 0:
-			ss << "\"" << value << "\"";
-			break;
+        ss << "\"" << key << "\" : ";
+        
+        switch (value.which())
+        {
+        // std::string
+        case 0:
+            ss << "\"" << value << "\"";
+            break;
 
-		// bool
-		case 1:
-			ss << (boost::get<bool>(value) ? "true" : "false");
-			break;
+        // bool
+        case 1:
+            ss << (boost::get<bool>(value) ? "true" : "false");
+            break;
 
-		default:
-			ss << value;
-		}
+        default:
+            ss << value;
+        }
 
         ss << ", ";
     });

@@ -28,15 +28,15 @@
 
 namespace Components
 {
-	class ActionQueue : public Base
-	{
-	public:
-		using Base::Base;
+    class ActionQueue : public Base
+    {
+    public:
+        using Base::Base;
 
-		std::string toString() const;
-	};
+        std::string toString() const;
+    };
 
-	typedef std::shared_ptr<ActionQueue> ActionQueuePtr;
+    typedef std::shared_ptr<ActionQueue> ActionQueuePtr;
 }
 
 #endif

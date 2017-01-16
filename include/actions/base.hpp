@@ -23,20 +23,20 @@
 namespace Actions
 {
     class Base : public Stringable
-	{
-	protected:
+    {
+    protected:
         Base(const std::string &&debugStr = "action") : _debugStr(std::move(debugStr)) {}
 
         void setDebugStr(const std::string &&str) { _debugStr = std::move(str); }
 
-	public:
-		virtual ~Base() {}
+    public:
+        virtual ~Base() {}
 
         std::string toString() const;
 
-	private:
+    private:
         std::string _debugStr;
-	};
+    };
 }
 
 #endif

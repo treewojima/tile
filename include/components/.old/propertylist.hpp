@@ -31,7 +31,7 @@ namespace Components
     class PropertyList : public Base, public ResourceManager<Variant>
     {
     public:
-		PropertyList(const std::string &name = "PropertyList");
+        PropertyList(const std::string &name = "PropertyList");
 
         std::string toString() const;
     };

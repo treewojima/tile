@@ -70,7 +70,7 @@ private:
 
 public:
     virtual ~ResourceManager();
-	void destroy();
+    void destroy();
 
     void add(const Key &name, const Resource &resource);
     bool has(const Key &name) const;
@@ -98,8 +98,8 @@ void ResourceManager<V, K>::destroy()
     static bool destroyed = false;
     if (destroyed) return;
 
-	// NOTE: Should this just rely on clearing the map, or should it be ensured
-	//       that every ResourcePtr is dropped properly?
+    // NOTE: Should this just rely on clearing the map, or should it be ensured
+    //       that every ResourcePtr is dropped properly?
 
     clear();
 
@@ -125,13 +125,13 @@ void ResourceManager<V, K>::add(const Key &name, const Resource &resource)
 template <class V, class K>
 bool ResourceManager<V, K>::has(const Key &name) const
 {
-	return _map.count(name);
+    return _map.count(name);
 }
 
 template <class V, class K> typename ResourceManager<V, K>::Resource
 ResourceManager<V, K>::get(const Key &name) const
 {
-	// NOTE: Should this use has() or the subscript operator instead?
+    // NOTE: Should this use has() or the subscript operator instead?
 
     try
     {

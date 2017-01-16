@@ -59,8 +59,8 @@ void Systems::Graphics::update(float dt)
         }
         else
         {
-			std::ostringstream ss;
-			ss << "no matching position component for " << sprite;
+            std::ostringstream ss;
+            ss << "no matching position component for " << sprite;
             throw Exceptions::Base(ss.str());
         }
     }
@@ -75,7 +75,7 @@ void Systems::Graphics::onEvent(const Events::SpriteComponentCreated &event)
 
 std::string Systems::Graphics::toString() const
 {
-	std::ostringstream ss;
-	ss << "Systems::Graphics[spriteComponentCount = " << _spriteComponents.size() << "]";
-	return ss.str();
+    std::ostringstream ss;
+    ss << "Systems::Graphics[spriteComponentCount = " << _spriteComponents.size() << "]";
+    return ss.str();
 }

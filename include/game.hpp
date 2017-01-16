@@ -36,10 +36,10 @@ class Game : public Events::Subscriber
 public:
     struct Options
     {
-		std::string programName;
+        std::string programName;
         unsigned windowWidth, windowHeight;
-		bool vsync;
-		std::string logFile;
+        bool vsync;
+        std::string logFile;
     };
 
     Game(const Options &options);

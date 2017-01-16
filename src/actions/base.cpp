@@ -21,7 +21,7 @@
 
 std::string Actions::Base::toString() const
 {
-	std::ostringstream ss;
-	ss << "Actions::Base[debugStr = \"" << _debugStr << "\"]";
-	return ss.str();
+    std::ostringstream ss;
+    ss << "Actions::Base[debugStr = \"" << _debugStr << "\"]";
+    return ss.str();
 }

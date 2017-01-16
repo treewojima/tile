@@ -180,9 +180,9 @@ void Map::onEvent(const Events::MapPositionComponentCreated &event)
 
 std::string Map::toString() const
 {
-	std::ostringstream ss;
-	ss << "Map[filename = \"" << _filename << "\"]";
-	return ss.str();
+    std::ostringstream ss;
+    ss << "Map[filename = \"" << _filename << "\"]";
+    return ss.str();
 }
 
 void Map::loadTilesetTextures()
@@ -233,7 +233,7 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
 
             // Calculate the tile's position on the screen/within the map
             auto col = cellID % map.getWidth();
-			assert(col < map.getWidth());
+            assert(col < map.getWidth());
             auto row = cellID / map.getWidth();
             assert(row < map.getHeight());
 
@@ -241,7 +241,7 @@ void Map::LayerVisitor::visitTileLayer(const tmx::Map &map, const tmx::TileLayer
             std::ostringstream entityName;
             entityName << layerName << "-" << col << "-" << row
                        << "-" << textureName.str();
-			auto entity = Entity::create(entityName.str());
+            auto entity = Entity::create(entityName.str());
 
             auto mapPos = Components::MapPosition::create(entity,
                                                           col,
