@@ -246,6 +246,7 @@ void Game::registerEvents()
 void Game::handleEvents()
 {
     // Call input event handlers every tick
+    // NOTE: This event name is misleading... change it to something like "Events::InputTick"
     Events::Dispatcher::raise<Events::KeyDown>();
 
     // Run the normal event loop
