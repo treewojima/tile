@@ -32,7 +32,7 @@
 
 namespace
 {
-    class DogEventSubscriber : public Events::Subscriber
+    class DogEventSubscriber : public Stringable, public Events::Subscriber
     {
     public:
         DogEventSubscriber(Entity::UUID entity)

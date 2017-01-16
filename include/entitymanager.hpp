@@ -28,6 +28,7 @@
 #include "exceptions.hpp"
 #include "logger.hpp"
 #include "pool.hpp"
+#include "stringable.hpp"
 #include "systems/base.hpp"
 
 namespace Exceptions
@@ -103,7 +104,7 @@ namespace Exceptions
     };
 }
 
-class EntityManager : public Events::Subscriber
+class EntityManager : public Stringable, public Events::Subscriber
 {
 public:
     typedef Entity::UUID UUID;

@@ -19,7 +19,6 @@
 #define __EVENTS_SUBSCRIBER_HPP__
 
 #include "defines.hpp"
-//#include "stringable.hpp"
 
 namespace Events
 {
@@ -28,11 +27,11 @@ namespace Events
 
     // Must guarantee the following function:
     // (virtual) void onEvent(const <subclass of Event> &event)
-    class Subscriber {};// : public Stringable {};
+    class Subscriber {};
 
     // Must guarantee the following function:
     // (virtual) void queueEvent(std::shared_ptr<subclass of Event> event)
-    class AsyncSubscriber {};// : public Stringable {};
+    class AsyncSubscriber {};
 }
 
 #endif

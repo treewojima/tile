@@ -56,7 +56,12 @@ namespace Events
             static_assert(std::is_base_of<Base, E>::value,
                           "Can only subscribe to types derived from class Events::Base");
             static_assert(std::is_base_of<Subscriber, T>::value,
-                          "Only subclasses of class Subscriber can subscribe to asynchronous events");
+                          "Only subclasses of class Subscriber can subscribe to synchronous events");
+#ifdef _DEBUG_EVENTS
+            static_assert(std::is_base_of<Stringable, T>::value,
+                          "Only subclasses of class Stringable can subscribe to synchronous events " \
+                          "when debugging is enabled");
+#endif
 
             subscribeSync<E>(subscriber);
         }
@@ -69,6 +74,13 @@ namespace Events
         {
             static_assert(std::is_base_of<Base, E>::value,
                           "Can only subscribe to types derived from class Events::Base");
+            static_assert(std::is_base_of<AsyncSubscriber, T>::value,
+                          "Only subclasses of class Subscriber can subscribe to asynchronous events");
+#ifdef _DEBUG_EVENTS
+            static_assert(std::is_base_of<Stringable, T>::value,
+                          "Only subclasses of class Stringable can subscribe to asynchronous events " \
+                          "when debugging is enabled");
+#endif
 
             subscribeAsync<E>(subscriber);
         }

@@ -27,11 +27,12 @@
 #include "helper_events.hpp"
 #include "statemanager.hpp"
 #include "states/maingame.hpp"
+#include "stringable.hpp"
 #include "systems/graphics.hpp"
 #include "systems/movement.hpp"
 #include "timer.hpp"
 
-class Game : public Events::Subscriber
+class Game : public Stringable, public Events::Subscriber
 {
 public:
     struct Options
