@@ -55,8 +55,8 @@ namespace Events
         {
             static_assert(std::is_base_of<Base, E>::value,
                           "Can only subscribe to types derived from class Events::Base");
-            static_assert(std::is_base_of<Subscriber, T>::value,
-                          "Only subclasses of class Subscriber can subscribe to synchronous events");
+            //static_assert(std::is_base_of<Subscriber, T>::value,
+            //              "Only subclasses of class Subscriber can subscribe to synchronous events");
 #ifdef _DEBUG_EVENTS
             static_assert(std::is_base_of<Stringable, T>::value,
                           "Only subclasses of class Stringable can subscribe to synchronous events " \
@@ -74,8 +74,8 @@ namespace Events
         {
             static_assert(std::is_base_of<Base, E>::value,
                           "Can only subscribe to types derived from class Events::Base");
-            static_assert(std::is_base_of<AsyncSubscriber, T>::value,
-                          "Only subclasses of class Subscriber can subscribe to asynchronous events");
+            //static_assert(std::is_base_of<AsyncSubscriber, T>::value,
+            //              "Only subclasses of class Subscriber can subscribe to asynchronous events");
 #ifdef _DEBUG_EVENTS
             static_assert(std::is_base_of<Stringable, T>::value,
                           "Only subclasses of class Stringable can subscribe to asynchronous events " \
@@ -172,7 +172,8 @@ void Events::Dispatcher::raise(Args&& ... args)
     auto baseEvent = std::static_pointer_cast<Base>(event);
 
 #ifdef _DEBUG_EVENTS
-    LOG_DEBUG << "event raised: " << event;
+    //LOG_DEBUG << "event raised: " << event;
+    LOG_DEBUG << "event raised: " << boost::core::demangle(typeid(E).name());
 #endif
 
     // First, queue it for asynchronous subscribers
