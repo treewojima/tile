@@ -1,4 +1,4 @@
-CC         := clang++
+CC         := g++
 WARNINGS   := -Wall -Wnon-virtual-dtor -Wno-ctor-dtor-privacy
 BOOST_VER  :=
 BOOST_LIBS := -lboost_filesystem$(BOOST_VER) -lboost_log$(BOOST_VER) \
