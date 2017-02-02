@@ -24,6 +24,12 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 
+// Object tag/property that prevents it from being logged
+namespace Debug
+{
+    struct DoNotLog {};
+}
+
 namespace Logger
 {
     typedef const char *SeverityType;
@@ -36,8 +42,16 @@ namespace Logger
         extern SeverityType Error;
     }
 
+    // Init/shutdown
     void init(const std::string &logFile);
     void destroy();
+
+    // Predicate that checks if an object is flagged as "do not log"
+    template <class T>
+    bool shouldLog()
+    {
+        return !std::is_base_of<Debug::DoNotLog, T>();
+    }
 }
 
 BOOST_LOG_GLOBAL_LOGGER(gLog, boost::log::sources::severity_logger_mt<Logger::SeverityType>)

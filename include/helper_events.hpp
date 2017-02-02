@@ -20,6 +20,7 @@
 
 #include "defines.hpp"
 #include "events/base.hpp"
+#include "logger.hpp"
 #include "vector.hpp"
 
 namespace Events
@@ -38,7 +39,7 @@ namespace Events
     };
 
     // Key down
-    class KeyDown : public Base
+    class KeyDown : public Base, public Debug::DoNotLog
     {
     public:
         static const uint8_t *keys;

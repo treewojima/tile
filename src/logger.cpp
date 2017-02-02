@@ -68,7 +68,7 @@ void Logger::init(const std::string &logFile)
     sink->locked_backend()->add_stream(
                 boost::make_shared<std::ofstream>(logFile));
 
-    // std::cout stream
+    // std::clog stream
     sink->locked_backend()->add_stream(
                 boost::shared_ptr<std::ostream>(&std::clog, boost::null_deleter()));
 

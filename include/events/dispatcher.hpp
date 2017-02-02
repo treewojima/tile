@@ -172,9 +172,10 @@ void Events::Dispatcher::raise(Args&& ... args)
     auto baseEvent = std::static_pointer_cast<Base>(event);
 
 #ifdef _DEBUG_EVENTS
-    // TODO: filter out events that shouldn't be logged. Try implementing it as
-    //       a property, like class AnnoyingEvent : public DoNotLog (maybe a template?)
-    LOG_DEBUG << "event raised: " << boost::core::demangle(typeid(E).name());
+    if (Logger::shouldLog<E>())
+    {
+        LOG_DEBUG << "event raised: " << boost::core::demangle(typeid(E).name());
+    }
 #endif
 
     // First, queue it for asynchronous subscribers
