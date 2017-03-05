@@ -1,3 +1,5 @@
 include/
 include/components
 src/components
+include/entities
+src/entities

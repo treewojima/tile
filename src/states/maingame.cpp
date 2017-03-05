@@ -44,7 +44,28 @@ void States::MainGame::destroy()
 
 void States::MainGame::draw(float dt)
 {
+    // First, draw entities
     getGame().getGraphicsSys().update(dt);
+
+    // Draw a grid overlay signifying tile boundaries
+    auto size = getGame().getWindow().getDimensions();
+    const int TILE_SIZE = 32;
+    for (int col = 0; col <= size.x / TILE_SIZE; col++)
+    {
+        getGame().getRenderer().drawLine(Color::WHITE,
+                                         col * TILE_SIZE,
+                                         0,
+                                         col * TILE_SIZE,
+                                         size.y);
+    }
+    for (int row = 0; row <= size.y / TILE_SIZE; row++)
+    {
+        getGame().getRenderer().drawLine(Color::WHITE,
+                                         0,
+                                         row * TILE_SIZE,
+                                         size.x,
+                                         row * TILE_SIZE);
+    }
 }
 
 void States::MainGame::loadTextures()
