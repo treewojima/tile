@@ -298,8 +298,7 @@ void Game::handleEvents()
 
 void Game::leftClick(int col, int row)
 {
-    std::ostringstream ss;
-    ss << "Entities at location: ";
+    LOG_DEBUG << "Left click at position (" << col << ", " << row << ")";
 
 #if 0
     try
