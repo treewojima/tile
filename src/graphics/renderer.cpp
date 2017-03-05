@@ -118,6 +118,40 @@ void Graphics::Renderer::blitToTexture(const TextureManager::Key &src_,
     SDL_SetRenderTarget(_renderer, nullptr);
 }
 
+void Graphics::Renderer::drawLine(const SDL_Color &color,
+                                  const Vector2i &start,
+                                  const Vector2i &end)
+{
+    drawLine(color, start.x, start.y, end.x, end.y);
+}
+
+void Graphics::Renderer::drawLine(const SDL_Color &color,
+                                  int x1, int y1,
+                                  int x2, int y2)
+{
+    // Preserve existing draw color
+    SDL_Color prevColor;
+    SDL_GetRenderDrawColor(_renderer,
+                           &prevColor.r,
+                           &prevColor.g,
+                           &prevColor.b,
+                           &prevColor.a);
+
+    SDL_SetRenderDrawColor(_renderer,
+                           color.r,
+                           color.g,
+                           color.b,
+                           color.a);
+    SDL_RenderDrawLine(_renderer, x1, y1, x2, y2);
+
+    // Reset previous draw color
+    SDL_SetRenderDrawColor(_renderer,
+                           prevColor.r,
+                           prevColor.g,
+                           prevColor.b,
+                           prevColor.a);
+}
+
 void Graphics::Renderer::blit(SDL_Texture *texture,
                               SDL_Rect *srcRect,
                               SDL_Rect *destRect)

@@ -49,6 +49,13 @@ namespace Graphics
                            const TextureManager::Key &dest_,
                            SDL_Rect *destRect);
 
+        void drawLine(const SDL_Color &color,
+                      const Vector2i &start,
+                      const Vector2i &end);
+        void drawLine(const SDL_Color &color,
+                      int x1, int y1,
+                      int x2, int y2);
+
         inline Window *getWindow() { return _window; }
 
     private:
