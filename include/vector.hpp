@@ -104,6 +104,20 @@ public:
         y -= v.y;
         return *this;
     }
+
+    inline Vector2<T> &operator/=(const T &scalar)
+    {
+        x /= scalar;
+        y /= scalar;
+        return *this;
+    }
+
+    inline Vector2<T> &operator/=(const Vector2<T> &v)
+    {
+        x /= v.x;
+        y /= v.y;
+        return *this;
+    }
 };
 
 template <class T>
@@ -149,16 +163,14 @@ inline Vector2<T> operator-(Vector2<T> lhs, const Vector2<T> &rhs)
 template <class T>
 inline Vector2<T> operator/(Vector2<T> lhs, const T &rhs)
 {
-    lhs.x /= rhs;
-    lhs.y /= rhs;
+    lhs /= rhs;
     return lhs;
 }
 
 template <class T>
 inline Vector2<T> operator/(Vector2<T> lhs, const Vector2<T> &rhs)
 {
-    lhs.x /= rhs.x;
-    lhs.y /= rhs.y;
+    lhs /= rhs;
     return lhs;
 }
 
