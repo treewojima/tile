@@ -19,7 +19,7 @@
 #define __COMPONENTS_POSITION_HPP__
 
 #include "defines.hpp"
-#include "events/base.hpp"
+#include "entity.hpp"
 #include "vector.hpp"
 
 namespace Components

@@ -25,6 +25,7 @@
 #include "graphics/surface.hpp"
 #include "map/tileset.hpp"
 #include "resourcemanager.hpp"
+#include "vector.hpp"
 
 namespace Map
 {
@@ -32,6 +33,7 @@ namespace Map
     {
     public:
         static const int TILE_WIDTH, TILE_HEIGHT;
+        static const Vector2i TILE_DIMENSIONS;
 
         Map(const std::string &filename);
         ~Map();

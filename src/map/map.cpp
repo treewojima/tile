@@ -26,6 +26,8 @@
 
 const int Map::Map::TILE_WIDTH = 32;
 const int Map::Map::TILE_HEIGHT = 32;
+const Vector2i Map::Map::TILE_DIMENSIONS =
+        Vector2i(Map::Map::TILE_WIDTH, Map::Map::TILE_HEIGHT);
 
 inline std::ostream &operator<<(std::ostream &os, const SDL_Rect &rect)
 {

@@ -48,23 +48,22 @@ void States::MainGame::draw(float dt)
     getGame().getGraphicsSys().update(dt);
 
     // Draw a grid overlay signifying tile boundaries
-    auto size = getGame().getWindow().getDimensions();
-    const int TILE_SIZE = 32;
-    for (int col = 0; col <= size.x / TILE_SIZE; col++)
+    const auto &screenSize = getGame().getWindow().getDimensions();
+    const auto &tileSize = Map::Map::TILE_DIMENSIONS;
+    Vector2i overlaySize(screenSize.x - screenSize.x % tileSize.x,
+                         screenSize.y - screenSize.y % tileSize.y);
+
+    for (int x = 0; x <= overlaySize.x; x += tileSize.x)
     {
         getGame().getRenderer().drawLine(Color::WHITE,
-                                         col * TILE_SIZE,
-                                         0,
-                                         col * TILE_SIZE,
-                                         size.y);
+                                         x, 0,
+                                         x, overlaySize.y);
     }
-    for (int row = 0; row <= size.y / TILE_SIZE; row++)
+    for (int y = 0; y <= overlaySize.y; y += tileSize.y)
     {
         getGame().getRenderer().drawLine(Color::WHITE,
-                                         0,
-                                         row * TILE_SIZE,
-                                         size.x,
-                                         row * TILE_SIZE);
+                                         0, y,
+                                         overlaySize.x, y);
     }
 }
 

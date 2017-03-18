@@ -92,8 +92,8 @@ void Graphics::Renderer::blitToScreen(const TextureManager::Key &texture_,
     auto *texture = getGame().getTexMgr()[texture_];
 
     auto dimensions = texture->getDimensions();
-    SDL_Rect r = { x + dimensions.x / 2,
-                   y + dimensions.y / 2,
+    SDL_Rect r = { x,// + dimensions.x / 2,
+                   y,// + dimensions.y / 2,
                    dimensions.x,
                    dimensions.y };
 

@@ -38,7 +38,6 @@ namespace
         DogEventSubscriber(Entity::UUID entity)
         {
             _pos = getGame().getEntityMgr().getComponent<Components::Position>(entity);
-            _mapPos = getGame().getEntityMgr().getComponent<Components::MapPosition>(entity);
         }
 
         void onEvent(const Events::KeyDown &e)
@@ -55,12 +54,12 @@ namespace
 
             if (e.keys[SDL_SCANCODE_DOWN])
             {
-                _pos->y -= MAGNITUDE;
+                _pos->y += MAGNITUDE;
             }
 
             if (e.keys[SDL_SCANCODE_UP])
             {
-                _pos->y += MAGNITUDE;
+                _pos->y -= MAGNITUDE;
             }
         }
 
@@ -68,12 +67,11 @@ namespace
         {
             if (e.button != Events::MouseDown::Button::Right) return;
 
-            auto col = e.position.x / 32;
-            auto row = (getGame().getWindow().getHeight() - e.position.y) / 32;
-
-            Actions::Movement m(_mapPos->getParent(),
-                                _mapPos->toVector(),
-                                Vector2i(col, row));
+            Vector2i dest(e.position.x,
+                          getGame().getWindow().getHeight() - e.position.y);
+            Actions::Movement m(_pos->getParent(),
+                                _pos->toVector() / Map::Map::TILE_DIMENSIONS,
+                                dest / Map::Map::TILE_DIMENSIONS);
             getGame().getMovementSys().queueMovement(std::move(m));
         }
 
@@ -86,7 +84,6 @@ namespace
         static const int MAGNITUDE = 1;
 
         Components::Position *_pos;
-        Components::MapPosition *_mapPos;
     };
 }
 
@@ -94,13 +91,10 @@ Entity::UUID createDog()
 {
     auto dog = Entity::create("Dog");
 
-    auto mapPos = Components::MapPosition::create(dog, 2, 2);
-    Components::Position::create(dog, *mapPos);
+    Components::Position::create(dog);
 
     auto texture = Graphics::Texture::create("dog", "res/dog/dog_down_0.png");
-    Components::Sprite::create(dog,
-                               texture->getName(),
-                               "Down");
+    Components::Sprite::create(dog, texture->getName(), "Down");
 
     auto subscriber = new DogEventSubscriber(dog);
     Events::Dispatcher::subscribe<Events::KeyDown>(*subscriber);
