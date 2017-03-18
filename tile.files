@@ -482,8 +482,6 @@ include/components/inputhandler.hpp
 src/components/inputhandler.cpp
 include/uuid.hpp
 src/uuid.cpp
-include/components/mapposition.hpp
-src/components/mapposition.cpp
 src/helper_events.cpp
 include/components/eventsubscriber.hpp
 include/systems/movement.hpp

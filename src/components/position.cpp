@@ -19,6 +19,7 @@
 #include "components/position.hpp"
 #include "entity.hpp"
 #include "events/dispatcher.hpp"
+#include "game.hpp"
 #include "map/map.hpp"
 
 Components::Position
@@ -39,16 +40,6 @@ Components::Position
                               const std::string &debugName)
 {
     return create(parent, v.x, v.y, debugName);
-}
-
-Components::Position
-*Components::Position::create(const Entity::UUID &parent,
-                              const Components::MapPosition &mapPosition,
-                              const std::string &debugName)
-{
-    int x = (mapPosition.x + 1) * Map::Map::TILE_WIDTH - (Map::Map::TILE_WIDTH / 2);
-    int y = (mapPosition.y + 1) * Map::Map::TILE_HEIGHT - (Map::Map::TILE_HEIGHT / 2);
-    return create(parent, x, y, debugName);
 }
 
 Components::Position::Position(const Entity::UUID &parent,

@@ -19,8 +19,6 @@
 #define __COMPONENTS_POSITION_HPP__
 
 #include "defines.hpp"
-
-#include "components/mapposition.hpp"
 #include "events/base.hpp"
 #include "vector.hpp"
 
@@ -37,9 +35,6 @@ namespace Components
                                 const std::string &debugName = "Position");
         static Position *create(const Entity::UUID &parent,
                                 const Vector2i &v = Vector2i::ZERO,
-                                const std::string &debugName = "Position");
-        static Position *create(const Entity::UUID &parent,
-                                const MapPosition &position,
                                 const std::string &debugName = "Position");
 
     private:
